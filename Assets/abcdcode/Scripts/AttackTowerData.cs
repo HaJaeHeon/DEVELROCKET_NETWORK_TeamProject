@@ -1,8 +1,13 @@
 using UnityEngine;
 public class AttackTowerData : TowerData
 {
-    protected float Range;
-    protected float Damage;
+    [SerializeField]protected float range;
+    [SerializeField]protected float damage;
+    [SerializeField]protected float cool;
+    [SerializeField]protected GameObject bulletPrefab;
+    public float Range => range;
+    public float Damage => damage;
+    public float Cool => cool;
 
     public override TowerType Type => TowerType.Attack;
 }

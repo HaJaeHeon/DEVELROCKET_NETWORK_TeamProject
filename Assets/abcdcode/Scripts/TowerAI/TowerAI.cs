@@ -1,16 +1,14 @@
-public abstract class TowerAI : IPacketer
+using System.Collections.Generic;
+
+public abstract class TowerAI
 {
     public virtual void Init(Tower parent)
     {
         Parent = parent;
     }
-
-    public void SavePacket(PacketData data)
+    public virtual void GameUpdate()
     {
-    }
-
-    public void LoadPacket(PacketData data)
-    {
+        
     }
 
     public Tower Parent{get;set;}

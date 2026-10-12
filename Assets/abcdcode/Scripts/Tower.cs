@@ -1,9 +1,18 @@
+using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using Photon.Pun;
 using UnityEngine;
 
 public class Tower : MultiMono,ITower,IPacketer
 {
+    public void Awake()
+    {
+        RPCEvent = new Dictionary<string, Action<PacketData>>();
+        Data = mData;
+        AIData = new LookAtAndAttackAI();
+        AIData.Init(this);
+    }
     public virtual void OnClickDemo()
     {
         if(photonView.IsMine)
@@ -24,21 +33,15 @@ public class Tower : MultiMono,ITower,IPacketer
     {
         if(PhotonNetwork.IsMasterClient)
         {
-            PacketData d = new PacketData();
-            SavePacket(d);
-            d.Save();
-            IPacketer.SendPacket(photonView,d);
+            AIData.GameUpdate();
         }
     }
-
-    public void SavePacket(PacketData data)
+    [PunRPC]
+    public void LoadPacket(byte[] data)
     {
-        AIData.SavePacket(data);
-    }
-
-    public void LoadPacket(PacketData data)
-    {
-        AIData.LoadPacket(data);
+        PacketData d = new(data);
+        string id = d;
+        RPCEvent[id](d);
     }
 
     public float Angle
@@ -56,4 +59,7 @@ public class Tower : MultiMono,ITower,IPacketer
     public ITowerSO Data{get;private set;}
     public TowerAI AIData{get;private set;}
     public string Owner{get;private set;}
+    public Dictionary<string, Action<PacketData>> RPCEvent {get;set;}
+
+    [SerializeField]private TowerData mData;
 }
