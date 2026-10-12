@@ -1,0 +1,117 @@
+using Firebase.Auth;
+using System;
+using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class TestUI : MonoBehaviour
+{
+    [Header("로그인 UI")]
+    [SerializeField] private TMP_InputField emailInput;
+    [SerializeField] private TMP_InputField passwordInput;
+    [SerializeField] private Button signInButton;
+    [SerializeField] private Button signOutButton;
+    
+
+    [Header("회원가입 UI")]
+    [SerializeField] private GameObject SignUpPanel;
+    [SerializeField] private TMP_InputField createEmailInput;
+    [SerializeField] private TMP_InputField createPasswordInput;
+    [SerializeField] private TMP_InputField createNickname;
+    [SerializeField] private Button signUpButton;
+
+    [Header("팝업 UI")]
+    [SerializeField] private GameObject PopupPanel;
+    [SerializeField] private TMP_Text messageText;
+
+    bool proceeding;
+    AuthManager AM => AuthManager.Instance;
+
+    private void Awake()
+    {
+        signUpButton.onClick.AddListener(() => AM.SignUp(emailInput.text, passwordInput.text, createNickname.text));
+        signInButton.onClick.AddListener(() => AM.SignIn(emailInput.text, passwordInput.text));
+        signOutButton.onClick.AddListener(() => AM.SignOut());
+    }
+
+    private void OnEnable()
+    {
+        AM.OnInitialized += RefreshHandler;
+        AM.OnBusyChanged += RefreshHandler;
+        AM.OnSignedIn += SignInHandler;
+
+        // 팝업UI
+        AM.OnAuthFailed += ShowError;
+        AM.OnNotice += ShowNotice;
+    }
+
+    private void OnDisable()
+    {
+        AM.OnInitialized -= RefreshHandler;
+        AM.OnBusyChanged -= RefreshHandler;
+        AM.OnSignedIn -= SignInHandler;
+
+        AM.OnAuthFailed -= ShowError;
+        AM.OnNotice -= ShowNotice;
+    }
+
+    private void RefreshHandler() => RefreshInteractable();
+    private void RefreshHandler(bool busy) => RefreshInteractable();
+
+    private void RefreshInteractable()
+    {
+        bool canInput = AM.IsReady && !AM.IsBusy && !proceeding;
+
+        signInButton.interactable = canInput;
+        signUpButton.interactable = canInput;
+        signOutButton.interactable = canInput;
+        //loadingPanel.SetActive(!canInput);
+    }
+
+    private async void SignInHandler(FirebaseUser user)
+    {
+        if (proceeding) return;
+        proceeding = true;
+
+        try
+        {
+            if (this == null)
+                return;
+            // 로비로 이동
+        }
+        catch(Exception e)
+        {
+            if (this == null)
+                return;
+            proceeding = false;
+            RefreshInteractable();
+        }
+
+    }
+
+    private void ShowError(string message)
+    {
+        PopupPanel.SetActive(true);
+        messageText.color = new Color(0.9f, 0.3f, 0.3f);
+        messageText.text = message;
+
+        StartCoroutine("ClosePopup");
+    }
+
+    private async void ShowNotice(string message)
+    {
+        PopupPanel.SetActive(true);
+        messageText.color = Color.black;
+        messageText.text = message;
+
+        StartCoroutine("ClosePopup");
+    }
+
+    private IEnumerator ClosePopup()
+    {
+        yield return new WaitForSeconds(3.0f);
+        PopupPanel.SetActive(false);
+    }
+
+}
