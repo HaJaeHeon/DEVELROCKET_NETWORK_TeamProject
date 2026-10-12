@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
-public interface IObjContainer<T,V> : ISingleton<T> where V : IMonoObj
+public interface IObjContainer<V> where V : IMonoObj
 {
     public List<V> GetList();
-    public V AddObj();
+    public void AddObj(V obj);
 }
