@@ -16,6 +16,7 @@
 /[Aa]ssets/google-services.json.meta
 /[Aa]ssets/StreamingAssets
 /[Aa]ssets/StreamingAssets.meta
+/[Aa]ssets/DEVELROCKET_NETWORK_TeamProject.slnx
 *.log
 
 # MemoryCaptures can get excessive in size.
@@ -43,6 +44,7 @@ ExportedObj/
 *.csproj
 *.unityproj
 *.sln
+*.slnx
 *.suo
 *.tmp
 *.user
@@ -79,3 +81,4 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
