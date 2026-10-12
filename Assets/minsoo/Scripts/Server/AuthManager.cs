@@ -1,4 +1,3 @@
-using ExitGames.Client.Photon;
 using Firebase;
 using Firebase.Auth;
 using System;
@@ -14,7 +13,7 @@ public class AuthManager : MonoBehaviour
     public FirebaseUser SignedInUser { get; private set; }
 
     public bool IsReady { get; private set; }
-    public bool IsBusy {  get; private set; }
+    public bool IsBusy { get; private set; }
 
     public event Action OnInitialized;
     public event Action<bool> OnBusyChanged;
@@ -25,6 +24,8 @@ public class AuthManager : MonoBehaviour
 
     //이메일 가입 인증 확인
     [SerializeField] bool requireEmailVerification = true;
+
+    public ProfileRepository PR {get; private set; }
 
     private void Awake()
     {
@@ -41,12 +42,12 @@ public class AuthManager : MonoBehaviour
 
     private async void Start()
     {
-        if (IsReady) 
+        if (IsReady)
             return;
 
         var status = await FirebaseApp.CheckAndFixDependenciesAsync();
 
-        if(status == DependencyStatus.Available)
+        if (status == DependencyStatus.Available)
         {
             Auth = FirebaseAuth.DefaultInstance;
 
@@ -91,7 +92,7 @@ public class AuthManager : MonoBehaviour
         FirebaseUser user = Auth.CurrentUser;
         if (user == null) return;
 
-        if(requireEmailVerification && !user.IsEmailVerified)
+        if (requireEmailVerification && !user.IsEmailVerified)
         {
             Auth.SignOut();
             return;
@@ -101,8 +102,14 @@ public class AuthManager : MonoBehaviour
 
 
     // 회원가입
-    public Task SignUp(string email, string password, string nickname) => RunAuthAsync(async () =>
+    public Task SignUpAsync(string email, string password, string nickname) => RunAuthAsync(async () =>
     {
+        if (await PR.NicknameExistAsync(nickname))
+        {
+            OnAuthFailed?.Invoke("이미 닉네임이 존재합니다.");
+            return;
+        }
+
         await Auth.CreateUserWithEmailAndPasswordAsync(email, password);
         FirebaseUser user = Auth.CurrentUser;
 
@@ -111,13 +118,15 @@ public class AuthManager : MonoBehaviour
             await user.SendEmailVerificationAsync();
             OnNotice?.Invoke("인증 메일 전송!");
         }
-       
+
+        await PR.CreateProfileAsync(nickname);
+
         Auth.SignOut();
     });
 
 
     // 로그인
-    public Task SignIn(string email, string password) => RunAuthAsync(async () =>
+    public Task SignInAsync(string email, string password) => RunAuthAsync(async () =>
     {
         await Auth.SignInWithEmailAndPasswordAsync(email, password);
         FirebaseUser user = Auth.CurrentUser;
@@ -130,7 +139,7 @@ public class AuthManager : MonoBehaviour
             OnAuthFailed?.Invoke("이메일 인증이 되어있지 않습니다. 인증 메일을 재전송합니다.");
             return;
         }
-            CompleteSignIn(user);
+        CompleteSignIn(user);
 
     });
 

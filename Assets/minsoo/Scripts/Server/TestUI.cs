@@ -30,8 +30,8 @@ public class TestUI : MonoBehaviour
 
     private void Awake()
     {
-        signUpButton.onClick.AddListener(() => AM.SignUp(emailInput.text, passwordInput.text, createNickname.text));
-        signInButton.onClick.AddListener(() => AM.SignIn(emailInput.text, passwordInput.text));
+        signUpButton.onClick.AddListener(() => AM.SignUpAsync(emailInput.text, passwordInput.text, createNickname.text));
+        signInButton.onClick.AddListener(() => AM.SignInAsync(emailInput.text, passwordInput.text));
         signOutButton.onClick.AddListener(() => AM.SignOut());
     }
 
@@ -69,7 +69,7 @@ public class TestUI : MonoBehaviour
         //loadingPanel.SetActive(!canInput);
     }
 
-    private async void SignInHandler(FirebaseUser user)
+    private void SignInHandler(FirebaseUser user)
     {
         if (proceeding) return;
         proceeding = true;
@@ -99,7 +99,7 @@ public class TestUI : MonoBehaviour
         StartCoroutine("ClosePopup");
     }
 
-    private async void ShowNotice(string message)
+    private void ShowNotice(string message)
     {
         PopupPanel.SetActive(true);
         messageText.color = Color.black;
