@@ -24,7 +24,9 @@ public class LookAtAndAttackAI : TParameterBridge<AttackTowerData>
     public void Shoot(PacketData data)
     {
         Debug.Log("Shoot!");
-        
+        var b = TData.Bullet;
+        b.Position = Parent.Position;
+        b.Init(Parent,5,new DamageInfo(1,""));
     }
     public float cool;
     public const string AI_Shoot = "AI_Shoot";
