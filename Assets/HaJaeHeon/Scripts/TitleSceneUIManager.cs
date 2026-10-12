@@ -1,16 +1,9 @@
 using UnityEngine;
-
-public class TitleSceneUIManager : MonoBehaviour
+using Photon.Pun;
+public class TitleSceneUIManager : MonoBehaviourPun
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void TestRoomInfo()
     {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
