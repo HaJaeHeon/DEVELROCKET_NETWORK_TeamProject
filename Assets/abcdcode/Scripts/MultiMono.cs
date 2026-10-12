@@ -1,7 +1,7 @@
 using Photon.Pun;
 using UnityEngine;
 [RequireComponent(typeof(PhotonView))]
-public class TowerMono : MonoBehaviourPun, IMonoObj
+public class MultiMono : MonoBehaviourPun, IMonoObj
 {
     public Vector2 Position
     {
