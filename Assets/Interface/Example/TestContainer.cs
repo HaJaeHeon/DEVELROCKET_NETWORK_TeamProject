@@ -16,5 +16,11 @@ public class TestContainer : Singleton<TestContainer>, IObjContainer<IEnemy>
     {
         throw new System.NotImplementedException();
     }
+
+    public void DeleteObj(IEnemy obj)
+    {
+        throw new System.NotImplementedException();
+    }
+
     private List<IEnemy> enemy;
 }
