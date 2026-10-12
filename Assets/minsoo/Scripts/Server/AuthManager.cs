@@ -119,7 +119,10 @@ public class AuthManager : MonoBehaviour
             OnNotice?.Invoke("인증 메일 전송!");
         }
 
-        await PR.CreateProfileAsync(nickname);
+        if(await PR.CreateProfileAsync(nickname))
+        {
+            OnAuthFailed?.Invoke("DB 생성 실패");
+        }
 
         Auth.SignOut();
     });

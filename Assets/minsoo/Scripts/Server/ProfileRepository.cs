@@ -1,55 +1,86 @@
 using Firebase.Auth;
 using Firebase.Database;
+using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using UnityEngine;
+
+[Serializable]
+public class UserProfile
+{
+    public string Name;
+    public int Rate;
+    public int Games;
+    public int Wins;
+    public int Losses;
+
+    public static UserProfile FromSnapshot(DataSnapshot snap)
+    {
+        if (!snap.Exists) return null;
+        return new UserProfile
+        {
+            Name = snap.Child("name").Value as string,
+            Rate = ToInt(snap.Child("rate").Value),
+            Games = ToInt(snap.Child("stats/games").Value),
+            Wins = ToInt(snap.Child("stats/wins").Value),
+            Losses = ToInt(snap.Child("stats/losses").Value),
+        };
+    }
+
+    // RTDB 숫자는 long
+    private static int ToInt(object v) => v == null ? 0 : Convert.ToInt32(v);
+}
 
 public class ProfileRepository
 {
     private FirebaseAuth auth;
-    private DatabaseReference nickRef;
     private DatabaseReference userRef;
+
+    private DatabaseReference listeningRef;
+    public event Action<UserProfile> ProfileChanged;
 
     public ProfileRepository()
     {
         auth = FirebaseAuth.DefaultInstance;
-        nickRef = FirebaseDatabase.DefaultInstance.RootReference.Child("Nicknames");
-        userRef = FirebaseDatabase.DefaultInstance.RootReference.Child("Users");
+        userRef = FirebaseDatabase.DefaultInstance.RootReference;
     }
 
+    private string CurrentUid => auth.CurrentUser?.UserId;
+
     // 프로필 생성
-    public async Task CreateProfileAsync(string name)
+    public async Task<bool> CreateProfileAsync(string name)
     {
         var user = auth.CurrentUser;
+        if (user == null)
+            return false;
         string uid = user.UserId;
 
-        if (string.IsNullOrWhiteSpace(uid))
-            return;
-
-        try
+        // 첫 DB 목록 생성
+        Dictionary<string, object> keyValuePairs = new Dictionary<string, object>
         {
-            // 첫 DB 목록 생성
-            Dictionary<string, object> keyValuePairs = new Dictionary<string, object>
-            {
-            {$"{uid}/name", name },
-            {$"{uid}/rate", 0 },
-            {$"{uid}/createdAt", ServerValue.Timestamp},
-            {$"{uid}/stats",  new Dictionary<string, object>
+            {$"Nicknames/{name.ToLower()}", uid},
+            {$"Users/{uid}/name", name },
+            {$"Users/{uid}/rate", 0 },
+            {$"Users/{uid}/createdAt", ServerValue.Timestamp},
+            {$"Users/{uid}/stats",  new Dictionary<string, object>
                 {
                     { "games", 0 },
                     { "wins", 0 },
                     { "losses", 0 }
                 } },
             {$"PrivateUser/{uid}/email", user.Email }
-            };
+        };
 
+        try
+        {
             await userRef.UpdateChildrenAsync(keyValuePairs);
+            return true;
         }
         catch (Exception e)
         {
             Debug.LogError($"Create Failed : {e}");
+            return false;
         }
 
     }
@@ -57,17 +88,44 @@ public class ProfileRepository
     // 닉네임 중복 검사
     public async Task<bool> NicknameExistAsync(string name)
     {
-        DataSnapshot nickSnap = await nickRef.Child(name).GetValueAsync();
-        bool isExist = nickSnap.Exists;
-
-        return isExist;
+        DataSnapshot nickSnap = await userRef.Child($"Nicknames/{name.ToLower()}").GetValueAsync();
+        return nickSnap.Exists;
     }
 
-
-    // 프로필 갱신
-    public void ProfileUpdate()
+    public async Task<UserProfile> LoadProfileAsync(string uid = null)
     {
-        
+        uid ??= CurrentUid;
+        if (uid == null) return null;
+
+        var snap = await userRef.Child("Users").Child(uid).GetValueAsync();
+        return UserProfile.FromSnapshot(snap);
+    }
+
+    public void StartListening()
+    {
+        StopListening();
+        string uid = auth.CurrentUser?.UserId;
+        if (uid == null) return;
+
+        listeningRef = userRef.Child("Users").Child(uid);
+        listeningRef.ValueChanged += OnProfileValueChanged;
+    }
+
+    public void StopListening()
+    {
+        if (listeningRef == null) return;
+        listeningRef.ValueChanged -= OnProfileValueChanged;
+        listeningRef = null;
+    }
+
+    private void OnProfileValueChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+        ProfileChanged?.Invoke(UserProfile.FromSnapshot(args.Snapshot));
     }
 
 
