@@ -12,6 +12,10 @@
 /[Uu]ser[Ss]ettings/
 /[Aa]ssets/Imports
 /[Aa]ssets/Imports.meta
+/[Aa]ssets/google-services.json
+/[Aa]ssets/google-services.json.meta
+/[Aa]ssets/StreamingAssets
+/[Aa]ssets/StreamingAssets.meta
 *.log
 
 # MemoryCaptures can get excessive in size.
