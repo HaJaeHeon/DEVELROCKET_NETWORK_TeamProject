@@ -1,152 +1,255 @@
-using Firebase.Auth;
-using Firebase.Database;
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class ProfileRepository2
+public static class PlayerProps 
+{ 
+    public const string Ready = "ready"; 
+    public const string Rate = "rate"; 
+}
+
+public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    private readonly FirebaseAuth auth;
-    private readonly DatabaseReference root;
+    public static NetworkManager Instance;
+    ProfileRepository profileRepo;
 
-    private DatabaseReference listeningRef;
+    public Dictionary<string, RoomInfo> RoomDicts = new();
 
-    public event Action<UserProfile> ProfileChanged;
+    public event Action<Dictionary<string, RoomInfo>> RoomListChanged;
 
-    public ProfileRepository2()
+    string ReadyKey = "ready";
+
+    RoomOptions roomOptions;
+    byte maxPlayers = 4;
+
+    private void Awake()
     {
-        auth = FirebaseAuth.DefaultInstance;
-        root = FirebaseDatabase.DefaultInstance.RootReference;
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
-    private string CurrentUid => auth.CurrentUser?.UserId;
-
-    // ───────── 생성 ─────────
-    public async Task<bool> CreateProfileAsync(string name)
+    private void Start()
     {
-        var user = auth.CurrentUser;
-        if (user == null) return false;
-        string uid = user.UserId;
-        string nickKey = ToNickKey(name);
-
-        var updates = new Dictionary<string, object>
+        profileRepo = new ProfileRepository();
+        roomOptions = new RoomOptions
         {
-            { $"Nicknames/{nickKey}", uid },                 // 닉네임 선점 (규칙으로 중복 차단)
-            { $"Users/{uid}/name", name },
-            { $"Users/{uid}/rate", 0 },
-            { $"Users/{uid}/createdAt", ServerValue.Timestamp },
-            { $"Users/{uid}/stats", new Dictionary<string, object>
-                { { "games", 0 }, { "wins", 0 }, { "losses", 0 } } },
-            { $"PrivateUser/{uid}/email", user.Email },
+            MaxPlayers = 4,
+            IsVisible = true,
+            IsOpen = true,
         };
+    }
+
+    // Photon 연결
+    public async Task<string> Connect()
+    {
+        if (PhotonNetwork.IsConnected)
+            return "Is already connected.";
 
         try
         {
-            await root.UpdateChildrenAsync(updates);   // 전부 성공 or 전부 실패
-            return true;
+            var profile = await profileRepo.LoadProfileAsync();
+            var auth = new AuthenticationValues(AuthManager.Instance.Auth.CurrentUser.UserId);
+            PhotonNetwork.AuthValues = auth;
+            PhotonNetwork.NickName = profile.Name;
+            PhotonNetwork.LocalPlayer
+                .SetCustomProperties(new Hashtable
+                {
+                    { PlayerProps.Rate,  profile.Rate},
+                    { PlayerProps.Ready, false }
+                });
+
+            PhotonNetwork.ConnectUsingSettings();
+            return null;
         }
         catch (Exception e)
         {
-            Debug.LogError($"Create Failed : {e}");
-            return false;   // 닉네임 중복이면 규칙에 막혀 여기로 옴
+            return $"Connect Failed : {e.Message}";
         }
     }
 
-    // ───────── 닉네임 중복 검사 (UI 안내용) ─────────
-    public async Task<bool> NicknameExistAsync(string name)
+    // 로비 - 방 검색
+    public void OnSearchRoom()
     {
-        var snap = await root.Child("Nicknames").Child(ToNickKey(name)).GetValueAsync();
-        return snap.Exists;
+
     }
-
-    // ───────── 불러오기 ─────────
-    public async Task<UserProfile> LoadProfileAsync(string uid = null)
+    // 로비 - 방 생성
+    public void OnCreateRoom(string roomName)
     {
-        uid ??= CurrentUid;
-        if (uid == null) return null;
+        PhotonNetwork.CreateRoom(roomName, roomOptions);
 
-        var snap = await root.Child("Users").Child(uid).GetValueAsync();
-        return UserProfile.FromSnapshot(snap);
     }
-
-    // ───────── 갱신 1: 닉네임 변경 ─────────
-    public async Task<bool> ChangeNameAsync(string oldName, string newName)
+    // 로비 - 방 랜덤입장
+    public void OnRandomJoinRoom()
     {
-        string uid = CurrentUid;
-        if (uid == null) return false;
-
-        var updates = new Dictionary<string, object>
+        /*
+        var props = new Hashtable { { "map", "desert" }, { "mode", 1 } };
+        var roomOptions = new RoomOptions
         {
-            { $"Nicknames/{ToNickKey(oldName)}", null },     // null = 삭제
-            { $"Nicknames/{ToNickKey(newName)}", uid },
-            { $"Users/{uid}/name", newName },
+            MaxPlayers = maxPlayers,
+            //CustomRoomProperties = props,
+            //CustomRoomPropertiesForLobby = new[] { "map", "mode" },
+            IsVisible = true,
+            IsOpen = true
         };
+        */
 
-        try
-        {
-            await root.UpdateChildrenAsync(updates);
-            return true;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"ChangeName Failed : {e}");
-            return false;
-        }
+        PhotonNetwork.JoinRandomOrCreateRoom(
+        expectedCustomRoomProperties: null,
+        expectedMaxPlayers: maxPlayers,
+        roomOptions: roomOptions
+        );
     }
 
-    // ───────── 갱신 2: 게임 결과 반영 ─────────
-    public async Task RecordGameResultAsync(bool isWin, int rateDelta)
+    // 게임 준비
+    public void OnReadyGame()
     {
-        string uid = CurrentUid;
-        if (uid == null) return;
+        if (!PhotonNetwork.InRoom)
+            return;
 
-        // 여러 기기/요청이 동시에 바꿔도 값이 꼬이지 않도록 트랜잭션 사용
-        await root.Child("Users").Child(uid).RunTransaction(data =>
+        bool ready = IsReady(PhotonNetwork.LocalPlayer);
+
+        PhotonNetwork.LocalPlayer.SetCustomProperties(
+            new Hashtable { { ReadyKey, !ready } });
+    }
+
+    // 게임 시작
+    public void OnStartGame()
+    {
+        if (!PhotonNetwork.IsMasterClient)
         {
-            if (data.Value == null) return TransactionResult.Success(data);
-
-            var user = data.Value as Dictionary<string, object>;
-            var stats = user["stats"] as Dictionary<string, object>;
-
-            stats["games"] = Convert.ToInt64(stats["games"]) + 1;
-            if (isWin) stats["wins"]   = Convert.ToInt64(stats["wins"]) + 1;
-            else       stats["losses"] = Convert.ToInt64(stats["losses"]) + 1;
-            user["rate"] = Convert.ToInt64(user["rate"]) + rateDelta;
-
-            data.Value = user;
-            return TransactionResult.Success(data);
-        });
-    }
-
-    // ───────── 갱신 받기: 내 프로필 실시간 감지 ─────────
-    public void StartListening()
-    {
-        StopListening();
-        string uid = CurrentUid;
-        if (uid == null) return;
-
-        listeningRef = root.Child("Users").Child(uid);
-        listeningRef.ValueChanged += OnProfileValueChanged;
-    }
-
-    public void StopListening()
-    {
-        if (listeningRef == null) return;
-        listeningRef.ValueChanged -= OnProfileValueChanged;
-        listeningRef = null;
-    }
-
-    private void OnProfileValueChanged(object sender, ValueChangedEventArgs args)
-    {
-        if (args.DatabaseError != null)
-        {
-            Debug.LogError(args.DatabaseError.Message);
+            Debug.Log("방장이 아닙니다.");
             return;
         }
-        ProfileChanged?.Invoke(UserProfile.FromSnapshot(args.Snapshot));
+
+        if (!AllReady())
+        {
+            Debug.Log("모든 플레이어가 준비되지 않았습니다.");
+            return;
+        }
+
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.LoadLevel((int)SceneNumber.InGame);
     }
 
-    // 대소문자 구분 없이 중복 검사 ("Abc"와 "abc"를 같은 닉네임으로)
-    private static string ToNickKey(string name) => name.Trim().ToLowerInvariant();
+    // 플레이어의 레디 상태를 반환
+    private bool IsReady(Player player)
+    {
+        if (player.CustomProperties.TryGetValue(ReadyKey, out object value))
+            return (bool)value;
+        return false;
+    }
+
+    // 전체 플레이어의 레디 상태를 확인 -> 한 명이라도 준비상태가 아니면 false
+    private bool AllReady()
+    {
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            if (!IsReady(p))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 방목록 갱신
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+
+        foreach (var room in roomList)
+        {
+            if (room.RemovedFromList) RoomDicts.Remove(room.Name);
+            else RoomDicts[room.Name] = room;
+        }
+        RoomListChanged?.Invoke(RoomDicts);
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        PhotonNetwork.JoinLobby();
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        RoomDicts.Clear();
+        Debug.LogWarning($"Photon Connect Failed : {cause}");
+    }
+
+    public override async void OnJoinedLobby()
+    {
+        PhotonNetwork.LoadLevel((int)SceneNumber.Lobby);
+    }
+
+    public override void OnLeftLobby()
+    {
+        RoomDicts.Clear();
+        PhotonNetwork.LoadLevel((int)SceneNumber.Title);
+    }
+
+    public override void OnCreatedRoom()
+    {
+        base.OnCreatedRoom();
+    }
+
+    public override void OnJoinedRoom()
+    {
+        RoomDicts.Clear();
+        foreach (var p in PhotonNetwork.PlayerList)
+            UpdateReadyUI(p, IsReady(p));
+        PhotonNetwork.LoadLevel((int)SceneNumber.Room);
+    }
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        base.OnCreateRoomFailed(returnCode, message);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+    }
+
+    public override void OnLeftRoom()
+    {
+        PhotonNetwork.LocalPlayer.SetCustomProperties(
+        new Hashtable { { ReadyKey, false } });
+        PhotonNetwork.LoadLevel((int)SceneNumber.Lobby);
+        RoomListChanged?.Invoke(RoomDicts);
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        Debug.Log($"선수 입장 : {newPlayer.NickName}");
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        Debug.Log($"선수 퇴장 : {otherPlayer.NickName}");
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (!changedProps.ContainsKey(ReadyKey)) return;
+
+        bool isReady = (bool)changedProps[ReadyKey];
+
+        UpdateReadyUI(targetPlayer, isReady);
+    }
+
+
+    public void UpdateReadyUI(Player player, bool isReady)
+    {
+        //TODO 방 플레이어 상태 갱신
+    }
 }

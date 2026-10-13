@@ -12,10 +12,10 @@ public class TestUI : MonoBehaviour
     [SerializeField] private TMP_InputField passwordInput;
     [SerializeField] private Button signInButton;
     [SerializeField] private Button signOutButton;
-    
+    [SerializeField] private Button guestButton;
+
 
     [Header("회원가입 UI")]
-    [SerializeField] private GameObject SignUpPanel;
     [SerializeField] private TMP_InputField createEmailInput;
     [SerializeField] private TMP_InputField createPasswordInput;
     [SerializeField] private TMP_InputField createNickname;
@@ -27,19 +27,23 @@ public class TestUI : MonoBehaviour
 
     bool proceeding;
     AuthManager AM => AuthManager.Instance;
+    private ProfileRepository pr;
+    Color errorColor = new Color(0.9f, 0.3f, 0.3f);
+    WaitForSeconds wait = new WaitForSeconds(3.0f);
 
     private void Awake()
     {
-        signUpButton.onClick.AddListener(() => AM.SignUpAsync(emailInput.text, passwordInput.text, createNickname.text));
+        signUpButton.onClick.AddListener(() => AM.SignUpAsync(createEmailInput.text, createPasswordInput.text, createNickname.text));
         signInButton.onClick.AddListener(() => AM.SignInAsync(emailInput.text, passwordInput.text));
         signOutButton.onClick.AddListener(() => AM.SignOut());
+        guestButton.onClick.AddListener(async () => await AM.AnonymousLogin());
     }
 
     private void OnEnable()
     {
         AM.OnInitialized += RefreshHandler;
         AM.OnBusyChanged += RefreshHandler;
-        AM.OnSignedIn += SignInHandler;
+        AM.OnSignedIn += SignInHandlerAsync;
 
         // 팝업UI
         AM.OnAuthFailed += ShowError;
@@ -50,7 +54,7 @@ public class TestUI : MonoBehaviour
     {
         AM.OnInitialized -= RefreshHandler;
         AM.OnBusyChanged -= RefreshHandler;
-        AM.OnSignedIn -= SignInHandler;
+        AM.OnSignedIn -= SignInHandlerAsync;
 
         AM.OnAuthFailed -= ShowError;
         AM.OnNotice -= ShowNotice;
@@ -63,28 +67,36 @@ public class TestUI : MonoBehaviour
     {
         bool canInput = AM.IsReady && !AM.IsBusy && !proceeding;
 
-        signInButton.interactable = canInput;
-        signUpButton.interactable = canInput;
-        signOutButton.interactable = canInput;
+        //signInButton.interactable = canInput;
+        //signUpButton.interactable = canInput;
+        //signOutButton.interactable = canInput;
         //loadingPanel.SetActive(!canInput);
     }
 
-    private void SignInHandler(FirebaseUser user)
+    private async void SignInHandlerAsync(FirebaseUser user)
     {
-        if (proceeding) return;
-        proceeding = true;
+        //if (proceeding) return;
+        //proceeding = true;
+
+        Debug.Log("선수 입장");
 
         try
         {
             if (this == null)
                 return;
             // 로비로 이동
+            string notice = await NetworkManager.Instance.Connect();
+            if (string.IsNullOrEmpty(notice))
+                ShowNotice("Connect!");
+            else
+                ShowError(notice);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             if (this == null)
                 return;
             proceeding = false;
+            Debug.Log("선수 입장 실패");
             RefreshInteractable();
         }
 
@@ -93,7 +105,7 @@ public class TestUI : MonoBehaviour
     private void ShowError(string message)
     {
         PopupPanel.SetActive(true);
-        messageText.color = new Color(0.9f, 0.3f, 0.3f);
+        messageText.color = errorColor;
         messageText.text = message;
 
         StartCoroutine("ClosePopup");
@@ -110,7 +122,7 @@ public class TestUI : MonoBehaviour
 
     private IEnumerator ClosePopup()
     {
-        yield return new WaitForSeconds(3.0f);
+        yield return wait;
         PopupPanel.SetActive(false);
     }
 
