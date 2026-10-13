@@ -36,6 +36,7 @@ public class ProfileRepository
 {
     private FirebaseAuth auth;
     private DatabaseReference userRef;
+    public DatabaseReference UserRef { get { return userRef; }}
 
     private DatabaseReference listeningRef;
     public event Action<UserProfile> ProfileChanged;
@@ -92,6 +93,7 @@ public class ProfileRepository
         return nickSnap.Exists;
     }
 
+    // 프로필 정보 가져오기
     public async Task<UserProfile> LoadProfileAsync(string uid = null)
     {
         uid ??= CurrentUid;
@@ -100,6 +102,7 @@ public class ProfileRepository
         var snap = await userRef.Child("Users").Child(uid).GetValueAsync();
         return UserProfile.FromSnapshot(snap);
     }
+
 
     public void StartListening()
     {
