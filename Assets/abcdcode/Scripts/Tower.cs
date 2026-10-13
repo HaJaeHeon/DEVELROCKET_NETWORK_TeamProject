@@ -30,7 +30,7 @@ public class Tower : MultiMono,ITower,IPacketer
     public override void Delete()
     {
         base.Delete();
-        TowerContainer.Instance?.DeleteObj(this);
+        GameManager.Instance.Container_Tower?.DeleteObj(this);
     }
     public void Update()
     {

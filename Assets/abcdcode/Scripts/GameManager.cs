@@ -12,5 +12,6 @@ public class GameManager : SingletonBehavior<GameManager>
         }
     }
     [SerializeField]private bool isOffDebug;
-    private IObjContainer<Enemy> m_EnemyContainer;
+    public IObjContainer<Enemy> Container_Enemy{get;private set;}
+    public IObjContainer<Tower> Container_Tower{get;private set;}
 }

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// 사거리 내에 적이 들어오면 인식하고, cool 주기마다 공격하는 패턴
+/// </summary>
 public class LookAtAndAttackAI : TParameterBridge<AttackTowerData>
 {
     public override void Init(Tower parent)
