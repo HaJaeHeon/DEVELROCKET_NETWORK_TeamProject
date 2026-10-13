@@ -17,5 +17,5 @@ public class TowerContainer : IObjContainer<ITower>
     {
         return towers.ToList();
     }
-    private List<ITower> towers;
+    private List<ITower> towers = new List<ITower>();
 }

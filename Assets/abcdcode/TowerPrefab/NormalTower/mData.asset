@@ -16,8 +16,8 @@ MonoBehaviour:
   cost: 0
   towerName: 
   desc: 
-  AIScript: 
-  range: 0
-  damage: 0
+  AIScript: LookAtAndAttackAI
+  range: 5
+  damage: 5
   cool: 1
   bulletPrefab: {fileID: 1107830369495406184, guid: e7681ca2342bedf4c9d57ab616f5e041, type: 3}
