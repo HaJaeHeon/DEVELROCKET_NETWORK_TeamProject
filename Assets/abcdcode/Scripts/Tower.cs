@@ -19,6 +19,7 @@ public class Tower : MultiMono,ITower,IPacketer
         Position = tile.Pos;
         Data = data;
         AIData = (data as TowerData).CreateAI();
+        AIData.Init(this);
     }
     public virtual void OnClickDemo()
     {
@@ -38,10 +39,7 @@ public class Tower : MultiMono,ITower,IPacketer
     }
     public void Update()
     {
-        if(PhotonNetwork.IsMasterClient)
-        {
-            AIData.GameUpdate();
-        }
+        AIData.GameUpdate();
     }
     [PunRPC]
     public void LoadPacket(byte[] data)

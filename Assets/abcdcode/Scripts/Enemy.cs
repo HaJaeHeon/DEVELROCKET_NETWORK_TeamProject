@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Enemy : IEnemy
+public class Enemy : MultiMono, IEnemy, IdOwn
 {
     
     public float HP { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
@@ -9,14 +9,12 @@ public class Enemy : IEnemy
 
     public IEnemySO Data => throw new System.NotImplementedException();
 
-    public UnityEngine.Vector2 Position { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-    public UnityEngine.Vector2 Scale { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public int IndexId { get; set;}
 
-    public GameObject Obj => throw new System.NotImplementedException();
-
-    public void Delete()
+    public override void Delete()
     {
-        throw new System.NotImplementedException();
+        base.Delete();
+        GameManager.Instance.Container_Enemy.DeleteObj(this);
     }
 
     public void Init(System.Numerics.Vector2 pos)
