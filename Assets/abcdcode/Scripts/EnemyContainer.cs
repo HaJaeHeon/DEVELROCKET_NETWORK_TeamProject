@@ -17,5 +17,5 @@ public class EnemyContainer :  IObjContainer<IEnemy>
     {
         return items.ToList();
     }
-    private List<IEnemy> items;
+    private List<IEnemy> items = new List<IEnemy>();
 }
