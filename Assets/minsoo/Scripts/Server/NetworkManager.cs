@@ -230,12 +230,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        
+        Debug.Log($"선수 입장 : {newPlayer.NickName}");
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        
+        Debug.Log($"선수 퇴장 : {otherPlayer.NickName}");
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
@@ -250,6 +250,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void UpdateReadyUI(Player player, bool isReady)
     {
-
+        //TODO 방 플레이어 상태 갱신
     }
 }

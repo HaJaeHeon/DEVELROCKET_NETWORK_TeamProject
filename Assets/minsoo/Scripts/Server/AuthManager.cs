@@ -250,4 +250,15 @@ public class AuthManager : MonoBehaviour
         }
     }
 
+    private static FirebaseApp CreateApp()
+    {
+#if UNITY_EDITOR
+        // 메인 에디터와 각 가상 플레이어는 프로젝트 경로가 달라서 서로 다른 이름이 나옴
+        string id = Hash128.Compute(Application.dataPath).ToString().Substring(0, 8);
+        return FirebaseApp.Create(FirebaseApp.DefaultInstance.Options, $"Player_{id}");
+#else
+        return FirebaseApp.DefaultInstance;   // 실제 빌드는 기기마다 따로라 문제없음
+#endif
+    }
+
 }

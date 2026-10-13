@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/minsoo/Scenes/TestAuthScene.unity
+    guid: 208c34d6298a55f48ae01ed54944e1fc
+  - enabled: 1
+    path: Assets/minsoo/Scenes/TestLobbyScene.unity
+    guid: 03e0c47589afe12449a5d9cf951b8cd3
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
