@@ -3,19 +3,24 @@ using Photon.Pun;
 using UnityEngine;
 
 [System.Serializable]
-public class NetworkPrefabPool : IPunPrefabPool
+public class NetworkPrefabPool : MonoBehaviour, IPunPrefabPool
 {
-    [SerializeField] private List<GameObject> prefabs = new List<GameObject>();
-
+    [SerializeField]private List<GameObject> m_towerPrefab = new List<GameObject>();
+    [SerializeField]private List<GameObject> m_enemyPrefab = new List<GameObject>();
     private Dictionary<string, GameObject> prefabMap;
     private readonly Dictionary<string, Queue<GameObject>> pool = new Dictionary<string, Queue<GameObject>>();
 
     public void Register()
     {
         prefabMap = new Dictionary<string, GameObject>();
-        foreach (var p in prefabs)
-            prefabMap[p.name] = p;
+        Register(m_towerPrefab);
+        Register(m_enemyPrefab);
         PhotonNetwork.PrefabPool = this;
+    }
+    private void Register(List<GameObject> list)
+    {
+        foreach (var p in list)
+            prefabMap[p.name] = p;
     }
 
     public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)
