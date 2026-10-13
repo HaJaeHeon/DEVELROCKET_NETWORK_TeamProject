@@ -5,7 +5,6 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
-using Unity.Android.Gradle.Manifest;
 
 public class GameFlowController : MonoBehaviourPunCallbacks
 {
