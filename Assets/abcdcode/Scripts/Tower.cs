@@ -15,6 +15,10 @@ public class Tower : MultiMono,ITower,IPacketer
     }
     public void Init(ITileMap tile, ITowerSO data)
     {
+        CurTile = tile;
+        Position = tile.Pos;
+        Data = data;
+        AIData = (data as TowerData).CreateAI();
     }
     public virtual void OnClickDemo()
     {
