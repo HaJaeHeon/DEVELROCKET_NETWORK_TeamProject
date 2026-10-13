@@ -1,5 +1,4 @@
 using Firebase.Auth;
-using Photon.Pun;
 using System;
 using System.Collections;
 using TMPro;
@@ -13,10 +12,10 @@ public class TestUI : MonoBehaviour
     [SerializeField] private TMP_InputField passwordInput;
     [SerializeField] private Button signInButton;
     [SerializeField] private Button signOutButton;
-    
+    [SerializeField] private Button guestButton;
+
 
     [Header("회원가입 UI")]
-    [SerializeField] private GameObject SignUpPanel;
     [SerializeField] private TMP_InputField createEmailInput;
     [SerializeField] private TMP_InputField createPasswordInput;
     [SerializeField] private TMP_InputField createNickname;
@@ -34,9 +33,10 @@ public class TestUI : MonoBehaviour
 
     private void Awake()
     {
-        signUpButton.onClick.AddListener(() => AM.SignUpAsync(emailInput.text, passwordInput.text, createNickname.text));
+        signUpButton.onClick.AddListener(() => AM.SignUpAsync(createEmailInput.text, createPasswordInput.text, createNickname.text));
         signInButton.onClick.AddListener(() => AM.SignInAsync(emailInput.text, passwordInput.text));
         signOutButton.onClick.AddListener(() => AM.SignOut());
+        guestButton.onClick.AddListener(async () => await AM.AnonymousLogin());
     }
 
     private void OnEnable()
@@ -67,16 +67,18 @@ public class TestUI : MonoBehaviour
     {
         bool canInput = AM.IsReady && !AM.IsBusy && !proceeding;
 
-        signInButton.interactable = canInput;
-        signUpButton.interactable = canInput;
-        signOutButton.interactable = canInput;
+        //signInButton.interactable = canInput;
+        //signUpButton.interactable = canInput;
+        //signOutButton.interactable = canInput;
         //loadingPanel.SetActive(!canInput);
     }
 
     private async void SignInHandlerAsync(FirebaseUser user)
     {
-        if (proceeding) return;
-        proceeding = true;
+        //if (proceeding) return;
+        //proceeding = true;
+
+        Debug.Log("선수 입장");
 
         try
         {
@@ -89,11 +91,12 @@ public class TestUI : MonoBehaviour
             else
                 ShowError(notice);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             if (this == null)
                 return;
             proceeding = false;
+            Debug.Log("선수 입장 실패");
             RefreshInteractable();
         }
 
