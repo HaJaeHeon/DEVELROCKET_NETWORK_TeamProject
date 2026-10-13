@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Enemy : IEnemy
 {
+    
     public float HP { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
     public float MaxHP => throw new System.NotImplementedException();
