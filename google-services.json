@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "481922521907",
+    "firebase_url": "https://network-teamproject-ea423-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "network-teamproject-ea423",
+    "storage_bucket": "network-teamproject-ea423.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481922521907:android:65df09915041c6065e7c46",
+        "android_client_info": {
+          "package_name": "com.UnityTechnologies.com.unity.template.urpblank"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUnxP4Sph-dumBvI21k4B0pj-gbpqeHaw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
