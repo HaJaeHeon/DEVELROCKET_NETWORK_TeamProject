@@ -349,18 +349,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2841146487611685592, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 48825d5b4b4630844a0876ef898d8fc0, type: 2}
     - target: {fileID: 4177683880564555840, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
       propertyPath: sceneViewId
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4177683880564555840, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
       propertyPath: ObservedComponents.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4177683880564555840, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
       propertyPath: 'ObservedComponents.Array.data[1]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1178217349}
     - target: {fileID: 4401480994956863589, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
       propertyPath: m_Name
       value: NormalTower
@@ -369,13 +373,22 @@ PrefabInstance:
       propertyPath: m_SynchronizeParameters.Array.size
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 4702648195780501238, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
-    - {fileID: 2841146487611685592, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
+--- !u!114 &1178217349 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4702648195780501238, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
+  m_PrefabInstance: {fileID: 1178217348}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonAnimatorView
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

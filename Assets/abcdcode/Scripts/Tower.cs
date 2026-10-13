@@ -13,6 +13,9 @@ public class Tower : MultiMono,ITower,IPacketer
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
     }
+    public void Init(ITileMap tile, ITowerSO data)
+    {
+    }
     public virtual void OnClickDemo()
     {
         if(photonView.IsMine)
@@ -44,6 +47,8 @@ public class Tower : MultiMono,ITower,IPacketer
         RPCEvent[id](d);
     }
 
+    
+
     public float Angle
     {
         get
@@ -60,6 +65,8 @@ public class Tower : MultiMono,ITower,IPacketer
     public TowerAI AIData{get;private set;}
     public string Owner{get;private set;}
     public Dictionary<string, Action<PacketData>> RPCEvent {get;set;}
+
+    public ITileMap CurTile {get;private set;}
 
     [SerializeField]private TowerData mData;
 }
