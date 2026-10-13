@@ -24,6 +24,7 @@ public class AuthManager : MonoBehaviour
 
     //이메일 가입 인증 확인
     [SerializeField] bool requireEmailVerification = true;
+    [SerializeField] bool autoLoginToggle = false;
 
     public ProfileRepository PR {get; private set; }
 
@@ -50,12 +51,17 @@ public class AuthManager : MonoBehaviour
         if (status == DependencyStatus.Available)
         {
             Auth = FirebaseAuth.DefaultInstance;
+            PR = new ProfileRepository();
 
             IsReady = true;
             OnInitialized?.Invoke();
 
             if (Auth.CurrentUser != null)
+            {
                 await TryAutoLoginAsync();
+                Auth.SignOut(); // 테스트용 초기화
+            }
+                
 
         }
         else
@@ -68,6 +74,9 @@ public class AuthManager : MonoBehaviour
     // 자동 로그인
     private async Task TryAutoLoginAsync()
     {
+        if (!autoLoginToggle)
+            return;
+
         SetBusy(true);
         try
         {
@@ -100,13 +109,31 @@ public class AuthManager : MonoBehaviour
         CompleteSignIn(user);
     }
 
+    // 익명 로그인
+    public Task AnonymousLogin() => RunAuthAsync(async () =>
+    {
+        var result = await Auth.SignInAnonymouslyAsync();
+        FirebaseUser user = result.User;
+
+        int rand = UnityEngine.Random.Range(0, 100);
+        string guestName = "Player" + rand;
+        while (!await PR.NicknameExistAsync(guestName))
+        {
+            rand = UnityEngine.Random.Range(0, 100);
+            guestName = "Player" + rand;
+        }
+
+        await PR.CreateGeustProfileAsync(guestName);
+        CompleteSignIn(user);
+    });
 
     // 회원가입
     public Task SignUpAsync(string email, string password, string nickname) => RunAuthAsync(async () =>
     {
+
         if (await PR.NicknameExistAsync(nickname))
         {
-            OnAuthFailed?.Invoke("이미 닉네임이 존재합니다.");
+            OnAuthFailed?.Invoke("The nickname already exists.");
             return;
         }
 
@@ -116,12 +143,12 @@ public class AuthManager : MonoBehaviour
         if (requireEmailVerification)
         {
             await user.SendEmailVerificationAsync();
-            OnNotice?.Invoke("인증 메일 전송!");
+            OnNotice?.Invoke("Send verification email");
         }
 
-        if(await PR.CreateProfileAsync(nickname))
+        if(!await PR.CreateProfileAsync(nickname))
         {
-            OnAuthFailed?.Invoke("DB 생성 실패");
+            OnAuthFailed?.Invoke("DB creation failed");
         }
 
         Auth.SignOut();
@@ -160,7 +187,7 @@ public class AuthManager : MonoBehaviour
     {
         if (!IsReady)
         {
-            OnAuthFailed?.Invoke("초기화 중입니다. 잠시 후 다시 시도해 주세요.");
+            OnAuthFailed?.Invoke("Connecting. Please try again in a moment.");
             return;
         }
         if (IsBusy) return;
@@ -203,6 +230,7 @@ public class AuthManager : MonoBehaviour
     private void CompleteSignIn(FirebaseUser user)
     {
         SignedInUser = user;
+        Debug.Log("UID : " + SignedInUser.UserId);
         OnSignedIn?.Invoke(user);
     }
 
@@ -210,12 +238,27 @@ public class AuthManager : MonoBehaviour
     {
         if (e is NotSupportedException || e is NotImplementedException) return e.Message;
 
+        Debug.Log($"{e.Message}");
         AuthError? code = GetAuthError(e);
         switch (code)
         {
-            case AuthError.MissingEmail: return "이메일을 입력해주세요.";
-            default: return $"로그인에 실패했습니다. ({code})";
+            case AuthError.MissingEmail: return "Please enter your email address.";
+            case AuthError.Failure: return "Failed";
+            case AuthError.InvalidEmail: return "Empty email";
+            case AuthError.OperationNotAllowed: return "Console Login Off";
+            default: return $"Login failed.. ({code})";
         }
+    }
+
+    private static FirebaseApp CreateApp()
+    {
+#if UNITY_EDITOR
+        // 메인 에디터와 각 가상 플레이어는 프로젝트 경로가 달라서 서로 다른 이름이 나옴
+        string id = Hash128.Compute(Application.dataPath).ToString().Substring(0, 8);
+        return FirebaseApp.Create(FirebaseApp.DefaultInstance.Options, $"Player_{id}");
+#else
+        return FirebaseApp.DefaultInstance;   // 실제 빌드는 기기마다 따로라 문제없음
+#endif
     }
 
 }
