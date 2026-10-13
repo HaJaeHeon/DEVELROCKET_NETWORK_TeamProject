@@ -13,6 +13,9 @@ public class Tower : MultiMono,ITower,IPacketer
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
     }
+    public void Init(ITileMap tile, ITowerSO data)
+    {
+    }
     public virtual void OnClickDemo()
     {
         if(photonView.IsMine)
@@ -27,7 +30,7 @@ public class Tower : MultiMono,ITower,IPacketer
     public override void Delete()
     {
         base.Delete();
-        TowerContainer.Instance?.DeleteObj(this);
+        GameManager.Instance.Container_Tower?.DeleteObj(this);
     }
     public void Update()
     {
@@ -43,6 +46,8 @@ public class Tower : MultiMono,ITower,IPacketer
         string id = d;
         RPCEvent[id](d);
     }
+
+    
 
     public float Angle
     {
@@ -60,6 +65,8 @@ public class Tower : MultiMono,ITower,IPacketer
     public TowerAI AIData{get;private set;}
     public string Owner{get;private set;}
     public Dictionary<string, Action<PacketData>> RPCEvent {get;set;}
+
+    public ITileMap CurTile {get;private set;}
 
     [SerializeField]private TowerData mData;
 }
