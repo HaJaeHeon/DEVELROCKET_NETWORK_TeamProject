@@ -5,45 +5,62 @@ using UnityEngine.UI;
 
 public class Photon_Player : MonoBehaviourPunCallbacks
 {
-    [SerializeField] private GameObject playerMouse;
+    [SerializeField] private GameObject mousePrefab;
+    
+    private GameObject playerMouse;
 
 
-    // 게임 씬에 들어오면 플레이어 마우스 따라 움직이는 이미지 생기게끔
+    // 카메라 캐싱|
+    private Camera mainCamera;
+
     private void Start()
     {
+        // 방에 없으면 리턴
         if (!PhotonNetwork.InRoom)
             return;
-
-        playerMouse = PhotonNetwork.Instantiate("PlayerMouse", Vector2.zero, Quaternion.identity);
-    }
-
-    private void Update()
-    {
-        ChaseOnwerMouse();
-
-
-    }
-
-
-    // 플레이어 마우싀 위치에 따라서 
-    private void ChaseOnwerMouse()
-    {
-        if (!PhotonNetwork.IsConnected)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        if (!PhotonNetwork.InRoom)
-        {
-            Destroy(gameObject);
-            return;
-        }
 
         if (!photonView.IsMine)
             return;
 
-        // 사람마다 해상도가 다른데 그럼 이거는 상관이 없는가?
-        
+        mainCamera = Camera.main;
 
+        // 프리팹 없거나 카메라 캐싱 안되면 return;
+        if (mousePrefab == null || mainCamera == null)
+        {
+            Debug.LogError("프리팹이 없거나 카메라 캐싱 안됨");
+            return;
+        }
+
+        //playerMouse = Instantiate(mousePrefab);
+        playerMouse = PhotonNetwork.Instantiate("mousePrefab", Vector3.zero, Quaternion.identity);
+    }
+
+    private void Update()
+    {
+        if (!PhotonNetwork.InRoom)
+            return;
+
+        if (!photonView.IsMine)
+            return;
+
+        OwnerMouseMove();
+    }
+
+    private void OwnerMouseMove()
+    {
+        if (playerMouse == null || mainCamera == null)
+            return;
+
+        Vector3 mousePosition = Input.mousePosition;
+
+        mousePosition.z =
+            mainCamera.WorldToScreenPoint(playerMouse.transform.position).z;
+
+        Vector3 target =
+            mainCamera.ScreenToWorldPoint(mousePosition);
+
+        target.z = playerMouse.transform.position.z;
+
+        playerMouse.transform.position = target;
     }
 }
