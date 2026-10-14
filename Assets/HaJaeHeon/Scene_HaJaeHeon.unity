@@ -201,7 +201,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2775774}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickRoomToLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2775774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1008,7 +1020,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 74058576}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnCLickLobbyToRoom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &74058576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3916,6 +3940,73 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 248003938}
   m_CullTransparentMesh: 1
+--- !u!1 &254553939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 254553941}
+  - component: {fileID: 254553940}
+  m_Layer: 0
+  m_Name: UIManager_TitleScene
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &254553940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254553939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd683b27936eb124c948a40ff45ca655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager_TitleScene
+  titlePanel: {fileID: 314530662}
+  loginPanel: {fileID: 1189632427}
+  signUpPanel: {fileID: 2029554226}
+  lobbyPanel: {fileID: 336008159}
+  createRoomPanel: {fileID: 914477802}
+  searchRoomPanel: {fileID: 804637347}
+  leaderBoardPanel: {fileID: 723716002}
+  settingsPanel: {fileID: 1545847868}
+  roomPanel: {fileID: 1176953880}
+  TowerPresetPanel: {fileID: 133921031}
+  mainPanelList:
+  - {fileID: 314530662}
+  - {fileID: 1189632427}
+  - {fileID: 336008159}
+  - {fileID: 1176953880}
+  subPanelList:
+  - {fileID: 2029554226}
+  - {fileID: 1545847868}
+  - {fileID: 723716002}
+  - {fileID: 133921031}
+  - {fileID: 1971784152}
+  - {fileID: 804637347}
+  - {fileID: 914477802}
+--- !u!4 &254553941
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254553939}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 867.936, y: 700.9848, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &258524848
 GameObject:
   m_ObjectHideFlags: 0
@@ -5098,7 +5189,7 @@ GameObject:
   - component: {fileID: 314530663}
   - component: {fileID: 314530665}
   m_Layer: 5
-  m_Name: MainPanel
+  m_Name: TitlePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6850,7 +6941,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 391534220}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickCloseSubPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &391534220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9316,7 +9419,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 593264758}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickTitleToLogIn
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &593264758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9437,7 +9552,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 622807793}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickCloseSubPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &622807793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10854,7 +10981,7 @@ GameObject:
   - component: {fileID: 739590319}
   - component: {fileID: 739590318}
   m_Layer: 5
-  m_Name: SignIn_Image
+  m_Name: SignIn_Back_Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11867,7 +11994,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 837854408}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickRoomPreset
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &837854408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12785,7 +12924,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 911199298}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLoginToLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &911199298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13284,7 +13435,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 947624335}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLobbyToTitle
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &947624335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13733,7 +13896,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 963601405}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickCloseSubPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &963601405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15364,7 +15539,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1059054544}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickQuitGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1059054544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17355,7 +17542,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1205116769}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickCloseSubPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1205116769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17568,10 +17767,10 @@ RectTransform:
   - {fileID: 1189632428}
   - {fileID: 2029554227}
   - {fileID: 336008160}
+  - {fileID: 1176953881}
+  - {fileID: 723716003}
   - {fileID: 1545847869}
   - {fileID: 133921032}
-  - {fileID: 723716003}
-  - {fileID: 1176953881}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -18085,7 +18284,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1238500967}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLobbyTowerPreset
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1238500967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19481,7 +19692,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1340096583}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickRoomSettings
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1340096583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20063,7 +20286,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1399580416}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLobbySettings
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1399580416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20496,7 +20731,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1428482152}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLobbyCreateRoom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1428482152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20798,7 +21045,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1448081048}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLobbyLeaderBoard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1448081048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23242,7 +23501,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1617526471}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickTitleSettings
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1617526471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23573,7 +23844,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1641529334}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLobbySearchRoom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1645234287
 GameObject:
   m_ObjectHideFlags: 0
@@ -24256,7 +24539,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1683640986}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickTitle
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1683640986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26934,7 +27229,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1841801682}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickCloseSubPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1841801682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28596,7 +28903,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1954219522}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickCloseSubPanel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1954219522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31000,7 +31319,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2052722568}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLobbyLeaderBoard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2052722568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32081,7 +32412,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2114293570}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 254553940}
+        m_TargetAssemblyTypeName: UIManager_TitleScene, Assembly-CSharp
+        m_MethodName: OnClickLoginySignUp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2114293570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32525,3 +32868,4 @@ SceneRoots:
   - {fileID: 1216681523}
   - {fileID: 83018778}
   - {fileID: 6729746}
+  - {fileID: 254553941}
