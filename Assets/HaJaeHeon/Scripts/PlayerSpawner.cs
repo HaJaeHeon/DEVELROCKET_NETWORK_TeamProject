@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject playerMousePrefab;
-    [SerializeField] private MyColor initialColor;
 
     private void Awake()
     {
@@ -22,18 +21,6 @@ public class PlayerSpawner : MonoBehaviour
     {
         if (!PhotonNetwork.InRoom)
             return;
-
-        //// 이미 선택한 색상이 있으면 유지합니다.
-        //if (!PhotonNetwork.LocalPlayer.CustomProperties
-        //        .ContainsKey("PlayerColor"))
-        //{
-        //    PhotonNetwork.LocalPlayer.SetCustomProperties(
-        //        new Hashtable
-        //        {
-        //            { "PlayerColor", (int)initialColor }
-        //        }
-        //    );
-        //}
 
         PhotonNetwork.Instantiate("PlayerMousePointer", Vector3.zero, Quaternion.identity);
     }

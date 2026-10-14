@@ -30,6 +30,7 @@ public class Photon_Player : MonoBehaviourPunCallbacks
             mainCamera = Camera.main;
             //SetMyColor(currentMyColor);
             ApplyColor(photonView.Owner.CustomProperties);
+            Cursor.visible = false;
         }
 
         if(photonView.Owner != null)
@@ -59,20 +60,20 @@ public class Photon_Player : MonoBehaviourPunCallbacks
         transform.position = target;
     }
 
-    private void SetMyColor(MyColor mColor)
-    {
-        if (!photonView.IsMine)
-            return;
+    //private void SetMyColor(MyColor mColor)
+    //{
+    //    if (!photonView.IsMine)
+    //        return;
 
-        currentMyColor = mColor;
+    //    currentMyColor = mColor;
 
-        Hashtable properties = new Hashtable
-        {
-            { ColorKey, (int) mColor}
-        };
+    //    Hashtable properties = new Hashtable
+    //    {
+    //        { ColorKey, (int) mColor}
+    //    };
 
-        PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
-    }
+    //    PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
+    //}
 
     private void ApplyColor(Hashtable properties)
     {
