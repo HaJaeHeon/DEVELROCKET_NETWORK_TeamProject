@@ -4,10 +4,10 @@ using UnityEngine;
 public class Monster : MonoBehaviour
 {
     [SerializeField] float speed = 2f;
-    IReadOnlyList<Vector3> path;
+    IReadOnlyList<Vector2> path;
     int index;   // 다음에 향할 점
 
-    public void Init(IReadOnlyList<Vector3> path)
+    public void Init(IReadOnlyList<Vector2> path)
     {
         this.path = path;
         index = 1;   // 0번은 생성 위치라 1번부터

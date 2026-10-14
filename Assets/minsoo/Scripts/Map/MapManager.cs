@@ -19,8 +19,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
     private TileType[,] grid;
     private Vector2Int startPos;
     private Vector2Int endPos;
-    private List<Vector3> path;
-
+    private List<Vector2> path;
     public override void Awake()
     {
         base.Awake();
@@ -79,7 +78,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
             return;
         }
 
-        path = new List<Vector3>();
+        path = new List<Vector2>();
         foreach (var idx in Pathfinder.Simplify(raw))
         {
             var cell = new Vector3Int(idx.x + b.xMin, idx.y + b.yMin, 0);
@@ -87,11 +86,18 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
         }
     }
 
-    public List<Vector3> GetPath()
+    // 전체 경로 보내주기
+    public List<Vector2> GetPath()
     {
         return path;
     }
 
+
+    //경로 리스트 중 원하는 시작위치에 따른 경로 보내주기
+    public List<Vector2> GetStartToPath(Vector2 startPos)
+    {
+        return path;
+    }
 
     // 현재 타일의 타입 보내주기
     public TileType GetTileType(Vector2Int curPos)

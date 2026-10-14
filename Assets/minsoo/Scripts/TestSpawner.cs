@@ -7,7 +7,7 @@ public class Spawner : MonoBehaviour
 {
     [SerializeField] MapManager map;
     [SerializeField] Monster prefab;
-    IReadOnlyList<Vector3> path;
+    IReadOnlyList<Vector2> path;
 
     WaitForSeconds wait = new WaitForSeconds(0.5f);
     void Start()
