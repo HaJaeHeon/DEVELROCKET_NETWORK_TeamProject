@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 
 public class MapManager : SingletonBehavior<MapManager>, IMap
 {
@@ -15,7 +13,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
     // 찾은 경로 보내주기
     // BuildType 보내주기
 
-    [SerializeField]private Tilemap tilemap;
+    [SerializeField] private Tilemap tilemap;
 
     Dictionary<Vector2, Tower> towerDict;
     private TileType[,] grid;
@@ -27,7 +25,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
     {
         base.Awake();
         GetGridTileType();
-        PrintGrid();
+        PrintGrid(); // 확인용
         BuildPath();
     }
 
@@ -89,15 +87,22 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
         }
     }
 
+    public List<Vector3> GetPath()
+    {
+        return path;
+    }
+
+
+    // 현재 타일의 타입 보내주기
+    public TileType GetTileType(Vector2Int curPos)
+    {
+        return grid[curPos.x, curPos.y];
+    }
+
     public ITileMap GetGoalTile()
     {
 
         throw new System.NotImplementedException();
-    }
-
-    public List<Vector3> GetPath()
-    {
-        return path;
     }
 
     public List<ITileMap> GetStartTile()
