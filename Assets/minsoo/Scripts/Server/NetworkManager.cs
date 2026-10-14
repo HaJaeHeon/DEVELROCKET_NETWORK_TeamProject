@@ -48,6 +48,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             IsVisible = true,
             IsOpen = true,
         };
+        PhotonNetwork.AutomaticallySyncScene = true;
     }
 
     // Photon 연결
@@ -188,6 +189,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override async void OnJoinedLobby()
     {
+        // UI panel on off
         PhotonNetwork.LoadLevel((int)SceneNumber.Lobby);
     }
 
