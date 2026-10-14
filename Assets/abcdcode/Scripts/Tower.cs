@@ -13,6 +13,7 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
         IndexId = photonView.ViewID;
+        GameManager.Instance?.Container_Tower.AddObj(this);
     }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     private static void RegisterPackets()

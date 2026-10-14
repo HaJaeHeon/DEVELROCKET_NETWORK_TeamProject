@@ -62,7 +62,7 @@ public class LookAtAndAttackAI : TParameterBridge<AttackTowerData>
         var b = TData.Bullet;
         b.Position = Parent.Position;
         b.transform.eulerAngles = new Vector3(0,0,Parent.Angle);
-        b.Init(Parent,5,new DamageInfo(1,""));
+        b.Init(Parent,5,TData.Range,new DamageInfo(1,""));
     }
     public void SetTarget(PacketData data)
     {

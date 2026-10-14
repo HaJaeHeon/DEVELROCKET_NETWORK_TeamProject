@@ -10,10 +10,12 @@ public class Bullet : NultiMono, IdOwn
     {
         MainGamePacketer.Register(BulletHit, BulletHitExCute);
     }
-    public virtual void Init(Tower owner, float speed, IDamageInfo dmg)
+    public virtual void Init(Tower owner, float speed, float range, IDamageInfo dmg)
     {
         Owner = owner;
         m_speed = speed;
+        m_range = range;
+        m_moved = 0;
         m_dmg = dmg;
         GameManager.Instance.Containder_Bullet.AddObj(this);
         this.SetIndex();
@@ -36,6 +38,11 @@ public class Bullet : NultiMono, IdOwn
     public virtual void Update()
     {
         this.MoveForward(m_speed);
+        m_moved += m_speed * Time.deltaTime;
+        if(m_moved >= m_range)
+        {
+            Delete();
+        }
     }
     public override void Delete()
     {
@@ -55,6 +62,8 @@ public class Bullet : NultiMono, IdOwn
     }
     private bool isHit;
     private float m_speed;
+    private float m_range;
+    private float m_moved;
     private IDamageInfo m_dmg;
     public Tower Owner{get;private set;}
     public int IndexId {get; set;}

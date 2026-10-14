@@ -17,10 +17,18 @@ public class NetworkPrefabPool : MonoBehaviour, IPunPrefabPool
         Register(m_enemyPrefab);
         PhotonNetwork.PrefabPool = this;
     }
-    private void Register(List<GameObject> list)
+    /// <summary>
+    /// 외부(EnemyDB 등)에서 프리팹을 추가 등록
+    /// </summary>
+    public void Register(IEnumerable<GameObject> list)
     {
         foreach (var p in list)
+        {
+            if (p == null) continue;
+            if (prefabMap.TryGetValue(p.name, out var exist) && exist != p)
+                Debug.LogWarning($"[NetworkPrefabPool] 이름이 같은 다른 프리팹이 덮어씌워짐: {p.name}");
             prefabMap[p.name] = p;
+        }
     }
 
     public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)
