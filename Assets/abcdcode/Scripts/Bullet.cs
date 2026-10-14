@@ -5,6 +5,11 @@ using UnityEngine.PlayerLoop;
 
 public class Bullet : NultiMono, IdOwn
 {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+    private static void RegisterPackets()
+    {
+        MainGamePacketer.Register(BulletHit, BulletHitExCute);
+    }
     public virtual void Init(Tower owner, float speed, IDamageInfo dmg)
     {
         Owner = owner;

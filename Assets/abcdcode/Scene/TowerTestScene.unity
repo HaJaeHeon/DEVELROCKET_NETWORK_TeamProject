@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c32de7615e5c2654b89900250f24be7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  isOffDebug: 1
+  isOffDebug: 0
   m_tData: {fileID: 11400000, guid: f69bd66cabbca304eb67be1e4816366b, type: 2}
   prefabPool: {fileID: 1233249302}
   m_mgp: {fileID: 1718949566}

@@ -53,6 +53,7 @@ public class LookAtAndAttackAI : TParameterBridge<AttackTowerData>
             p.Write(AI_Shoot);
             IPacketer.SendPacket(Parent.photonView,p,Photon.Pun.RpcTarget.AllViaServer);
             cool = TData.Cool;
+            Debug.Log("Send Shoot Packet");
         }
     }
     public void Shoot(PacketData data)
