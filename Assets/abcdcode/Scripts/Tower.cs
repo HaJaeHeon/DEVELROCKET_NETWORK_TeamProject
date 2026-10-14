@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Photon.Pun;
 using UnityEngine;
 
-public class Tower : MultiMono,ITower,IPacketer
+public class Tower : MultiMono,ITower,IPacketer,IdOwn
 {
     public void Awake()
     {
@@ -12,6 +12,13 @@ public class Tower : MultiMono,ITower,IPacketer
         Data = mData;
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
+        IndexId = photonView.ViewID;
+        GameManager.Instance?.Container_Tower.AddObj(this);
+    }
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+    private static void RegisterPackets()
+    {
+        MainGamePacketer.Register(TowerDestroy, TowerDestroyEvent);
     }
     public void Init(ITileMap tile, ITowerSO data)
     {
@@ -69,6 +76,19 @@ public class Tower : MultiMono,ITower,IPacketer
     public Dictionary<string, Action<PacketData>> RPCEvent {get;set;}
 
     public ITileMap CurTile {get;private set;}
+    public int IndexId { get; set; }
+
+    public static void TowerDestroyEvent(PacketData data)
+    {
+        var t = GameManager.Instance.Container_Tower.GetList().FindTower(data);
+        if(t == null) return;
+        if(PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(t.gameObject);
+        }
+        GameManager.Instance.Container_Tower.DeleteObj(t);
+    }
 
     [SerializeField]private TowerData mData;
+    public const string TowerDestroy = "TowerDestroy";
 }
