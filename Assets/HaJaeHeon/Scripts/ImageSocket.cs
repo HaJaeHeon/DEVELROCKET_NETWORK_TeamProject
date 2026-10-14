@@ -90,6 +90,7 @@ public class ImageSocket : MonoBehaviour, IDropHandler
         return true;
     }
 
+    // 소켓 등록 그룹에서 제거
     public void DetachImage(DraggableImage image)
     {
         if (CurrentImage != image)
@@ -99,6 +100,7 @@ public class ImageSocket : MonoBehaviour, IDropHandler
             group.Unregister(image);
 
         CurrentImage = null;
+        // 소켓에서 제거
         image.ClearSocket(this);
     }
 }

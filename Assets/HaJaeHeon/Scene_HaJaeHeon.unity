@@ -5098,12 +5098,12 @@ GameObject:
   - component: {fileID: 314530663}
   - component: {fileID: 314530665}
   m_Layer: 5
-  m_Name: MainPanel
+  m_Name: TitlePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &314530663
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11377,7 +11377,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &804637348
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12841,7 +12841,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &914477803
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17569,9 +17569,9 @@ RectTransform:
   - {fileID: 2029554227}
   - {fileID: 336008160}
   - {fileID: 1545847869}
-  - {fileID: 133921032}
   - {fileID: 723716003}
   - {fileID: 1176953881}
+  - {fileID: 133921032}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
