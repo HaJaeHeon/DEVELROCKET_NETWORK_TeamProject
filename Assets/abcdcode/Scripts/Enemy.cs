@@ -9,12 +9,13 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
     {
         RPCEvent = new Dictionary<string, Action<PacketData>>();
         RPCEvent[ModifyHP] = ModifyHPEvent;
-        IndexId = photonView.ViewID;
-        GameManager.Instance?.Container_Enemy.AddObj(this);
     }
     // PhotonNetwork.Instantiate 시 모든 클라이언트에서 호출 (풀에서 재사용될 때도 호출됨)
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
+        // 풀 재사용 시 Awake가 다시 호출되지 않으므로 ViewID 갱신 및 컨테이너 등록은 여기서 수행
+        IndexId = photonView.ViewID;
+        GameManager.Instance?.Container_Enemy.AddObj(this);
         object[] instData = info.photonView.InstantiationData;
         if(instData != null && instData.Length > 0 && instData[0] is string enemyId)
         {
@@ -161,6 +162,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
 
     public void TakeDamage(IDamageInfo dmgInfo)
     {
+        Debug.Log($"TakeDamage {dmgInfo.Dmg}");
         PacketData d = new PacketData();
         d.Write(ModifyHP);
         d.Write(dmgInfo.Dmg);
