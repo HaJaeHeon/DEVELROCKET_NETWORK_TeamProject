@@ -130,6 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f59be60ff24bbf4e9a3d5e222140523, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  mData: {fileID: 11400000, guid: bda68ce04cf34214590e324b662901c6, type: 2}
 --- !u!114 &2491254418636159809
 MonoBehaviour:
   m_ObjectHideFlags: 0

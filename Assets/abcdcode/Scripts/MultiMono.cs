@@ -30,6 +30,9 @@ public class MultiMono : MonoBehaviourPun, IMonoObj
 
     public virtual void Delete()
     {
-        Destroy(this.gameObject);
+        if(PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(this.gameObject);
+        }
     }
 }
