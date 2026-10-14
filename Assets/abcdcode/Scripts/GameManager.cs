@@ -29,9 +29,8 @@ public class GameManager : SingletonBehavior<GameManager>
         /*
         Enemy e = PhotonNetwork.Instantiate("TestEnemy", new Vector3(0, 0), Quaternion.identity).GetComponent<Enemy>();
         e.Position = new Vector2(-3, -3);
-        }
         */
-        
+        }
     }
     public void Update()
     {
