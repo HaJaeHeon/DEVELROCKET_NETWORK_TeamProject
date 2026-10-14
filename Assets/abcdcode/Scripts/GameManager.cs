@@ -26,10 +26,11 @@ public class GameManager : SingletonBehavior<GameManager>
             Type = TileType.Build
         };
         t.Init(ft, m_tData);
-
+        /*
         Enemy e = PhotonNetwork.Instantiate("TestEnemy", new Vector3(0, 0), Quaternion.identity).GetComponent<Enemy>();
         e.Position = new Vector2(-3, -3);
         }
+        */
         
     }
     public void Update()
