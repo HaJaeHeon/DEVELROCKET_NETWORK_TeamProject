@@ -164,6 +164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
   playerMousePrefab: {fileID: 775388519069672163, guid: 9b64d9c8e0184df49b7957da3b1df6a2, type: 3}
+  initialColor: 1
 --- !u!1 &665878518
 GameObject:
   m_ObjectHideFlags: 0
