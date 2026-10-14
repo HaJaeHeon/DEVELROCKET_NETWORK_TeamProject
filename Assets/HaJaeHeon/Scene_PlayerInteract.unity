@@ -163,6 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33d487f718643f249b3b27d09ef2e182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawner
+  playerMousePrefab: {fileID: 775388519069672163, guid: 9b64d9c8e0184df49b7957da3b1df6a2, type: 3}
 --- !u!1 &665878518
 GameObject:
   m_ObjectHideFlags: 0
