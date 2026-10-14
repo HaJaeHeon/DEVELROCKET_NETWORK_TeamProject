@@ -49,7 +49,7 @@ public class ProfileRepository
     private string CurrentUid => auth.CurrentUser?.UserId;
 
     //익명 프로필 생성
-    public async Task<bool> CreateGeustProfileAsync(string name)
+    public async Task<bool> CreateGuestProfileAsync(string name)
     {
         var user = auth.CurrentUser;
         if (user == null)

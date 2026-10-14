@@ -117,13 +117,13 @@ public class AuthManager : MonoBehaviour
 
         int rand = UnityEngine.Random.Range(0, 100);
         string guestName = "Player" + rand;
-        while (!await PR.NicknameExistAsync(guestName))
+        while (await PR.NicknameExistAsync(guestName))
         {
             rand = UnityEngine.Random.Range(0, 100);
             guestName = "Player" + rand;
         }
 
-        await PR.CreateGeustProfileAsync(guestName);
+        await PR.CreateGuestProfileAsync(guestName);
         CompleteSignIn(user);
     });
 
@@ -244,7 +244,7 @@ public class AuthManager : MonoBehaviour
         {
             case AuthError.MissingEmail: return "Please enter your email address.";
             case AuthError.Failure: return "Failed";
-            case AuthError.InvalidEmail: return "Empty email";
+            case AuthError.InvalidEmail: return "Invalid email";
             case AuthError.OperationNotAllowed: return "Console Login Off";
             default: return $"Login failed.. ({code})";
         }
