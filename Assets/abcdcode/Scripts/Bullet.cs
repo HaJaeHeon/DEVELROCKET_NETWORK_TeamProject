@@ -54,17 +54,19 @@ public class Bullet : NultiMono, IdOwn
         int bid = data;
         int eid = data;
         var b = GameManager.Instance.Containder_Bullet.GetList().FindObj(bid);
-        if(b != null)
+        if(b == null) return;
+        if(PhotonNetwork.IsMasterClient)
         {
-            b.Delete();
+            var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
+            e.TakeDamage(b.m_dmg);
         }
-        var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
+        b.Delete();
     }
     private bool isHit;
     private float m_speed;
     private float m_range;
     private float m_moved;
-    private IDamageInfo m_dmg;
+    public IDamageInfo m_dmg;
     public Tower Owner{get;private set;}
     public int IndexId {get; set;}
 

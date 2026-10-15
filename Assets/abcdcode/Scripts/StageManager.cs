@@ -5,7 +5,8 @@ using UnityEngine;
 
 /// <summary>
 /// StageData의 웨이브 목록을 순서대로 진행하며 적을 소환
-/// 소환은 마스터 클라이언트에서만 수행
+/// 소환 및 웨이브 진행 판정은 마스터 클라이언트에서만 수행
+/// 웨이브 소환 완료 → 필드의 적이 모두 제거됨 → WaveInterval 카운트다운 → 다음 웨이브
 /// </summary>
 public class StageManager
 {
@@ -19,7 +20,18 @@ public class StageManager
     private List<WaveData.SpawnInfo> curSpawns;
     private int spawnIndex;
     private float timer;
-    private bool isWaiting;
+    private WaveState state;
+
+    private enum WaveState
+    {
+        Spawning,   // 현재 웨이브 적 소환 중
+        WaitClear,  // 소환 완료, 필드의 적이 모두 제거되길 대기
+        Countdown,  // 다음 웨이브까지 카운트다운
+    }
+    /// <summary>
+    /// 다음 웨이브까지 남은 시간(초). 카운트다운 중이 아니면 -1
+    /// </summary>
+    public float RemainCountdown => state == WaveState.Countdown ? Mathf.Max(0, Data.WaveInterval - timer) : -1;
 
     public void Init(StageData data)
     {
@@ -36,29 +48,37 @@ public class StageManager
     {
         if(!PhotonNetwork.IsMasterClient || IsCleared) return;
 
-        timer += deltaTime;
-        if(isWaiting)
+        if(state == WaveState.Spawning)
         {
+            timer += deltaTime;
+            while(spawnIndex < curSpawns.Count && curSpawns[spawnIndex].time <= timer)
+            {
+                Spawn(curSpawns[spawnIndex].enemyId);
+                spawnIndex++;
+            }
+            if(spawnIndex < curSpawns.Count) return;
+            // 현재 웨이브 소환 완료, 적이 모두 제거될 때까지 대기
+            state = WaveState.WaitClear;
+        }
+        if(state == WaveState.WaitClear)
+        {
+            if(GameManager.Instance.Container_Enemy.GetList().Count > 0) return;
+            // 적 전멸, 다음 웨이브 카운트다운 시작
+            state = WaveState.Countdown;
+            timer = 0;
+            return;
+        }
+        if(state == WaveState.Countdown)
+        {
+            timer += deltaTime;
             if(timer < Data.WaveInterval) return;
             StartWave(CurWaveIndex + 1);
-            if(IsCleared) return;
-        }
-        while(spawnIndex < curSpawns.Count && curSpawns[spawnIndex].time <= timer)
-        {
-            Spawn(curSpawns[spawnIndex].enemyId);
-            spawnIndex++;
-        }
-        if(spawnIndex >= curSpawns.Count)
-        {
-            // 현재 웨이브 소환 완료, 다음 웨이브 대기
-            isWaiting = true;
-            timer = 0;
         }
     }
     private void StartWave(int index)
     {
         CurWaveIndex = index;
-        isWaiting = false;
+        state = WaveState.Spawning;
         timer = 0;
         spawnIndex = 0;
         if(IsCleared) return;

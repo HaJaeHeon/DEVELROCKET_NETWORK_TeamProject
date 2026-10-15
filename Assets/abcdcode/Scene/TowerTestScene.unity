@@ -268,6 +268,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 4454784676332147502, guid: 7a2e04eb25a8b7f4497f759a56d7f8d2, type: 3}
+      propertyPath: entries.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4454784676332147502, guid: 7a2e04eb25a8b7f4497f759a56d7f8d2, type: 3}
+      propertyPath: entries.Array.data[1].id
+      value: TestEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 4454784676332147502, guid: 7a2e04eb25a8b7f4497f759a56d7f8d2, type: 3}
+      propertyPath: entries.Array.data[1].data
+      value: 
+      objectReference: {fileID: 11400000, guid: bda68ce04cf34214590e324b662901c6, type: 2}
+    - target: {fileID: 4454784676332147502, guid: 7a2e04eb25a8b7f4497f759a56d7f8d2, type: 3}
+      propertyPath: entries.Array.data[1].prefab
+      value: 
+      objectReference: {fileID: 5088987549580627509, guid: 2e8ccad3059fddf488f6f1c9507965f7, type: 3}
     - target: {fileID: 7512662955351840025, guid: 7a2e04eb25a8b7f4497f759a56d7f8d2, type: 3}
       propertyPath: sceneViewId
       value: 1
