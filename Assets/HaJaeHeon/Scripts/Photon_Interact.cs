@@ -2,43 +2,57 @@ using Photon.Pun;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
-public class Photon_Interact : MonoBehaviourPunCallbacks, ITileMap, IPointerClickHandler
+public class Photon_Interact : MonoBehaviourPunCallbacks//, IPointerClickHandler
 {
-    public Vector2 Pos => throw new System.NotImplementedException();
+    private MapManager map;
+    private Camera targetCamera;
+    private Tilemap tilemap;
 
-    public TileType Type => throw new System.NotImplementedException();
 
-    private List<RaycastResult> rayResult = new();
-
-    void Start()
+    private void Awake()
     {
-
+        map = MapManager.Instance;
+        targetCamera = Camera.main;
     }
 
-    void Update()
+    private void Start()
     {
-
+        tilemap = map.GetTileMap();
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    private void Update()
     {
-        // raycast 이전 결과 삭제
-        rayResult.Clear();
-
-        EventSystem.current.RaycastAll(eventData, rayResult);
-
-        foreach (RaycastResult result in rayResult)
+        if (Input.GetMouseButtonDown(0))
         {
-            // 자신은 제외
-            if (result.gameObject == gameObject)
-                continue;
-
-            GameObject target = result.gameObject;
-
-            Debug.Log($"감지된 객체: {target.name}");
-            Debug.Log($"객체 위치: {target.transform.position}");
-            break;
+            PlayerClickTile();
         }
+    }
+
+    private void PlayerClickTile()
+    {
+        if (map == null || targetCamera == null)
+            return;
+
+        if (tilemap == null)
+            return;
+
+        Vector3 screenPosition = Input.mousePosition;
+
+        screenPosition.z = targetCamera.WorldToScreenPoint(tilemap.transform.position).z;
+
+        Vector3 worldPosition = targetCamera.ScreenToWorldPoint(screenPosition);
+
+        Vector2Int cell = (Vector2Int)tilemap.WorldToCell(worldPosition);
+
+        // 타일 맵이 아닌 위치를 클릭 시 return;
+        if (!tilemap.HasTile(new Vector3Int(cell.x, cell.y, 0)))
+            return;
+
+        TileType cellType = map.GetTileType(cell);
+
+        Debug.Log($"position2D : {cell}\n" +
+            $"CellType : {cellType}");
     }
 }
