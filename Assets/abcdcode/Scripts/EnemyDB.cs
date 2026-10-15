@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 /// <summary>
@@ -55,5 +56,21 @@ public class EnemyDB : MonoBehaviour
             return null;
         }
         return entry;
+    }
+    /// <summary>
+    /// tile 위치에 id에 해당하는 적을 네트워크 생성 (마스터 전용)
+    /// </summary>
+    public Enemy Create(ITileMap tile, string id)
+    {
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            Debug.LogWarning($"[EnemyDB] 적 생성은 마스터 클라이언트만 가능: {id}");
+            return null;
+        }
+        var entry = Get(id);
+        if(entry == null || entry.prefab == null) return null;
+        // 적 Id를 함께 보내 모든 클라이언트에서 같은 데이터로 Init (Enemy.OnPhotonInstantiate)
+        var go = PhotonNetwork.Instantiate(entry.prefab.name, tile.Pos, Quaternion.identity, 0, new object[] { id });
+        return go != null ? go.GetComponent<Enemy>() : null;
     }
 }

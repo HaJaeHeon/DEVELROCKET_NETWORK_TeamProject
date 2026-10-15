@@ -1,0 +1,89 @@
+using System.Collections.Generic;
+using Photon.Pun;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.PlayerLoop;
+
+public class Bullet : NultiMono, IdOwn
+{
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+    private static void RegisterPackets()
+    {
+        MainGamePacketer.Register(BulletHit, BulletHitExCute);
+    }
+    public virtual void Init(Tower owner, float speed, float range, IDamageInfo dmg)
+    {
+        Owner = owner;
+        m_speed = speed;
+        m_range = range;
+        m_moved = 0;
+        m_dmg = dmg;
+        isHit = false;
+        hitEnemies.Clear();
+        GameManager.Instance.Container_Bullet.AddObj(this);
+        this.SetIndex();
+    }
+    public virtual void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("Hit");
+        if(!PhotonNetwork.IsMasterClient) return; //마스터 아니면 빠지기
+        if(isHit) return;
+        var e = collision.GetComponent<IEnemy>();
+        if(e == null) return;
+        var re = e as Enemy;
+        if(!hitEnemies.Add(re.IndexId)) return; //이미 피해를 입힌 적
+        PacketData d = new ();
+        d.Write(BulletHit);
+        d.Write(IndexId);
+        d.Write(re.IndexId);
+        IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView,d);
+        if(isOnce) isHit = true;
+    }
+    public virtual void Update()
+    {
+        this.MoveForward(m_speed);
+        m_moved += m_speed * Time.deltaTime;
+        if(m_moved >= m_range)
+        {
+            Delete();
+        }
+    }
+    public override void Delete()
+    {
+        base.Delete();
+        GameManager.Instance.Container_Bullet.DeleteObj(this);
+    }
+    public virtual void BulletHitAction(PacketData data)
+    {
+        int eid = data;
+        var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
+        if(e == null) return; // 적이 이미 죽었다면 적중 판정 무효
+        if(PhotonNetwork.IsMasterClient)
+        {
+            e.TakeDamage(m_dmg);
+        }
+        if(isOnce)
+        {
+            Delete();
+        }
+    }
+    public static void BulletHitExCute(PacketData data)
+    {
+        int bid = data;
+        var b = GameManager.Instance.Container_Bullet.GetList().FindObj(bid);
+        if(b == null) return;
+        b.BulletHitAction(data);
+        
+    }
+    [SerializeField]public bool isOnce = true;
+    private bool isHit;
+    private HashSet<int> hitEnemies = new();
+    private float m_speed;
+    private float m_range;
+    private float m_moved;
+    public IDamageInfo m_dmg;
+    public Tower Owner{get;private set;}
+    public int IndexId {get; set;}
+
+    public const string BulletHit = "BulletHit";
+}
