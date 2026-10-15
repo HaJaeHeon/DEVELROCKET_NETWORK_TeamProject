@@ -19,7 +19,7 @@ public class Photon_Interact : MonoBehaviourPunCallbacks//, IPointerClickHandler
 
     private void Start()
     {
-        tilemap = map.GetTileMap();
+        tilemap = map.Tilemap;
     }
 
     private void Update()

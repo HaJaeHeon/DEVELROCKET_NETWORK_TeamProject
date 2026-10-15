@@ -17,7 +17,7 @@ public class TilemapSocket : MonoBehaviour, IDropHandler
     }
     private void Start()
     {
-        tilemap = map.GetTileMap();
+        tilemap = map.Tilemap;
     }
 
 
