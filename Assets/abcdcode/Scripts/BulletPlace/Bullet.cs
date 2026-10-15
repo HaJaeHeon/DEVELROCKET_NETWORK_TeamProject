@@ -17,7 +17,7 @@ public class Bullet : NultiMono, IdOwn
         m_range = range;
         m_moved = 0;
         m_dmg = dmg;
-        GameManager.Instance.Containder_Bullet.AddObj(this);
+        GameManager.Instance.Container_Bullet.AddObj(this);
         this.SetIndex();
     }
     public virtual void OnTriggerEnter2D(Collider2D collision)
@@ -47,21 +47,30 @@ public class Bullet : NultiMono, IdOwn
     public override void Delete()
     {
         base.Delete();
-        GameManager.Instance.Containder_Bullet.DeleteObj(this);
+        GameManager.Instance.Container_Bullet.DeleteObj(this);
+    }
+    public virtual void BulletHitAction(PacketData data)
+    {
+        int eid = data;
+        if(PhotonNetwork.IsMasterClient)
+        {
+            var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
+            e.TakeDamage(m_dmg);
+        }
+        if(isOnce)
+        {
+            Delete();
+        }
     }
     public static void BulletHitExCute(PacketData data)
     {
         int bid = data;
-        int eid = data;
-        var b = GameManager.Instance.Containder_Bullet.GetList().FindObj(bid);
+        var b = GameManager.Instance.Container_Bullet.GetList().FindObj(bid);
         if(b == null) return;
-        if(PhotonNetwork.IsMasterClient)
-        {
-            var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
-            e.TakeDamage(b.m_dmg);
-        }
-        b.Delete();
+        b.BulletHitAction(data);
+        
     }
+    [SerializeField]public bool isOnce = true;
     private bool isHit;
     private float m_speed;
     private float m_range;

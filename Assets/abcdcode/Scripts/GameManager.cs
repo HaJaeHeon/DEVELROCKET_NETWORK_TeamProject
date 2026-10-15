@@ -14,7 +14,7 @@ public class GameManager : SingletonBehavior<GameManager>
         }
         Container_Enemy = new EnemyContainer();
         Container_Tower = new TowerContainer();
-        Containder_Bullet = new BulletContainer();
+        Container_Bullet = new BulletContainer();
         StageManager = new StageManager();
         StageManager.Init(m_StageData);
         if(PhotonNetwork.IsMasterClient)
@@ -40,7 +40,7 @@ public class GameManager : SingletonBehavior<GameManager>
     [SerializeField] private bool isOffDebug;
     public IObjContainer<IEnemy> Container_Enemy { get; private set; }
     public IObjContainer<ITower> Container_Tower { get; private set; }
-    public IObjContainer<Bullet> Containder_Bullet { get; private set; }
+    public IObjContainer<Bullet> Container_Bullet { get; private set; }
     public StageManager StageManager { get; private set; }
 
     [SerializeField] private StageData m_StageData;

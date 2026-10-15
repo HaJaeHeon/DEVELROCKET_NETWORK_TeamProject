@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 978ebd8569fa4ae4496a2b0dc761d772, type: 3}
   m_Name: mData
   m_EditorClassIdentifier: Assembly-CSharp::AttackTowerData
-  id: Test
-  cost: 0
-  towerName: 
-  desc: 
+  id: NormalTower
+  cost: 10
+  towerName: "\uC77C\uBC18 \uD0C0\uC6CC"
+  desc: "\uC0AC\uAC70\uB9AC\uB3C4 \uACF5\uACA9\uB825\uB3C4 \uD3C9\uBC94\uD55C \uD0C0\uC6CC"
   AIScript: LookAtAndAttackAI
   range: 5
   damage: 5
