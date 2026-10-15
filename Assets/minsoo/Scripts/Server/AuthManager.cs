@@ -72,7 +72,7 @@ public class AuthManager : MonoBehaviour
     }
 
     // 자동 로그인
-    private async Task TryAutoLoginAsync()
+    public async Task TryAutoLoginAsync()
     {
         if (!autoLoginToggle)
             return;
