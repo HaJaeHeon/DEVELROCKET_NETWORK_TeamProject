@@ -109,7 +109,7 @@ public class DraggableImage : MonoBehaviour, IDragHandler, IEndDragHandler, IBeg
     {
         currentSocket = socket;
 
-        // 이미지를 장착 기준점의 자식으로 옮깁니다.
+        // 이미지를 장착 기준점의 자식으로 옮기기
         rect.SetParent(tr, false);
 
         SetRect();
@@ -117,14 +117,14 @@ public class DraggableImage : MonoBehaviour, IDragHandler, IEndDragHandler, IBeg
         dropSuccessed = true;
     }
 
-    // 소켓 비우기
+    // currentSocket 비우기
     public void ClearSocket(ImageSocket socket)
     {
         if (currentSocket == socket)
             currentSocket = null;
     }
 
-    // 소켓 떼어내기
+    // 버튼 등록용( 소켓에서 떼어내기 )
     public void DetachSocket()
     {
         if (currentSocket == null)

@@ -7,8 +7,8 @@ public interface ITileMap
 }
 public enum TileType
 {
-    Road,
     Block,
+    Road,
     Build,
     Start,
     Goal
