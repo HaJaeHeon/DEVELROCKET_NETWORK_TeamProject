@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Photon.Pun;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -17,7 +18,9 @@ public class Bullet : NultiMono, IdOwn
         m_range = range;
         m_moved = 0;
         m_dmg = dmg;
-        GameManager.Instance.Containder_Bullet.AddObj(this);
+        isHit = false;
+        hitEnemies.Clear();
+        GameManager.Instance.Container_Bullet.AddObj(this);
         this.SetIndex();
     }
     public virtual void OnTriggerEnter2D(Collider2D collision)
@@ -28,12 +31,13 @@ public class Bullet : NultiMono, IdOwn
         var e = collision.GetComponent<IEnemy>();
         if(e == null) return;
         var re = e as Enemy;
+        if(!hitEnemies.Add(re.IndexId)) return; //이미 피해를 입힌 적
         PacketData d = new ();
         d.Write(BulletHit);
         d.Write(IndexId);
         d.Write(re.IndexId);
         IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView,d);
-        isHit = true;
+        if(isOnce) isHit = true;
     }
     public virtual void Update()
     {
@@ -47,22 +51,33 @@ public class Bullet : NultiMono, IdOwn
     public override void Delete()
     {
         base.Delete();
-        GameManager.Instance.Containder_Bullet.DeleteObj(this);
+        GameManager.Instance.Container_Bullet.DeleteObj(this);
+    }
+    public virtual void BulletHitAction(PacketData data)
+    {
+        int eid = data;
+        var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
+        if(e == null) return; // 적이 이미 죽었다면 적중 판정 무효
+        if(PhotonNetwork.IsMasterClient)
+        {
+            e.TakeDamage(m_dmg);
+        }
+        if(isOnce)
+        {
+            Delete();
+        }
     }
     public static void BulletHitExCute(PacketData data)
     {
         int bid = data;
-        int eid = data;
-        var b = GameManager.Instance.Containder_Bullet.GetList().FindObj(bid);
+        var b = GameManager.Instance.Container_Bullet.GetList().FindObj(bid);
         if(b == null) return;
-        if(PhotonNetwork.IsMasterClient)
-        {
-            var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
-            e.TakeDamage(b.m_dmg);
-        }
-        b.Delete();
+        b.BulletHitAction(data);
+        
     }
+    [SerializeField]public bool isOnce = true;
     private bool isHit;
+    private HashSet<int> hitEnemies = new();
     private float m_speed;
     private float m_range;
     private float m_moved;

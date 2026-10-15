@@ -31,6 +31,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
     {
         Data = data;
         if(Data != null) m_hp = MaxHP;
+        UpdateHPBar();
         path = CreateTestPath();
         pathIndex = 0;
     }
@@ -75,6 +76,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
         set
         {
             m_hp = Mathf.Clamp(value,0,MaxHP);
+            UpdateHPBar();
             if(m_hp <= 0)
             {
                 if(PhotonNetwork.IsMasterClient)
@@ -89,10 +91,18 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
     }
 
     public float MaxHP => Data.HP;
+    private void UpdateHPBar()
+    {
+        if(hpBar == null || Data == null || MaxHP <= 0) return;
+        hpBar.SetRatio(m_hp / MaxHP);
+    }
 
     public IEnemySO Data {get;private set;}
     [Tooltip("EnemyDB 없이 소환될 때 사용할 기본 데이터")]
     [SerializeField]private EnemyData mData;
+    [Tooltip("회전시킬 외형(스프라이트) Transform. HP바 등은 회전하지 않음")]
+    [SerializeField]private Transform body;
+    [SerializeField]private HPBar hpBar;
 
     public int IndexId { get; set;}
     public Dictionary<string, Action<PacketData>> RPCEvent { get ; set ; }
@@ -138,7 +148,15 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
             Vector2 dir = path[pathIndex].Pos - cur;
             if(dir != Vector2.zero)
             {
-                this.SetAngle(dir);
+                if(body != null)
+                {
+                    float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+                    body.eulerAngles = new Vector3(0, 0, angle);
+                }
+                else
+                {
+                    this.SetAngle(dir);
+                }
             }
         }
 
