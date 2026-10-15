@@ -33,7 +33,8 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
         }
         else
         {
-            path = MapManager.Instance.GetPath(MapManager.Instance.GetStartTile().FindIndex(x => new Vector2Int((int)x.Pos.x, (int)x.Pos.y) == new Vector2Int((int)this.Position.x,(int)this.Position.y))).ToList();
+            int index = (int)instData[1];
+            path = MapManager.Instance.GetPath(index).ToList();
         }
     }
     public void Init(IEnemySO data)
@@ -91,13 +92,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
             UpdateHPBar();
             if(m_hp <= 0)
             {
-                if(PhotonNetwork.IsMasterClient)
-                {
-                    PacketData d = new PacketData();
-                    d.Write(Enemy.EnemyDestroy);
-                    d.Write(IndexId);
-                    IPacketer.SendPacket(MainGamePacketer.Instance.photonView,d);
-                }
+                SendDestroy();
             }
         }
     }
@@ -177,9 +172,22 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
             OnReachGoal();
         }
     }
+    // 마스터에서만 호출됨 (Update가 마스터 전용)
     private void OnReachGoal()
     {
-        // TODO: 최종 타일 도착 처리 (라이프 감소, 적 제거 등)
+        SendDestroy();
+        PlayerHP.Damage(1);
+    }
+    /// <summary>
+    /// 모든 클라이언트에 적 제거 패킷 전송 (마스터 전용)
+    /// </summary>
+    private void SendDestroy()
+    {
+        if(!PhotonNetwork.IsMasterClient) return;
+        PacketData d = new PacketData();
+        d.Write(Enemy.EnemyDestroy);
+        d.Write(IndexId);
+        IPacketer.SendPacket(MainGamePacketer.Instance.photonView,d);
     }
 
     [PunRPC]

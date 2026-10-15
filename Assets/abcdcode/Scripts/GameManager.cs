@@ -15,6 +15,8 @@ public class GameManager : SingletonBehavior<GameManager>
             PhotonNetwork.CreateRoom(null);
         }
         if(PhotonNetwork.InRoom) PlayerGold.Set(PlayerGold.StartGold);
+        IsGameOver = false;
+        PlayerHP.Init(m_startPlayerHP);
         Container_Enemy = new EnemyContainer();
         Container_Tower = new TowerContainer();
         Container_Bullet = new BulletContainer();
@@ -38,10 +40,33 @@ public class GameManager : SingletonBehavior<GameManager>
         */
         }
     }
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+    private static void RegisterPackets()
+    {
+        MainGamePacketer.Register(GameOverPacket, GameOverEvent);
+    }
     public void Update()
     {
+        if(IsGameOver) return;
         StageManager?.Update(Time.deltaTime);
     }
+    public static void GameOverEvent(PacketData data)
+    {
+        Instance.GameOver();
+    }
+    /// <summary>
+    /// PlayerHP가 0이 되면 모든 클라이언트에서 호출됨
+    /// </summary>
+    public void GameOver()
+    {
+        if(IsGameOver) return;
+        IsGameOver = true;
+        Debug.Log("Game Over");
+        // TODO: 게임오버 UI 표시, 결과 처리 등
+    }
+    public bool IsGameOver { get; private set; }
+    [SerializeField] private int m_startPlayerHP = 20;
+    public const string GameOverPacket = "GameOver";
     public PhotonView View { get; private set; }
     [SerializeField] private bool isOffDebug;
     [SerializeField]public bool IsMapDebug;
