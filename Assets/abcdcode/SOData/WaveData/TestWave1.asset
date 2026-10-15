@@ -15,10 +15,22 @@ MonoBehaviour:
   id: 
   spawns:
   - time: 1
-    enemyId: TestEnemy
+    enemyId: Enemy3
+  - time: 1.5
+    enemyId: Enemy3
   - time: 2
-    enemyId: TestEnemy
+    enemyId: Enemy3
+  - time: 2.5
+    enemyId: Enemy3
   - time: 3
-    enemyId: TestEnemy
+    enemyId: Enemy3
+  - time: 3.5
+    enemyId: Enemy3
   - time: 4
-    enemyId: TestEnemy
+    enemyId: Enemy3
+  - time: 4.5
+    enemyId: Enemy3
+  - time: 5
+    enemyId: Enemy3
+  - time: 5.5
+    enemyId: Enemy3
