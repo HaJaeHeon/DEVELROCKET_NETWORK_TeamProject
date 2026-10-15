@@ -149,17 +149,20 @@ public class StageManager
     }
     private void Spawn(string enemyId)
     {
-        Vector2 spawnpos = GameManager.Instance.IsMapDebug ? SpawnPos : GetStartTile();
+        int index = 0;
+        Vector2 spawnpos = GameManager.Instance.IsMapDebug ? SpawnPos : GetStartTile(out index);
         var entry = GameManager.Instance.EnemyDB.Get(enemyId);
         if(entry == null || entry.prefab == null) return;
         // 적 Id를 함께 보내 모든 클라이언트에서 같은 데이터로 Init (Enemy.OnPhotonInstantiate)
-        PhotonNetwork.Instantiate(entry.prefab.name, spawnpos, Quaternion.identity, 0, new object[] { enemyId });
+        PhotonNetwork.Instantiate(entry.prefab.name, spawnpos, Quaternion.identity, 0, new object[] { enemyId,index });
     }
-    private Vector2 GetStartTile()
+    private Vector2 GetStartTile(out int index)
     {
-        var list = MapManager.Instance.GetStartTile();
-        var result = list[Random.Range(0,list.Count)];
-        return result.Pos;
+        var list = MapManager.Instance.GetPaths();
+        index = Random.Range(0,list.Count);
+        var result = list[index];
+        
+        return result.Points[0];
     }
     private int CalcRemainEnemy()
     {
