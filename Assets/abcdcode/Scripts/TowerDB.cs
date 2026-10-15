@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
 /// <summary>
@@ -58,9 +59,9 @@ public class TowerDB : MonoBehaviour
         return entry;
     }
     /// <summary>
-    /// tile 위치에 id에 해당하는 타워를 네트워크 생성 (생성한 클라이언트 소유)
+    /// tile 위치에 id에 해당하는 타워를 네트워크 생성하고 owner를 소유자로 지정
     /// </summary>
-    public Tower Create(ITileMap tile, string id)
+    public Tower Create(ITileMap tile, string id, Player owner)
     {
         var entry = Get(id);
         if(entry == null || entry.prefab == null) return null;
@@ -69,6 +70,7 @@ public class TowerDB : MonoBehaviour
         if(go == null) return null;
         var t = go.GetComponent<Tower>();
         t.SetTile(tile);
+        t.SetOwner(owner);
         return t;
     }
 }

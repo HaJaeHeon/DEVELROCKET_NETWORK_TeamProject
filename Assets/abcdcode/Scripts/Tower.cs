@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
 public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallback
@@ -18,6 +19,7 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     {
         // 풀 재사용 시 Awake가 다시 호출되지 않으므로 ViewID 갱신 및 컨테이너 등록은 여기서 수행
         IndexId = photonView.ViewID;
+        OwnerPlayer = null; // 풀 재사용 시 이전 소유자 초기화 (TowerSetOwner 패킷으로 지정됨)
         GameManager.Instance?.Container_Tower.AddObj(this);
         object[] instData = info.photonView.InstantiationData;
         if(instData != null && instData.Length > 0 && instData[0] is string towerId)
@@ -34,6 +36,28 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     private static void RegisterPackets()
     {
         MainGamePacketer.Register(TowerDestroy, TowerDestroyEvent);
+        MainGamePacketer.Register(TowerSetOwner, TowerSetOwnerEvent);
+    }
+    /// <summary>
+    /// 타워 소유자를 지정하고 모든 클라이언트에 전파 (Player는 ActorNumber로 식별)
+    /// </summary>
+    public void SetOwner(Player owner)
+    {
+        PacketData d = new PacketData();
+        d.Write(TowerSetOwner);
+        d.Write(IndexId);
+        d.Write(owner != null ? owner.ActorNumber : -1);
+        IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView, d);
+    }
+    public static void TowerSetOwnerEvent(PacketData data)
+    {
+        int tid = data;
+        int actorNumber = data;
+        var t = GameManager.Instance.Container_Tower.GetList().FindTower(tid);
+        if(t == null) return;
+        t.OwnerPlayer = actorNumber >= 0 && PhotonNetwork.CurrentRoom != null
+            ? PhotonNetwork.CurrentRoom.GetPlayer(actorNumber)
+            : null;
     }
     public void Init(ITileMap tile, ITowerSO data)
     {
@@ -54,8 +78,9 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     }
     public virtual void OnClickDemo()
     {
-        if(photonView.IsMine)
+        if(OwnerPlayer == PhotonNetwork.LocalPlayer)
         {
+            
             this.Delete();
         }
         else
@@ -96,7 +121,8 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     [SerializeField]private Transform mainTransform;
     public ITowerSO Data{get;private set;}
     public TowerAI AIData{get;private set;}
-    public string Owner{get;private set;}
+    public Player OwnerPlayer{get;private set;}
+    public string Owner => OwnerPlayer?.NickName;
     public Dictionary<string, Action<PacketData>> RPCEvent {get;set;}
 
     public ITileMap CurTile {get;private set;}
@@ -115,4 +141,5 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
 
     [SerializeField]private TowerData mData;
     public const string TowerDestroy = "TowerDestroy";
+    public const string TowerSetOwner = "TowerSetOwner";
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Photon.Pun;
 using UnityEngine;
 
@@ -26,20 +27,28 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
             // EnemyDB를 거치지 않고 소환된 경우 프리팹에 지정된 기본 데이터 사용
             Init(mData);
         }
+        if(GameManager.Instance.IsMapDebug)
+        {
+            path = CreateTestPath();
+        }
+        else
+        {
+            path = MapManager.Instance.GetPath(MapManager.Instance.GetStartTile().FindIndex(x => new Vector2Int((int)x.Pos.x, (int)x.Pos.y) == new Vector2Int((int)this.Position.x,(int)this.Position.y))).ToList();
+        }
     }
     public void Init(IEnemySO data)
     {
         Data = data;
         if(Data != null) m_hp = MaxHP;
         UpdateHPBar();
-        path = CreateTestPath();
+        
         pathIndex = 0;
     }
     // 테스트용 경로: (-3,-3)에서 출발해 지그재그로 (3,3)에 도착
-    private static List<ITileMap> CreateTestPath()
+    private static List<Vector2> CreateTestPath()
     {
-        Vector2[] corners =
-        {
+        List<Vector2> corners =
+        new (){
             new Vector2(-3,-3),
             new Vector2( 3,-3),
             new Vector2( 3, 0),
@@ -47,6 +56,8 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
             new Vector2(-3, 3),
             new Vector2( 3, 3),
         };
+        return corners;
+        /*
         List<ITileMap> result = new List<ITileMap>();
         result.Add(new FakeTile { Pos = corners[0], Type = TileType.Start });
         for(int i = 1; i < corners.Length; i++)
@@ -61,6 +72,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
         }
         ((FakeTile)result[result.Count - 1]).Type = TileType.Goal;
         return result;
+        */
     }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     private static void RegisterPackets()
@@ -116,7 +128,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
     {
         throw new System.NotImplementedException();
     }
-    private List<ITileMap> path;
+    private List<Vector2> path;
     private int pathIndex = 0;
 
     public void Update()
@@ -128,7 +140,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
         Vector2 cur = Position;
         while(pathIndex < path.Count)
         {
-            Vector2 target = path[pathIndex].Pos;
+            Vector2 target = path[pathIndex];
             float dist = Vector2.Distance(cur, target);
             if(dist > moveDist)
             {
@@ -145,7 +157,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
         // 프레임 이동량이 아닌 다음 목표 타일 방향을 바라봄 (프레임레이트 무관)
         if(pathIndex < path.Count)
         {
-            Vector2 dir = path[pathIndex].Pos - cur;
+            Vector2 dir = path[pathIndex] - cur;
             if(dir != Vector2.zero)
             {
                 if(body != null)
