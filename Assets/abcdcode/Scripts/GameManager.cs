@@ -13,6 +13,7 @@ public class GameManager : SingletonBehavior<GameManager>
             PhotonNetwork.OfflineMode = true;
             PhotonNetwork.CreateRoom(null);
         }
+        if(PhotonNetwork.InRoom) PlayerGold.Set(PlayerGold.StartGold);
         Container_Enemy = new EnemyContainer();
         Container_Tower = new TowerContainer();
         Container_Bullet = new BulletContainer();
@@ -38,6 +39,7 @@ public class GameManager : SingletonBehavior<GameManager>
     }
     public PhotonView View { get; private set; }
     [SerializeField] private bool isOffDebug;
+    [SerializeField]public bool IsMapDebug;
     public IObjContainer<IEnemy> Container_Enemy { get; private set; }
     public IObjContainer<ITower> Container_Tower { get; private set; }
     public IObjContainer<Bullet> Container_Bullet { get; private set; }
@@ -53,6 +55,7 @@ public class GameManager : SingletonBehavior<GameManager>
 
     [SerializeField] private TowerData m_tData;
     [SerializeField] private NetworkPrefabPool prefabPool;
+    
     [SerializeField] private MainGamePacketer m_mgp;
     public MainGamePacketer MainGamePacketer
     {

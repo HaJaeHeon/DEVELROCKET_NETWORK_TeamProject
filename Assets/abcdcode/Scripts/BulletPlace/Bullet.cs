@@ -56,9 +56,10 @@ public class Bullet : NultiMono, IdOwn
     public virtual void BulletHitAction(PacketData data)
     {
         int eid = data;
+        var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
+        if(e == null) return; // 적이 이미 죽었다면 적중 판정 무효
         if(PhotonNetwork.IsMasterClient)
         {
-            var e = GameManager.Instance.Container_Enemy.GetList().FindEnemy(eid);
             e.TakeDamage(m_dmg);
         }
         if(isOnce)
