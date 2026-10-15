@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 public class GameManager : SingletonBehavior<GameManager>
 {
@@ -21,12 +22,16 @@ public class GameManager : SingletonBehavior<GameManager>
         StageManager.Init(m_StageData);
         if(PhotonNetwork.IsMasterClient)
         {
-        FakeTile ft = new FakeTile
+            if(IsMapDebug)
+            {
+                FakeTile ft = new FakeTile
         {
             Pos = new Vector2(0, 0),
             Type = TileType.Build
         };
-        CreateTower(ft, "FireTower1");
+        CreateTower(ft, "FireTower1", PhotonNetwork.LocalPlayer);
+            }
+        
         /*
         Enemy e = PhotonNetwork.Instantiate("TestEnemy", new Vector3(0, 0), Quaternion.identity).GetComponent<Enemy>();
         e.Position = new Vector2(-3, -3);
@@ -51,7 +56,7 @@ public class GameManager : SingletonBehavior<GameManager>
     [SerializeField] private TowerDB m_towerDB;
     public TowerDB TowerDB => m_towerDB;
     public Enemy CreateEnemy(ITileMap tile, string id) => m_enemyDB != null ? m_enemyDB.Create(tile, id) : null;
-    public Tower CreateTower(ITileMap tile, string id) => m_towerDB != null ? m_towerDB.Create(tile, id) : null;
+    public Tower CreateTower(ITileMap tile, string id, Player owner) => m_towerDB != null ? m_towerDB.Create(tile, id, owner) : null;
 
     [SerializeField] private TowerData m_tData;
     [SerializeField] private NetworkPrefabPool prefabPool;
