@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5361882293277134090}
   - component: {fileID: 3540037647837290315}
   - component: {fileID: 5795268016652966716}
-  - component: {fileID: -3817942205012302297}
+  - component: {fileID: 3182850857791717492}
   - component: {fileID: 2491254418636159809}
   - component: {fileID: 7306437294202781385}
   m_Layer: 0
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7133782965717835721, guid: 3b32fc0eb1afa4f4d858f777b71934a7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -118,7 +118,7 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &-3817942205012302297
+--- !u!114 &3182850857791717492
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,10 +127,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5088987549580627509}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b5c976a1c30a0b4595cf261103b0342, type: 3}
+  m_Script: {fileID: 11500000, guid: fc7b9ca5b14a13e45a0c85da420f7876, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Monster
-  speed: 2
+  m_EditorClassIdentifier: Assembly-CSharp::TestMonster
+  mData: {fileID: 11400000, guid: bda68ce04cf34214590e324b662901c6, type: 2}
 --- !u!114 &2491254418636159809
 MonoBehaviour:
   m_ObjectHideFlags: 0
