@@ -1,25 +1,17 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class MapManager : SingletonBehavior<MapManager>, IMap
 {
-
-    // 타일맵 가져오기
-
-    // 맵 시작점 보내주기
-
-    // 길찾기
-    // 찾은 경로 보내주기
-    // BuildType 보내주기
-
     [SerializeField] private Tilemap tilemap;
 
-    Dictionary<Vector2, Tower> towerDict;
     private TileType[,] grid;
-    private Vector2Int startPos;
+    private readonly List<Vector2Int> startCells = new();
     private Vector2Int endPos;
-    private List<Vector2> path;
+    private readonly List<MapPath> paths = new();
+    public Tilemap Tilemap => tilemap;
     public override void Awake()
     {
         base.Awake();
@@ -30,6 +22,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
 
     private void GetGridTileType()
     {
+        startCells.Clear();
         BoundsInt b = tilemap.cellBounds;
         grid = new TileType[b.size.x, b.size.y];
         foreach (var p in b.allPositionsWithin)
@@ -38,7 +31,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
             var type = t ? t.Type : TileType.Block;
             int x = p.x - b.xMin, y = p.y - b.yMin;
             grid[x, y] = type;
-            if (type == TileType.Start) startPos = new(x, y);
+            if (type == TileType.Start) startCells.Add(new(x, y));
             if (type == TileType.Goal) endPos = new(x, y);
         }
     }
@@ -69,40 +62,47 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
 
     private void BuildPath()
     {
+        paths.Clear();
+
         BoundsInt b = tilemap.cellBounds;
-
-        var raw = Pathfinder.FindPath(grid, startPos, endPos);
-        if (raw == null)
+        for(int i = 0; i < startCells.Count; i++)
         {
-            Debug.LogError("시작점에서 도착점까지 길이 없습니다.");
-            return;
+            var raw = Pathfinder.FindPath(grid, startCells[i], endPos);
+            if (raw == null)
+            {
+                Debug.LogError("시작점에서 도착점까지 길이 없습니다.");
+                continue;
+            }
+            var corners = Pathfinder.Simplify(raw);
+            var points = new Vector2[corners.Count];
+
+            for (int j = 0; j < corners.Count; j++)
+            {
+                var cell = new Vector3Int(corners[j].x + b.xMin, corners[j].y + b.yMin, 0);
+                points[j] = tilemap.GetCellCenterWorld(cell);
+            }
+            paths.Add(new MapPath(paths.Count, startCells[i], points));
         }
 
-        path = new List<Vector2>();
-        foreach (var idx in Pathfinder.Simplify(raw))
-        {
-            var cell = new Vector3Int(idx.x + b.xMin, idx.y + b.yMin, 0);
-            path.Add(tilemap.GetCellCenterWorld(cell));
-        }
+        if (paths.Count == 0)
+            Debug.LogError("도착점까지 갈 수 있는 시작점이 없습니다.");
+
     }
 
-    // 전체 경로 보내주기
-    public List<Vector2> GetPath()
-    {
-        return path;
-    }
+    // 모든 경로 보내기
+    public IReadOnlyList<MapPath> GetPaths() => paths;
 
-
-    //경로 리스트 중 원하는 시작위치에 따른 경로 보내주기
-    public List<Vector2> GetStartToPath(Vector2 startPos)
-    {
-        return path;
-    }
+    // 경로 하나 보내기
+    public IReadOnlyList<Vector2> GetPath(int index) => paths[index].Points;
 
     // 현재 타일의 타입 보내주기
-    public TileType GetTileType(Vector2Int curPos)
+    public TileType GetTileType(Vector2Int curPos) => grid[curPos.x, curPos.y];
+
+    // GetTile로 타입 보내주기
+    public TileType GetTileType(Vector3Int cell)
     {
-        return grid[curPos.x, curPos.y];
+        var t = tilemap.GetTile<GameTile>(cell);
+        return t ? t.Type : TileType.Block;
     }
 
     public ITileMap GetGoalTile()
@@ -120,4 +120,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
     {
         throw new System.NotImplementedException();
     }
+
+
+    
 }
