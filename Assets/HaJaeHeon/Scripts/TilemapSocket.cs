@@ -69,16 +69,7 @@ public class TilemapSocket : MonoBehaviour, IDropHandler
 
         if(cellType == TileType.Build)
         {
-            Sprite imageSprite = image.GetComponent<Image>().sprite;
-
-            GameObject target = new GameObject("new_Image");
-
-            SpriteRenderer renderer = target.AddComponent<SpriteRenderer>();
-            renderer.sprite = imageSprite;
-            renderer.sortingOrder = 10;
-
-            target.transform.position = tilemap.GetCellCenterWorld(new Vector3Int(cell.x, cell.y, 0));
-
+            SpawnTower(image, cell);
         }
         else
         {
@@ -86,5 +77,18 @@ public class TilemapSocket : MonoBehaviour, IDropHandler
             return;
         }
 
+    }
+
+    private void SpawnTower(DraggableImage image, Vector2Int cell)
+    {
+        Sprite imageSprite = image.GetComponent<Image>().sprite;
+
+        GameObject target = new GameObject("new_Image");
+
+        SpriteRenderer renderer = target.AddComponent<SpriteRenderer>();
+        renderer.sprite = imageSprite;
+        renderer.sortingOrder = 10;
+
+        target.transform.position = tilemap.GetCellCenterWorld(new Vector3Int(cell.x, cell.y, 0));
     }
 }
