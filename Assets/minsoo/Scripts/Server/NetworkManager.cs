@@ -39,6 +39,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         DontDestroyOnLoad(gameObject);
     }
 
+    public event Action JoinedLobby;
+    public event Action JoinedRoom;
+
+    public override void OnJoinedLobby() => JoinedLobby?.Invoke();
+
     private void Start()
     {
         profileRepo = new ProfileRepository();
@@ -49,6 +54,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             IsOpen = true,
         };
         PhotonNetwork.AutomaticallySyncScene = true;
+
+        AuthManager.Instance.OnSignedIn += OnFirebaseSignedIn;
+    }
+
+    private async void OnFirebaseSignedIn(Firebase.Auth.FirebaseUser user)
+    {
+        string error = await Connect();
+        if (!string.IsNullOrEmpty(error))
+            Debug.LogWarning(error);
     }
 
     // Photon 연결
@@ -112,17 +126,54 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         );
     }
 
-    // 게임 준비
+    // 방 인원 / 준비 상태 / 방장이 바뀔 때마다 알림
+    public event Action RoomPlayersChanged;
+
+    // static으로 바꾸고 public으로 → UI에서도 사용
+    public static bool IsReady(Player player) =>
+        player.CustomProperties.TryGetValue(PlayerProps.Ready, out object v) && v is bool b && b;
+
+    public bool AllReady()
+    {
+        foreach (Player p in PhotonNetwork.PlayerList)
+            if (!IsReady(p)) return false;
+        return true;
+    }
+
     public void OnReadyGame()
     {
-        if (!PhotonNetwork.InRoom)
-            return;
-
+        if (!PhotonNetwork.InRoom) return;
         bool ready = IsReady(PhotonNetwork.LocalPlayer);
-
         PhotonNetwork.LocalPlayer.SetCustomProperties(
-            new Hashtable { { ReadyKey, !ready } });
+            new Hashtable { { PlayerProps.Ready, !ready } });
     }
+
+    
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        Debug.Log($"선수 입장 : {newPlayer.NickName}");
+        RoomPlayersChanged?.Invoke();
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        Debug.Log($"선수 퇴장 : {otherPlayer.NickName}");
+        RoomPlayersChanged?.Invoke();
+    }
+
+    // 방장이 나가면 방장 표시와 시작 버튼이 바뀌어야 함
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        RoomPlayersChanged?.Invoke();
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (changedProps.ContainsKey(PlayerProps.Ready))
+            RoomPlayersChanged?.Invoke();
+    }
+
 
     // 게임 시작
     public void OnStartGame()
@@ -140,29 +191,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.LoadLevel((int)SceneNumber.InGame);
+        PhotonNetwork.LoadLevel((int)SceneNumber.InGame); //TODO GameScene 정하기
     }
 
-    // 플레이어의 레디 상태를 반환
-    private bool IsReady(Player player)
-    {
-        if (player.CustomProperties.TryGetValue(ReadyKey, out object value))
-            return (bool)value;
-        return false;
-    }
-
-    // 전체 플레이어의 레디 상태를 확인 -> 한 명이라도 준비상태가 아니면 false
-    private bool AllReady()
-    {
-        foreach (Player p in PhotonNetwork.PlayerList)
-        {
-            if (!IsReady(p))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
 
     // 방목록 갱신
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -187,16 +218,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.LogWarning($"Photon Connect Failed : {cause}");
     }
 
-    public override async void OnJoinedLobby()
-    {
-        // UI panel on off
-        PhotonNetwork.LoadLevel((int)SceneNumber.Lobby);
-    }
 
     public override void OnLeftLobby()
     {
         RoomDicts.Clear();
-        PhotonNetwork.LoadLevel((int)SceneNumber.Title);
     }
 
     public override void OnCreatedRoom()
@@ -204,12 +229,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         base.OnCreatedRoom();
     }
 
+
     public override void OnJoinedRoom()
     {
         RoomDicts.Clear();
-        foreach (var p in PhotonNetwork.PlayerList)
-            UpdateReadyUI(p, IsReady(p));
-        PhotonNetwork.LoadLevel((int)SceneNumber.Room);
+        JoinedRoom?.Invoke();
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -226,10 +250,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.LocalPlayer.SetCustomProperties(
         new Hashtable { { ReadyKey, false } });
-        PhotonNetwork.LoadLevel((int)SceneNumber.Lobby);
         RoomListChanged?.Invoke(RoomDicts);
     }
-
+    /*
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         Debug.Log($"선수 입장 : {newPlayer.NickName}");
@@ -248,10 +271,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         UpdateReadyUI(targetPlayer, isReady);
     }
-
-
-    public void UpdateReadyUI(Player player, bool isReady)
+    */
+    private void OnDestroy()
     {
-        //TODO 방 플레이어 상태 갱신
+        if (AuthManager.Instance != null)
+            AuthManager.Instance.OnSignedIn -= OnFirebaseSignedIn;
     }
 }

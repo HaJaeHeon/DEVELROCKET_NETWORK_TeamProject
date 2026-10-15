@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c32de7615e5c2654b89900250f24be7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  m_startPlayerHP: 20
+  m_startPlayerHP: 10
   isOffDebug: 0
   IsMapDebug: 0
   m_StageData: {fileID: 11400000, guid: 47f9f8fe281964c4d9843d69e39de570, type: 2}

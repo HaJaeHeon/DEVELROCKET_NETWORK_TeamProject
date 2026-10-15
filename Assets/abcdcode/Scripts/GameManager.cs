@@ -44,6 +44,7 @@ public class GameManager : SingletonBehavior<GameManager>
     private static void RegisterPackets()
     {
         MainGamePacketer.Register(GameOverPacket, GameOverEvent);
+        MainGamePacketer.Register(GameClearPacket, GameClearEvent);
     }
     public void Update()
     {
@@ -62,11 +63,26 @@ public class GameManager : SingletonBehavior<GameManager>
         if(IsGameOver) return;
         IsGameOver = true;
         Debug.Log("Game Over");
-        // TODO: 게임오버 UI 표시, 결과 처리 등
+        GameEndPanelUI.Instance.OpenGameOver();
+    }
+    public static void GameClearEvent(PacketData data)
+    {
+        Instance.GameClear();
+    }
+    /// <summary>
+    /// 마지막 웨이브의 적이 모두 제거되면 모든 클라이언트에서 호출됨
+    /// </summary>
+    public void GameClear()
+    {
+        if(IsGameOver) return;
+        IsGameOver = true;
+        Debug.Log("Game Clear");
+        GameEndPanelUI.Instance.OpenGameClear();
     }
     public bool IsGameOver { get; private set; }
-    [SerializeField] private int m_startPlayerHP = 20;
+    [SerializeField] private int m_startPlayerHP = 10;
     public const string GameOverPacket = "GameOver";
+    public const string GameClearPacket = "GameClear";
     public PhotonView View { get; private set; }
     [SerializeField] private bool isOffDebug;
     [SerializeField]public bool IsMapDebug;
