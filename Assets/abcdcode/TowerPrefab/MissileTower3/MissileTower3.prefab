@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 69732801250463261}
   - component: {fileID: 2841146487611685592}
   m_Layer: 0
-  m_Name: TMPTower3
+  m_Name: MissileTower3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

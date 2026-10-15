@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Photon.Pun;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -17,6 +18,8 @@ public class Bullet : NultiMono, IdOwn
         m_range = range;
         m_moved = 0;
         m_dmg = dmg;
+        isHit = false;
+        hitEnemies.Clear();
         GameManager.Instance.Container_Bullet.AddObj(this);
         this.SetIndex();
     }
@@ -28,12 +31,13 @@ public class Bullet : NultiMono, IdOwn
         var e = collision.GetComponent<IEnemy>();
         if(e == null) return;
         var re = e as Enemy;
+        if(!hitEnemies.Add(re.IndexId)) return; //이미 피해를 입힌 적
         PacketData d = new ();
         d.Write(BulletHit);
         d.Write(IndexId);
         d.Write(re.IndexId);
         IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView,d);
-        isHit = true;
+        if(isOnce) isHit = true;
     }
     public virtual void Update()
     {
@@ -72,6 +76,7 @@ public class Bullet : NultiMono, IdOwn
     }
     [SerializeField]public bool isOnce = true;
     private bool isHit;
+    private HashSet<int> hitEnemies = new();
     private float m_speed;
     private float m_range;
     private float m_moved;

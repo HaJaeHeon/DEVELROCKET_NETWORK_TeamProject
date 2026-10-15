@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Photon.Pun;
 using UnityEngine;
 
-public class Tower : MultiMono,ITower,IPacketer,IdOwn
+public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallback
 {
     public void Awake()
     {
@@ -12,8 +12,23 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn
         Data = mData;
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
+    }
+    // PhotonNetwork.Instantiate 시 모든 클라이언트에서 호출 (풀에서 재사용될 때도 호출됨)
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        // 풀 재사용 시 Awake가 다시 호출되지 않으므로 ViewID 갱신 및 컨테이너 등록은 여기서 수행
         IndexId = photonView.ViewID;
         GameManager.Instance?.Container_Tower.AddObj(this);
+        object[] instData = info.photonView.InstantiationData;
+        if(instData != null && instData.Length > 0 && instData[0] is string towerId)
+        {
+            InitData(GameManager.Instance.TowerDB.Get(towerId)?.data);
+        }
+        else
+        {
+            // TowerDB를 거치지 않고 소환된 경우 프리팹에 지정된 기본 데이터 사용
+            InitData(mData);
+        }
     }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     private static void RegisterPackets()
@@ -22,8 +37,17 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn
     }
     public void Init(ITileMap tile, ITowerSO data)
     {
+        SetTile(tile);
+        InitData(data);
+    }
+    public void SetTile(ITileMap tile)
+    {
         CurTile = tile;
         Position = tile.Pos;
+    }
+    public void InitData(ITowerSO data)
+    {
+        if(data == null) return;
         Data = data;
         AIData = (data as TowerData).CreateAI();
         AIData.Init(this);

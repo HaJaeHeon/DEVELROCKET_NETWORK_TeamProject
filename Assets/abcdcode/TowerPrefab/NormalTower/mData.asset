@@ -18,6 +18,6 @@ MonoBehaviour:
   desc: "\uC0AC\uAC70\uB9AC\uB3C4 \uACF5\uACA9\uB825\uB3C4 \uD3C9\uBC94\uD55C \uD0C0\uC6CC"
   AIScript: LookAtAndAttackAI
   range: 5
-  damage: 5
-  cool: 1
+  damage: 3
+  cool: 0.5
   bulletPrefab: {fileID: 1107830369495406184, guid: e7681ca2342bedf4c9d57ab616f5e041, type: 3}
