@@ -1,6 +1,12 @@
 using UnityEngine;
 using Photon.Pun;
 
+
+/// <summary>
+/// 카메라 이동 범위 제한 존재해야함
+/// </summary>
+
+
 public class CameraMove : MonoBehaviourPunCallbacks
 {
     private Camera myCamera;
