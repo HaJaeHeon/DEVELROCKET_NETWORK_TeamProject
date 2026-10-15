@@ -117,6 +117,15 @@ public class StageManager
         {
             SyncRemainEnemy();
             if(GameManager.Instance.Container_Enemy.GetList().Count > 0) return;
+            if(CurWaveIndex + 1 >= Data.Waves.Count)
+            {
+                // 마지막 웨이브 적 전멸, 게임 클리어 패킷 전송
+                StartWave(CurWaveIndex + 1);
+                PacketData d = new PacketData();
+                d.Write(GameManager.GameClearPacket);
+                IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView, d);
+                return;
+            }
             // 적 전멸, 다음 웨이브 카운트다운 시작
             state = WaveState.Countdown;
             timer = 0;
