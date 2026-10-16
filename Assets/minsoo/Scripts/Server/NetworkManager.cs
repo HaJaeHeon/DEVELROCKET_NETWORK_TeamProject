@@ -70,7 +70,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public async Task<string> Connect()
     {
         if (PhotonNetwork.IsConnected)
-            return "Is already connected.";
+            return "Is already connected!";
 
         try
         {
@@ -202,7 +202,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.LoadLevel("GameScene"); //TODO GameScene 정하기
+        PhotonNetwork.LoadLevel("GameScene");
     }
 
 
