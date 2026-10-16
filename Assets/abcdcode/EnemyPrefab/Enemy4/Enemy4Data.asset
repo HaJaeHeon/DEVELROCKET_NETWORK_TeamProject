@@ -17,3 +17,4 @@ MonoBehaviour:
   speed: 0.5
   gold: 50
   dmg: 1
+  icon: {fileID: 21300000, guid: 4749c5c031eb1294a9efe0c7ea4c4c08, type: 3}
