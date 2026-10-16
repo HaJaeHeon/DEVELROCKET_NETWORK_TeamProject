@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using UnityEngine.Pool;
+using UnityEditor.Rendering;
 
 public class BuyTower : MonoBehaviourPunCallbacks
 {
@@ -14,6 +15,8 @@ public class BuyTower : MonoBehaviourPunCallbacks
     private bool isRequestComplete;
 
     private float targetGold;
+
+    private int currentInventoryCount;
 
     // 인벤토리 상태 확인 후 결제하는 부분 필요
     // 지금은 그냥 버튼을 삭제하는데 이걸 objectpool 해야함
@@ -35,6 +38,12 @@ public class BuyTower : MonoBehaviourPunCallbacks
 
             return;
         }
+
+        if(ButtonTowerPool.INVENTORYMAXCOUNT <= currentInventoryCount)
+        {
+            Debug.Log($"현재 인벤토리 여유 공간이 모자랍니다. 현재:{currentInventoryCount} / 맥스 : {ButtonTowerPool.INVENTORYMAXCOUNT}");
+            return;
+        }
         Debug.Log("결제 진행중");
 
         reflectedGold = currentGold - targetGold;
@@ -51,6 +60,8 @@ public class BuyTower : MonoBehaviourPunCallbacks
         }
 
         ButtonTowerPool.Instance.Return(button.gameObject, ButtonTowerPool.UIType.Shop);
+        ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory);
+        currentInventoryCount++;
     }
 
     // 타워 데이터 가져오기

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Pool;
 using UnityEngine.UI;
 
@@ -15,12 +14,16 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
 
     [Header("패널")]
     [SerializeField] private GameObject shopPanel;
+    [SerializeField] private GameObject shopContent;
     [SerializeField] private GameObject inventoryPanel;
+    [SerializeField] private GameObject inventoryContent;
 
-    private UnityEvent<GameObject> onSelected;
 
+    public const int INVENTORYMAXCOUNT = 7;
+    private const int SHOPMAXCOUNT = 10;
 
     private IObjectPool<GameObject> pool;
+
 
     public override void Awake()
     {
@@ -36,14 +39,21 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
             maxSize: 100
             );
     }
-    
+
+    private void Start()
+    {
+        for (int i = 0; i < SHOPMAXCOUNT; i++)
+        {
+            ButtonTowerPool.Instance.Spawn(UIType.Shop);
+        }
+    }
 
 
     public GameObject Spawn(UIType type)
     {
         GameObject buttonTower = pool.Get();
 
-        DraggableImage drag = buttonTower.transform.GetChild(0).GetComponent<DraggableImage>();
+        InventoryDraggable drag = buttonTower.transform.GetChild(0).GetComponent<InventoryDraggable>();
         PresetSODataContainer so = buttonTower.transform.GetChild(0).GetComponent<PresetSODataContainer>();
         Image towerImage = buttonTower.transform.GetChild(0).GetComponent<Image>();
         Button towerButton = buttonTower.GetComponent<Button>();
@@ -51,13 +61,11 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
 
         if (type == UIType.Shop)
         {
-            buttonTower.transform.SetParent(shopPanel.transform, false);
+            buttonTower.transform.SetParent(shopContent.transform, false);
             
-            drag.enabled = true;
-            drag.imageId = $"{so.data.Id}";
-            drag.rootPanel = shopPanel;
+            drag.enabled = false;
 
-            towerImage.raycastTarget = true;
+            towerImage.raycastTarget = false;
 
             towerButton.enabled = true;
             BuyTower bt = shopPanel.GetComponent<BuyTower>();
@@ -65,12 +73,13 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         }
         else if (type == UIType.Inventory)
         {
-            buttonTower.transform.SetParent(inventoryPanel.transform, false);
+            buttonTower.transform.SetParent(inventoryContent.transform, false);
 
-            drag.enabled = false;
+            drag.enabled = true;
+            drag.imageId = $"{so.data.Id}";
+            drag.rootPanel = shopPanel;
 
-            towerImage.raycastTarget = false;
-
+            towerImage.raycastTarget = true;
 
             towerButton.enabled = false;
         }
