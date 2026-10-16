@@ -46,7 +46,6 @@ public class WaveData : SOData
                 result.Add(new SpawnEvent { time = info.time + info.interval * i, enemyId = info.enemyId });
             }
         }
-        // OrderBy는 안정 정렬이라 같은 시간은 입력 순서 유지
         return result.OrderBy(e => e.time).ToList();
     }
 }
