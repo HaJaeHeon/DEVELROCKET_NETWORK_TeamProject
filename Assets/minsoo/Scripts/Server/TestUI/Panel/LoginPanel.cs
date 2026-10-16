@@ -14,19 +14,13 @@ public class LoginPanel : UIPanel
     [Header("로그인 UI")]
     [SerializeField] private TMP_InputField emailInput;
     [SerializeField] private TMP_InputField passwordInput;
-    //[SerializeField] private Button signOutButton;
-    //[SerializeField] private Button guestButton;
-
 
     [Header("팝업 UI")]
     [SerializeField] private GameObject PopupPanel;
     [SerializeField] private TMP_Text messageText;
 
-
-    bool isShow;
     bool proceeding;
     AuthManager AM => AuthManager.Instance;
-    private ProfileRepository pr;
     Color errorColor = new Color(0.9f, 0.3f, 0.3f);
     WaitForSeconds wait = new WaitForSeconds(1.0f);
 
@@ -37,8 +31,6 @@ public class LoginPanel : UIPanel
         signInButton.onClick.AddListener(() => AM.SignInAsync(emailInput.text, passwordInput.text));
         signUpButton.onClick.AddListener(() => ui.Open(PanelId.Login, PanelId.SignUp));
         titleButton.onClick.AddListener(() => ui.Open(PanelId.Title));
-
-        //guestButton.onClick.AddListener(async () => await AM.AnonymousLogin());
     }
 
     private void OnEnable()
