@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
 
 public class CurrentTile: ITileMap
 {
