@@ -1958,6 +1958,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 5131287501596023453, guid: 7a2e04eb25a8b7f4497f759a56d7f8d2, type: 3}
+      propertyPath: m_startPlayerHP
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 7512662955351840025, guid: 7a2e04eb25a8b7f4497f759a56d7f8d2, type: 3}
       propertyPath: sceneViewId
       value: 1
