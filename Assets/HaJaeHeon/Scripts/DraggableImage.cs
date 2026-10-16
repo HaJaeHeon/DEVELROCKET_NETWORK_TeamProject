@@ -8,8 +8,8 @@ public class DraggableImage : MonoBehaviour, IDragHandler, IEndDragHandler, IBeg
     public string imageId;
     public ImageSocket currentSocket {  get; private set; }
     
-    [SerializeField] private Canvas canvas;
-    [SerializeField] private GameObject rootPanel;
+    public Canvas canvas;
+    public GameObject rootPanel;
     
     private CanvasGroup canvasGroup;
     private Button imageButton;

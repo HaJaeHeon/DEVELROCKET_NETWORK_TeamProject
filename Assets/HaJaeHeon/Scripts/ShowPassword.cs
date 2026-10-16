@@ -31,17 +31,16 @@ public class ShowPassword : MonoBehaviour
 
     public void OnClickShowPassword()
     {
-        if(!isShow)
+        isShow = !isShow;
+        if (!isShow)
         {
-            isShow = !isShow;
-            buttonImage.sprite = closeEyeSprite;
-            passwordInputField.contentType = TMP_InputField.ContentType.Standard;
+            buttonImage.sprite = OpenEyeSprite;
+            passwordInputField.inputType = TMP_InputField.InputType.Standard;
         }
         else
         {
-            isShow = !isShow;
-            buttonImage.sprite = OpenEyeSprite;
-            passwordInputField.contentType = TMP_InputField.ContentType.Password;
+            buttonImage.sprite = closeEyeSprite;
+            passwordInputField.inputType = TMP_InputField.InputType.Password;
         }
 
         passwordInputField.ForceLabelUpdate();

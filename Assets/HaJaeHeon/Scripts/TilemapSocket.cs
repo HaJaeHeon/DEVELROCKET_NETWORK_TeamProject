@@ -49,20 +49,20 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
             Debug.Log("eventData null");
             return;
         }
-        DraggableImage image = eventData.pointerDrag.GetComponent<DraggableImage>();
+        InventoryDraggable inventoryTower = eventData.pointerDrag.GetComponent<InventoryDraggable>();
 
-        if (image == null)
+        if (inventoryTower == null)
         {
             Debug.Log("image(draggableImage) null");
             return;
         }
 
-        TryAttatchImage(image);
+        TryAttatchImage(inventoryTower);
 
 
     }
 
-    public void TryAttatchImage(DraggableImage image)
+    public void TryAttatchImage(InventoryDraggable inventoryTower)
     {
         if (map == null || targetCamera == null)
             return;
@@ -70,7 +70,7 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
         if (tilemap == null)
             return;
 
-        if (image == null)
+        if (inventoryTower == null)
             return;
 
         Vector3 screenPosition = Input.mousePosition;
@@ -91,7 +91,7 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
 
         string towerId = "";
         //string towerId = image.GetComponent<PresetSODataContainer>().data.Id;
-        if(image.TryGetComponent<PresetSODataContainer>(out var component) )
+        if(inventoryTower.TryGetComponent<PresetSODataContainer>(out var component) )
         {
             if(component.data == null)
             {
@@ -105,6 +105,8 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
             Debug.LogError("PresetSODataContainer is null");
             return;
         }
+
+
 
         if(cellType == TileType.Build)
         {
@@ -159,6 +161,7 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
         if(!GameManager.Instance.CreateTower(currentTile, towerId, player))
         {
             Debug.Log("건설 실패");
+            return;
         }
 
         Debug.Log($"{actorNumber} 의 요청으로 건설함");
