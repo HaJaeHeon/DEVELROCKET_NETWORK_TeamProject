@@ -3,8 +3,6 @@ using Photon.Pun;
 using UnityEngine.UI;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
-using UnityEngine.Pool;
-using UnityEditor.Rendering;
 
 public class BuyTower : MonoBehaviourPunCallbacks
 {
