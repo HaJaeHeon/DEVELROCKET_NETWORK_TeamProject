@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using UnityEngine;
@@ -19,7 +18,7 @@ public class StageManager
     // TODO: 맵의 Start 타일 위치로 교체
     public Vector2 SpawnPos = new Vector2(-3, -3);
 
-    private List<WaveData.SpawnInfo> curSpawns;
+    private List<WaveData.SpawnEvent> curSpawns;
     private int spawnIndex;
     private float timer;
     private WaveState state;
@@ -147,13 +146,12 @@ public class StageManager
         spawnIndex = 0;
         if(IsCleared)
         {
-            curSpawns = new List<WaveData.SpawnInfo>();
+            curSpawns = new List<WaveData.SpawnEvent>();
             SyncState();
             return;
         }
         WaveData wave = Data.Waves[index];
-        curSpawns = wave == null ? new List<WaveData.SpawnInfo>()
-            : wave.Spawns.OrderBy(s => s.time).ToList();
+        curSpawns = wave == null ? new List<WaveData.SpawnEvent>() : wave.BuildTimeline();
         SyncState();
     }
     private void Spawn(string enemyId)

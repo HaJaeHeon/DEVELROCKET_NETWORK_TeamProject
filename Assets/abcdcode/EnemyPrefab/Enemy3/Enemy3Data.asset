@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   id: Enemy3
   hp: 15
-  speed: 15
+  speed: 2
   gold: 5
   dmg: 1
