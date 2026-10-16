@@ -17,6 +17,7 @@ MonoBehaviour:
   towerName: 
   desc: 
   AIScript: LookAtAndAttackAI
+  icon: {fileID: 21300000, guid: 8da1f9e62f7b61648bc6dc13a04a245f, type: 3}
   range: 5
   damage: 5
   cool: 1
