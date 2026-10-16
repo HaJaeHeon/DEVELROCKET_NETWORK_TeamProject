@@ -21,9 +21,9 @@ public class GameEndPanelUI : SingletonBehavior<GameEndPanelUI>
     {
         if (PhotonNetwork.InRoom)
             PhotonNetwork.LeaveRoom();
-        SceneManager.LoadScene(m_gotoScene);
+        //SceneManager.LoadScene(m_gotoScene);
     }
     [SerializeField]private GameObject m_GameOver;
     [SerializeField]private GameObject m_GameClear;
-    [SerializeField]private string m_gotoScene;
+    //[SerializeField]private string m_gotoScene;
 }
