@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e9b110725e2d4841bc438fe679b648f, type: 3}
   m_Name: GoalTile
   m_EditorClassIdentifier: Assembly-CSharp::TilemapSO
-  m_Sprite: {fileID: 2810180194748809789, guid: 34c653857244afb4e94937af940e450f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 34c653857244afb4e94937af940e450f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

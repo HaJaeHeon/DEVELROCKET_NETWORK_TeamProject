@@ -36,8 +36,6 @@ public class LobbyPanel : UIPanel
         searchRoomButton.onClick.AddListener(() => ui.Open(PanelId.Lobby, PanelId.SearchRoom));
         createRoomButton.onClick.AddListener(() => ui.Open(PanelId.Lobby, PanelId.CreateRoom));
 
-
-        searchRoomButton.onClick.AddListener(() => NM.OnSearchRoom());
         
         randomJoinButton.onClick.AddListener(() => NM.OnRandomJoinRoom());
         refreshButton.onClick.AddListener(() => RefreshRoomInfo(NM.RoomDicts));
