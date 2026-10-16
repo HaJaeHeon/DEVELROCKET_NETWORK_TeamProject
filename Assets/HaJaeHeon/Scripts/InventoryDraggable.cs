@@ -14,7 +14,10 @@ public class InventoryDraggable : MonoBehaviour, IDragHandler, IEndDragHandler, 
     private RectTransform rect;
 
     private Transform beforeParentTransform;
-    private Vector3 beforePosition;
+    private Vector3 beforeAnchoredPosition;
+    private Quaternion beforeLocalRotation;
+    private Vector3 beforeLocalScale;
+    private int beforeSiblingIndex;
 
     private bool isDragging;
     private bool dropSuccessed;
@@ -35,7 +38,10 @@ public class InventoryDraggable : MonoBehaviour, IDragHandler, IEndDragHandler, 
             return;
 
         beforeParentTransform = rect.parent;
-        beforePosition = rect.position;
+        beforeAnchoredPosition = rect.anchoredPosition3D;
+        beforeLocalRotation = rect.localRotation;
+        beforeLocalScale = rect.localScale;
+        beforeSiblingIndex = rect.GetSiblingIndex();
 
         gameObject.transform.SetParent(rootPanel.transform);
         canvasGroup.blocksRaycasts = false;
@@ -67,8 +73,11 @@ public class InventoryDraggable : MonoBehaviour, IDragHandler, IEndDragHandler, 
 
         if (!dropSuccessed)
         {
-            rect.SetParent(beforeParentTransform);
-            rect.position = beforePosition;
+            rect.SetParent(beforeParentTransform, false);
+            rect.SetSiblingIndex(beforeSiblingIndex);
+            rect.anchoredPosition3D = beforeAnchoredPosition;
+            rect.localRotation = beforeLocalRotation;
+            rect.localScale = beforeLocalScale;
         }
 
         canvasGroup.blocksRaycasts = true;
