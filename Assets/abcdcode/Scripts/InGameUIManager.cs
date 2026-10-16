@@ -7,6 +7,7 @@ public class InGameUIManager : SingletonBehavior<InGameUIManager>
     {
         UpdateWaveState();
         UpdateGold();
+        UpdateHP();
     }
     private void UpdateWaveState()
     {
@@ -38,7 +39,12 @@ public class InGameUIManager : SingletonBehavior<InGameUIManager>
         if(m_GoldText == null) return;
         m_GoldText.SetText("{0:0} G", PlayerGold.Local);
     }
+    private void UpdateHP()
+    {
+        m_HPText.SetText("HP : {0}", PlayerHP.Get());
+    }
     [SerializeField]private TMP_Text m_WaveNumText;
     [SerializeField]private TMP_Text m_WaveStateText;
     [SerializeField]private TMP_Text m_GoldText;
+    [SerializeField]private TMP_Text m_HPText;
 }
