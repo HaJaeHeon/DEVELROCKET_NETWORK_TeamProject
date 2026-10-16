@@ -16,21 +16,5 @@ MonoBehaviour:
   spawns:
   - time: 1
     enemyId: Enemy3
-  - time: 1.5
-    enemyId: Enemy3
-  - time: 2
-    enemyId: Enemy3
-  - time: 2.5
-    enemyId: Enemy3
-  - time: 3
-    enemyId: Enemy3
-  - time: 3.5
-    enemyId: Enemy3
-  - time: 4
-    enemyId: Enemy3
-  - time: 4.5
-    enemyId: Enemy3
-  - time: 5
-    enemyId: Enemy3
-  - time: 5.5
-    enemyId: Enemy3
+    count: 10
+    interval: 0.5

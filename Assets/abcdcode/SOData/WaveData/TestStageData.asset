@@ -14,9 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StageData
   id: 
   waves:
-  - {fileID: 11400000, guid: d090ed0fe76aeb84cafab6577d5fed6d, type: 2}
-  - {fileID: 11400000, guid: d090ed0fe76aeb84cafab6577d5fed6d, type: 2}
-  - {fileID: 11400000, guid: d090ed0fe76aeb84cafab6577d5fed6d, type: 2}
-  - {fileID: 11400000, guid: d090ed0fe76aeb84cafab6577d5fed6d, type: 2}
-  - {fileID: 11400000, guid: d090ed0fe76aeb84cafab6577d5fed6d, type: 2}
-  waveInterval: 3
+  - {fileID: 11400000, guid: dc58bc7c410e8b846855884d662dde16, type: 2}
+  - {fileID: 11400000, guid: c283fd661c195504eb6e36369075d2ec, type: 2}
+  - {fileID: 11400000, guid: ae5c99e8b7549d44abc1e80a37bda0aa, type: 2}
+  waveInterval: 10
