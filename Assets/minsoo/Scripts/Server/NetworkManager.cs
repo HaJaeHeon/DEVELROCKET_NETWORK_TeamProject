@@ -98,27 +98,39 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
 
     }
+
     // 로비 - 방 생성
-    public void OnCreateRoom(string roomName)
+    public void OnCreateRoom(bool isOffline, string roomName, int playerCount, string password, bool isVisible, bool isOpen)
     {
-        PhotonNetwork.CreateRoom(roomName, roomOptions);
+        if (isOffline)
+        {
+            OnSiglePlay();
+            return;
+        }
+            
+
+        RoomOptions roomOtions = new RoomOptions
+        {
+            MaxPlayers = playerCount,
+            CustomRoomProperties = new Hashtable { { "pw", password }, { "locked", true } },
+            CustomRoomPropertiesForLobby = new[] { "locked" },
+            IsVisible = isVisible,
+            IsOpen = isOpen,
+        };
+
+        PhotonNetwork.CreateRoom(roomName ?? null, roomOtions);
 
     }
+
+    public void OnSiglePlay()
+    {
+        PhotonNetwork.Disconnect();
+        PhotonNetwork.OfflineMode = true;
+    }
+
     // 로비 - 방 랜덤입장
     public void OnRandomJoinRoom()
     {
-        /*
-        var props = new Hashtable { { "map", "desert" }, { "mode", 1 } };
-        var roomOptions = new RoomOptions
-        {
-            MaxPlayers = maxPlayers,
-            //CustomRoomProperties = props,
-            //CustomRoomPropertiesForLobby = new[] { "map", "mode" },
-            IsVisible = true,
-            IsOpen = true
-        };
-        */
-
         PhotonNetwork.JoinRandomOrCreateRoom(
         expectedCustomRoomProperties: null,
         expectedMaxPlayers: maxPlayers,
@@ -147,8 +159,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LocalPlayer.SetCustomProperties(
             new Hashtable { { PlayerProps.Ready, !ready } });
     }
-
-    
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
@@ -209,7 +219,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinLobby();
+        if(PhotonNetwork.OfflineMode)
+            PhotonNetwork.CreateRoom(null);
+        else
+            PhotonNetwork.JoinLobby();
     }
 
     public override void OnDisconnected(DisconnectCause cause)
