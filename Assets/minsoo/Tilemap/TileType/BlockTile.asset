@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e9b110725e2d4841bc438fe679b648f, type: 3}
   m_Name: BlockTile
   m_EditorClassIdentifier: Assembly-CSharp::TilemapSO
-  m_Sprite: {fileID: -3682411210785286315, guid: 6a87d617fdf9ead4fa0e39446074845a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 6a87d617fdf9ead4fa0e39446074845a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

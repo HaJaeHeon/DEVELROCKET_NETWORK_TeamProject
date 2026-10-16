@@ -23,7 +23,7 @@ public class TestLobbyUI : MonoBehaviour
     private void Awake()
     {
         searchButton.onClick.AddListener(() => NM.OnSearchRoom());
-        createButton.onClick.AddListener(() => NM.OnCreateRoom(roomNameField.text));
+        //createButton.onClick.AddListener(() => NM.OnCreateRoom(roomNameField.text));
         randomJoinButton.onClick.AddListener(() => NM.OnRandomJoinRoom());
         refreshButton.onClick.AddListener(() => RefreshRoomInfo(NM.RoomDicts));
     }

@@ -22,6 +22,8 @@ public class LoginPanel : UIPanel
     [SerializeField] private GameObject PopupPanel;
     [SerializeField] private TMP_Text messageText;
 
+
+    bool isShow;
     bool proceeding;
     AuthManager AM => AuthManager.Instance;
     private ProfileRepository pr;
@@ -35,9 +37,6 @@ public class LoginPanel : UIPanel
         signInButton.onClick.AddListener(() => AM.SignInAsync(emailInput.text, passwordInput.text));
         signUpButton.onClick.AddListener(() => ui.Open(PanelId.Login, PanelId.SignUp));
         titleButton.onClick.AddListener(() => ui.Open(PanelId.Title));
-
-        
-
 
         //guestButton.onClick.AddListener(async () => await AM.AnonymousLogin());
     }
@@ -60,6 +59,7 @@ public class LoginPanel : UIPanel
         AM.OnAuthFailed -= ShowError;
         AM.OnNotice -= ShowNotice;
     }
+
 
     private void RefreshHandler() => RefreshInteractable();
     private void RefreshHandler(bool busy) => RefreshInteractable();

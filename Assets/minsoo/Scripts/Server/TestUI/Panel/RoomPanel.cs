@@ -30,14 +30,15 @@ public class RoomPanel : UIPanel
         leaderBoardButton.onClick.AddListener(() => ui.Open(PanelId.Room, PanelId.LeaderBoard));
         presetButton.onClick.AddListener(() => ui.Open(PanelId.Room, PanelId.Preset));
 
-        // NM은 람다 안에서 꺼내 씀 (Awake 순서상 아직 Instance가 없을 수 있음)
-        readyButton.onClick.AddListener(() => NM.OnReadyGame());
-        gameStartButton.onClick.AddListener(() => NM.OnStartGame());
+        
+        
     }
 
     private void OnEnable()
     {
         NM.RoomPlayersChanged += Refresh;
+        readyButton.onClick.AddListener(() => NM.OnReadyGame());
+        gameStartButton.onClick.AddListener(() => NM.OnStartGame());
         Refresh();                     // 내가 들어온 순간 현재 인원으로 한 번 그림
     }
 
