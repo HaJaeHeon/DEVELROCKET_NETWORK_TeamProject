@@ -1,10 +1,12 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject playerMousePrefab;
+    [SerializeField] private Image playerMousePrefab;
+    [SerializeField] private Transform cursorParent;
 
     private void Awake()
     {
@@ -13,7 +15,7 @@ public class PlayerSpawner : MonoBehaviour
 
         if (PhotonNetwork.PrefabPool is DefaultPool pool)
         {
-            pool.ResourceCache["PlayerMousePointer"] = playerMousePrefab;
+            pool.ResourceCache["PlayerMouse"] = playerMousePrefab.gameObject;
         }
     }
 
@@ -22,6 +24,6 @@ public class PlayerSpawner : MonoBehaviour
         if (!PhotonNetwork.InRoom)
             return;
 
-        PhotonNetwork.Instantiate("PlayerMousePointer", Vector3.zero, Quaternion.identity);
+        GameObject mouse = PhotonNetwork.Instantiate("PlayerMouse", Vector3.zero, Quaternion.identity);
     }
 }
