@@ -51,20 +51,20 @@ public class PanelController : MonoBehaviour
         }
 
         // 타이틀에서 로그인한 상태면 문제없으면 바로 로비로 이동
-        if (curPanel == PanelId.Title)
-        {
-            await AuthManager.Instance.TryAutoLoginAsync();
-            if (AuthManager.Instance.Auth.CurrentUser != null)
-            {
-                main = PanelId.Lobby;
-                sub = PanelId.None;
-            }
-        }
+        //if (curPanel == PanelId.Title)
+        //{
+        //    await AuthManager.Instance.TryAutoLoginAsync();
+        //    if (AuthManager.Instance.Auth.CurrentUser != null)
+        //    {
+        //        main = PanelId.Lobby;
+        //        sub = PanelId.None;
+        //    }
+        //}
             
             
         // 타이틀로 돌아가는 경우는 로그아웃
-        //if (main == PanelId.Title)
-        //    AuthManager.Instance.Auth.SignOut();
+        if (main == PanelId.Title)
+            AuthManager.Instance.Auth.SignOut();
 
 
         foreach (var (id, go) in panels)
