@@ -37,9 +37,9 @@ public class BuyTower : MonoBehaviourPunCallbacks
             return;
         }
 
-        if(ButtonTowerPool.INVENTORYMAXCOUNT <= currentInventoryCount)
+        if(PlayerInventory.MAXINVENTORYCOUNT <= currentInventoryCount)
         {
-            Debug.Log($"현재 인벤토리 여유 공간이 모자랍니다. 현재:{currentInventoryCount} / 맥스 : {ButtonTowerPool.INVENTORYMAXCOUNT}");
+            Debug.Log($"현재 인벤토리 여유 공간이 모자랍니다. 현재:{currentInventoryCount} / 맥스 : {PlayerInventory.MAXINVENTORYCOUNT}");
             return;
         }
         Debug.Log("결제 진행중");
@@ -58,8 +58,12 @@ public class BuyTower : MonoBehaviourPunCallbacks
         }
 
         ButtonTowerPool.Instance.Return(button.gameObject, ButtonTowerPool.UIType.Shop);
-        ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory);
-        currentInventoryCount++;
+
+        if (PlayerInventory.Instance.TryAddTower(button.gameObject))
+        {
+            ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory);
+            currentInventoryCount++;
+        }
     }
 
     // 타워 데이터 가져오기

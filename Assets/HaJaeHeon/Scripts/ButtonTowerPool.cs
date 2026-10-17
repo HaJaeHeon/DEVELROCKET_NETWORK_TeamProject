@@ -19,7 +19,6 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
     [SerializeField] private GameObject inventoryContent;
 
 
-    public const int INVENTORYMAXCOUNT = 5;
     private const int SHOPMAXCOUNT = 3;
 
     private IObjectPool<GameObject> pool;
