@@ -1,10 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventory : SingletonBehavior<PlayerInventory>
 {
     public const int MAXINVENTORYCOUNT = 5;
     private readonly List<GameObject> towerInventory = new();
+
+    public override void Awake()
+    {
+        base.Awake();
+    }
+
+
 
     public bool IsFullInventory
     {
@@ -29,44 +36,46 @@ public class PlayerInventory : MonoBehaviour
         });
     }
 
-    // ÀÎº¥Åä¸®¿¡¼­ Å¸¿ö Ãß°¡ (°°Àº Å¸¿öµµ Ãß°¡ Çã¿ë)
+    // ì¸ë²¤í† ë¦¬ì—ì„œ íƒ€ì›Œ ì¶”ê°€ (ê°™ì€ íƒ€ì›Œë„ ì¶”ê°€ í—ˆìš©)
     public bool TryAddTower(GameObject tower)
     {
-        // ÀÎº¥Åä¸® »óÇÑ¼± º¸´Ù ¸¹ÀÌ ±¸¸ÅÇÏ·Á°í ÇÑ´Ù¸é false;
+        if (tower == null)
+        {
+            Debug.LogError("ì¶”ê°€í•  ì¸ë²¤í† ë¦¬ íƒ€ì›Œê°€ ì—†ìŠµë‹ˆë‹¤.");
+            return false;
+        }
+
+        // ì¸ë²¤í† ë¦¬ ìƒí•œì„  ë³´ë‹¤ ë§ì´ êµ¬ë§¤í•˜ë ¤ê³  í•œë‹¤ë©´ false;
         if (towerInventory.Count >= MAXINVENTORYCOUNT)
         {
-            Debug.LogError("ÀÎº¥Åä¸® »óÇÑº¸´Ù ´õ ÀÎº¥Åä¸®¿¡ Ãß°¡ÇÏ·Á°í ÇÔ");
+            Debug.LogError("ì¸ë²¤í† ë¦¬ ìƒí•œë³´ë‹¤ ë” ì¸ë²¤í† ë¦¬ì— ì¶”ê°€í•˜ë ¤ê³  í•¨");
             return false;
         }
         PresetSODataContainer so = tower.GetComponentInChildren<PresetSODataContainer>();
 
-        // so data°¡ ¾ø´Ù¸é false; 
-        if (so.data == null)
+        // so dataê°€ ì—†ë‹¤ë©´ false;
+        if (so == null || so.data == null)
         {
-            Debug.LogError("ÄÄÆ÷³ÍÆ®³ª soµ¥ÀÌÅÍ°¡ ¾øÀ½.");
+            Debug.LogError("ì»´í¬ë„ŒíŠ¸ë‚˜ soë°ì´í„°ê°€ ì—†ìŒ.");
             return false;
         }
         towerInventory.Add(tower);
 
-        Debug.Log("ÀÎº¥Åä¸® Ãß°¡ ¿Ï·á");
+        Debug.Log("ì¸ë²¤í† ë¦¬ ì¶”ê°€ ì™„ë£Œ");
         return true;
     }
 
-    // ÀÎº¥Åä¸®¿¡¼­ Å¸¿ö Á¦°Å
-    public bool TryRemoveTower(string towerid, int towerIndex)
+    // ì¸ë²¤í† ë¦¬ì—ì„œ íƒ€ì›Œ ì œê±°
+    public bool TryRemoveTower(GameObject tower)
     {
-        PresetSODataContainer so = towerInventory[towerIndex].GetComponentInChildren<PresetSODataContainer>();
-
-        if (so.data.Id != towerid)
-        {
-            Debug.LogError($"{towerIndex}ÀÇ À§Ä¡¿¡ ÀÖ´Â id°¡ {towerid}°¡ ¾Æ´Ô");
+        if (tower == null)
             return false;
-        }
-        ButtonTowerPool.Instance.Return(towerInventory[towerIndex]);
-        towerInventory.RemoveAt(towerIndex);
 
-        Debug.Log($"{towerIndex}À§Ä¡ÀÇ Å¸¿ö Á¦°Å");
+        bool removed = towerInventory.Remove(tower);
 
-        return true;
+        if (!removed)
+            Debug.LogError("ì¸ë²¤í† ë¦¬ì— í•´ë‹¹ íƒ€ì›Œê°€ ì—†ìŠµë‹ˆë‹¤.");
+
+        return removed;
     }
 }

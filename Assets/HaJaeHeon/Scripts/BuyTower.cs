@@ -6,7 +6,6 @@ using ExitGames.Client.Photon;
 
 public class BuyTower : MonoBehaviourPunCallbacks
 {
-    [SerializeField] private PlayerInventory inventory;
     [SerializeField] private GameObject inventoryObject;
     [SerializeField] private float currentGold;
     private float reflectedGold;
@@ -36,7 +35,7 @@ public class BuyTower : MonoBehaviourPunCallbacks
             return;
         }
 
-        if(inventory.IsFullInventory)
+        if(PlayerInventory.Instance.IsFullInventory)
         {
             Debug.LogError("인벤토리가 가득 찼습니다.");
             return;
@@ -53,20 +52,23 @@ public class BuyTower : MonoBehaviourPunCallbacks
         }
         else
         {
+            isRequestComplete = false;
             Debug.Log("골드가 부족하여 요청이 거절되었습니다.");
             return;
         }
-
         
-
-        if (inventory.TryAddTower(button.gameObject))
+        GameObject inventoryTower = ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory, data);
+        // 인벤토리에 추가 못한다면
+        if (!PlayerInventory.Instance.TryAddTower(inventoryTower))
         {
-            // 상점은 반환
-            ButtonTowerPool.Instance.Return(button.gameObject);
+            ButtonTowerPool.Instance.Return(inventoryTower);
+            PlayerGold.Add(targetGold);
+            isRequestComplete = false;
 
-            // 인벤토리에서는 생성ㅇ
-            ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory);
+            return;
         }
+
+        ButtonTowerPool.Instance.Return(button.gameObject);
     }
 
     // 타워 데이터 가져오기
@@ -113,7 +115,7 @@ public class BuyTower : MonoBehaviourPunCallbacks
         if (targetPlayer != PhotonNetwork.LocalPlayer)
             return;
 
-        if (!(changedProps[PlayerGold.Key] is float gold))
+        if (!changedProps.TryGetValue(PlayerGold.Key, out object value) || !(value is float gold))
             return;
 
         Debug.Log($" 반영된 재화 : {gold}");

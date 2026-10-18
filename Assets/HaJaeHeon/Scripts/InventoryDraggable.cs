@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class InventoryDraggable : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler
 {
     public string imageId;
     public ImageSocket currentSocket { get; private set; }
+    public GameObject InventoryItemObject { get; private set; }
 
     public Canvas canvas;
     public GameObject rootPanel;
@@ -36,6 +38,16 @@ public class InventoryDraggable : MonoBehaviour, IDragHandler, IEndDragHandler, 
     {
         if (rect == null || canvas == null || rootPanel == null)
             return;
+
+        Button inventoryButton = GetComponentInParent<Button>();
+
+        if (inventoryButton == null)
+        {
+            Debug.LogError("인벤토리 버튼을 찾을 수 없습니다.");
+            return;
+        }
+
+        InventoryItemObject = inventoryButton.gameObject;
 
         beforeParentTransform = rect.parent;
         beforeAnchoredPosition = rect.anchoredPosition3D;
