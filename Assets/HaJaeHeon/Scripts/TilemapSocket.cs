@@ -1,3 +1,4 @@
+using System;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -26,6 +27,8 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
 
     private GameObject pendingInventoryTower;
     private bool isBuildRequestPending;
+
+    public event Action<bool> TowerRecallResultReceived;
 
     private void Awake()
     {
@@ -183,6 +186,60 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
     {
         photonView.RPC(nameof(RpcTowerSpawn), RpcTarget.MasterClient, pos.x, pos.y, (int)type, towerId);
         Debug.Log($"{PhotonNetwork.LocalPlayer.ActorNumber}가 건설 요청");
+    }
+
+    public void RequestTowerRecall(int towerViewId)
+    {
+        if (!PhotonNetwork.InRoom || towerViewId <= 0)
+            return;
+
+        photonView.RPC(
+            nameof(RpcRequestTowerRecall),
+            RpcTarget.MasterClient,
+            towerViewId);
+    }
+
+    [PunRPC]
+    private void RpcRequestTowerRecall(int towerViewId, PhotonMessageInfo info)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        Player requester = info.Sender;
+
+        if (requester == null)
+            return;
+
+        PhotonView towerView = PhotonView.Find(towerViewId);
+        Tower tower = towerView != null
+            ? towerView.GetComponent<Tower>()
+            : null;
+
+        bool success = tower != null &&
+            tower.OwnerPlayer != null &&
+            tower.OwnerPlayer.ActorNumber == requester.ActorNumber;
+
+        if (success)
+        {
+            PacketData destroyPacket = new PacketData();
+            destroyPacket.Write(Tower.TowerDestroy);
+            destroyPacket.Write(tower.IndexId);
+
+            IPacketer.SendPacket(
+                GameManager.Instance.MainGamePacketer.photonView,
+                destroyPacket);
+        }
+
+        photonView.RPC(
+            nameof(RpcTowerRecallResult),
+            requester,
+            success);
+    }
+
+    [PunRPC]
+    private void RpcTowerRecallResult(bool success)
+    {
+        TowerRecallResultReceived?.Invoke(success);
     }
 
     public override void OnDisconnected(DisconnectCause cause)
