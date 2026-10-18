@@ -48,7 +48,7 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
     }
 
 
-    public GameObject Spawn(UIType type)
+    public GameObject Spawn(UIType type, TowerData data = null)
     {
         GameObject buttonTower = pool.Get();
 
@@ -57,6 +57,9 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         Image towerImage = buttonTower.transform.GetChild(0).GetComponent<Image>();
         Button towerButton = buttonTower.GetComponent<Button>();
         drag.canvas = shopPanel.transform.root.GetComponent<Canvas>();
+
+        if (data != null)
+            so.data = data;
 
         if (type == UIType.Shop)
         {
@@ -87,7 +90,7 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         return buttonTower;
     }
 
-    public void Return(GameObject obj, UIType type)
+    public void Return(GameObject obj)
     {
         //if(type == UIType.Shop)
         //{

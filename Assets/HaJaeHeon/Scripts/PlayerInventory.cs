@@ -1,12 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInventory : Singleton<PlayerInventory>
+public class PlayerInventory : MonoBehaviour
 {
     public const int MAXINVENTORYCOUNT = 5;
     private readonly List<GameObject> towerInventory = new();
 
-    public bool IsFullInventory { get; }
+    public bool IsFullInventory
+    {
+        get
+        {
+            return towerInventory.Count >= MAXINVENTORYCOUNT;
+        }
+    }
 
     public bool HasTower(string towerId)
     {
@@ -56,6 +62,7 @@ public class PlayerInventory : Singleton<PlayerInventory>
             Debug.LogError($"{towerIndex}의 위치에 있는 id가 {towerid}가 아님");
             return false;
         }
+        ButtonTowerPool.Instance.Return(towerInventory[towerIndex]);
         towerInventory.RemoveAt(towerIndex);
 
         Debug.Log($"{towerIndex}위치의 타워 제거");
