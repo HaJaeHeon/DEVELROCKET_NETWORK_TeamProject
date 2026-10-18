@@ -16,6 +16,7 @@ public class Photon_Player : MonoBehaviourPunCallbacks
 
     
     [SerializeField] private Image cursorImage;
+    [SerializeField] private RectTransform myRectTransform;
     [SerializeField] private RectTransform canvasRect;
     
     
@@ -28,8 +29,8 @@ public class Photon_Player : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        cursorImage = GetComponent<Image>();
         cursorImage.raycastTarget = false;
+        myRectTransform = GetComponent<RectTransform>();
     }
 
     private void Start()
@@ -81,7 +82,7 @@ public class Photon_Player : MonoBehaviourPunCallbacks
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRect, Input.mousePosition, null, out Vector2 localMousePoint))
         {
-            cursorImage.rectTransform.localPosition = new Vector3(localMousePoint.x, localMousePoint.y, 0f);
+            myRectTransform.localPosition = new Vector3(localMousePoint.x, localMousePoint.y, 0f);
         }
     }
 
