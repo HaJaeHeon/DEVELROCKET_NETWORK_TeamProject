@@ -1,7 +1,6 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,6 +29,7 @@ public class Photon_Player : MonoBehaviourPunCallbacks
     private void Awake()
     {
         cursorImage.raycastTarget = false;
+        cursorImage = GetComponentInChildren<Image>();
         myRectTransform = GetComponent<RectTransform>();
     }
 
@@ -50,7 +50,6 @@ public class Photon_Player : MonoBehaviourPunCallbacks
             mainCamera = Camera.main;
             //SetMyColor(currentMyColor);
             ApplyColor(photonView.Owner.CustomProperties);
-            Cursor.visible = false;
         }
 
         if(photonView.Owner != null)
