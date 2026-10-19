@@ -209,7 +209,13 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
     public void ModifyHPEvent(PacketData data)
     {
         float dmg = data;
+        bool wasAlive = m_hp > 0;
         HP -= dmg;
+        // 피해로 처치된 순간에만 골드 지급 (모든 클라이언트에서 실행되어 각자 본인 골드를 증가)
+        if(wasAlive && m_hp <= 0 && Data != null)
+        {
+            PlayerGold.Add(Data.Gold);
+        }
     }
     public static void EnemyCreateEvent(PacketData data)
     {

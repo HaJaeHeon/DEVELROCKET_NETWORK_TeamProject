@@ -113,6 +113,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Tower
   mainTransform: {fileID: 5531634744116112485}
   mData: {fileID: 11400000, guid: 7f2609ac5f054932b6c57c22d7c16e7c, type: 2}
+  m_BaseSprite: {fileID: 4060052886518668540}
+  m_HeadSprite: {fileID: 6627492129850703556}
 --- !u!95 &2841146487611685592
 Animator:
   serializedVersion: 7

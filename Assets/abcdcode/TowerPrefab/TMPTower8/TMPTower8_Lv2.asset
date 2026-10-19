@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 978ebd8569fa4ae4496a2b0dc761d772, type: 3}
+  m_Name: TMPTower8_Lv2
+  m_EditorClassIdentifier: Assembly-CSharp::AttackTowerData
+  id: Test_Lv2
+  cost: 0
+  towerName: 
+  desc: 
+  AIScript: LookAtAndAttackAI
+  icon: {fileID: 21300000, guid: aae9077f26d23194a81a402ff8d3c1fd, type: 3}
+  level: 2
+  next: {fileID: 11400000, guid: 09e7ba3f0ae53e98b9a4d39bd6d29bbd, type: 2}
+  range: 5
+  damage: 7.5
+  cool: 1
+  bulletPrefab: {fileID: 1107830369495406184, guid: e7681ca2342bedf4c9d57ab616f5e041, type: 3}

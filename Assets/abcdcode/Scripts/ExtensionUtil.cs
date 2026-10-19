@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public static class ExtensionUtil
 {
@@ -17,5 +18,22 @@ public static class ExtensionUtil
     public static T FindObj<T>(this List<T> list, int id) where T : IdOwn
     {
         return list.Find(x=>x.IndexId == id);
+    }
+    public static Color GetColor(MyColor mColor)
+    {
+        switch (mColor)
+        {
+            case MyColor.Red:
+                return Color.red;
+
+            case MyColor.Green:
+                return Color.green;
+
+            case MyColor.Blue:
+                return Color.blue;
+
+            default:
+                return Color.white;
+        }
     }
 }

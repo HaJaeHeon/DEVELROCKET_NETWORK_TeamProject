@@ -184,6 +184,36 @@ MonoBehaviour:
   - id: FireTower1
     prefab: {fileID: 4401480994956863589, guid: 7fb70a301ced4188bea1736f497e4827, type: 3}
     data: {fileID: 11400000, guid: d9e91ece8b804829a202c16ac9ab07f8, type: 2}
+  - id: NormalTower_Lv2
+    prefab: {fileID: 4401480994956863589, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
+    data: {fileID: 11400000, guid: 36ccaca85562d6039780ba2115e97280, type: 2}
+  - id: NormalTower_Lv3
+    prefab: {fileID: 4401480994956863589, guid: a50ec9ef95c70824b808726552f6c6c6, type: 3}
+    data: {fileID: 11400000, guid: 1c766086a059a9130f2747bad73b3b24, type: 2}
+  - id: MissileTower1_Lv2
+    prefab: {fileID: 4401480994956863589, guid: 53396563b0c54c41ab1b9ec752def059, type: 3}
+    data: {fileID: 11400000, guid: 6c1ca158ab7430e52a54c9dc2293edc1, type: 2}
+  - id: MissileTower1_Lv3
+    prefab: {fileID: 4401480994956863589, guid: 53396563b0c54c41ab1b9ec752def059, type: 3}
+    data: {fileID: 11400000, guid: f9d6a3ddcda1f5719c8ff15d9f2dc72c, type: 2}
+  - id: MissileTower2_Lv2
+    prefab: {fileID: 4401480994956863589, guid: f4738b780ae549fd99986602b597afd7, type: 3}
+    data: {fileID: 11400000, guid: 46ba6966552edee1761fbb2527d3d5e4, type: 2}
+  - id: MissileTower2_Lv3
+    prefab: {fileID: 4401480994956863589, guid: f4738b780ae549fd99986602b597afd7, type: 3}
+    data: {fileID: 11400000, guid: d4a841c83487c810549cc730dcaed9e3, type: 2}
+  - id: MissileTower3_Lv2
+    prefab: {fileID: 4401480994956863589, guid: 0876122b65944853907213dc33253ced, type: 3}
+    data: {fileID: 11400000, guid: 91e20e998f3919515c1afc418fe6d44e, type: 2}
+  - id: MissileTower3_Lv3
+    prefab: {fileID: 4401480994956863589, guid: 0876122b65944853907213dc33253ced, type: 3}
+    data: {fileID: 11400000, guid: 9d43b51f8e965e9aa4bd8cff3bc7ddba, type: 2}
+  - id: FireTower1_Lv2
+    prefab: {fileID: 4401480994956863589, guid: 7fb70a301ced4188bea1736f497e4827, type: 3}
+    data: {fileID: 11400000, guid: af9b4b9a4692f824249f1b086a1b926c, type: 2}
+  - id: FireTower1_Lv3
+    prefab: {fileID: 4401480994956863589, guid: 7fb70a301ced4188bea1736f497e4827, type: 3}
+    data: {fileID: 11400000, guid: b2a498b2b98ab25840c09aaac365d5e5, type: 2}
 --- !u!1 &7508980262109434331
 GameObject:
   m_ObjectHideFlags: 0

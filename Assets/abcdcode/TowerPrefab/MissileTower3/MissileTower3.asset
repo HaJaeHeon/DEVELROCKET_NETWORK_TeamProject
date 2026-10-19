@@ -19,6 +19,8 @@ MonoBehaviour:
     \uBBF8\uC0AC\uC77C\uC744 \uC3DC\uB2E4. \uACF5\uACA9 \uC18D\uB3C4\uAC00 \uB290\uB9AC\uB2E4."
   AIScript: LookAtAndAttackAI
   icon: {fileID: 21300000, guid: 99f3a6b8b7331644bb6a8e9809755e60, type: 3}
+  level: 1
+  next: {fileID: 11400000, guid: 91e20e998f3919515c1afc418fe6d44e, type: 2}
   range: 7
   damage: 20
   cool: 2

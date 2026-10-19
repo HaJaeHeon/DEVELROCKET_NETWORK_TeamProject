@@ -18,6 +18,8 @@ MonoBehaviour:
   desc: "\uD654\uC5FC\uC744 \uC3DC\uB2E4."
   AIScript: LookAtAndAttackAI
   icon: {fileID: 21300000, guid: d71135e3a055f6a40a4f7beb7c0927be, type: 3}
+  level: 1
+  next: {fileID: 11400000, guid: af9b4b9a4692f824249f1b086a1b926c, type: 2}
   range: 4
   damage: 1
   cool: 0.1
