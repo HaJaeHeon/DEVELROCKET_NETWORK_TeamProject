@@ -18,6 +18,7 @@ public class TowerDB : MonoBehaviour
     }
     [SerializeField]private List<Entry> entries = new List<Entry>();
     private Dictionary<string, Entry> map;
+    public Dictionary<string,Entry> Map => map;
 
     public void Awake()
     {
