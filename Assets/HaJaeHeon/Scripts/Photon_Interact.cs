@@ -52,7 +52,8 @@ public class Photon_Interact : MonoBehaviourPunCallbacks//, IPointerClickHandler
 
         TileType cellType = map.GetTileType(cell);
 
-        Debug.Log($"position2D : {cell}\n" +
-            $"CellType : {cellType}");
+        // 클릭한 위치의 타일 타입과 타일 위치 찾기
+        //Debug.Log($"position2D : {cell}\n" +
+        //    $"CellType : {cellType}");
     }
 }

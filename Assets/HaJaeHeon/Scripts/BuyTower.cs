@@ -14,12 +14,10 @@ public class BuyTower : MonoBehaviourPunCallbacks
 
     private float targetGold;
 
-    private int currentInventoryCount;
-
     // 인벤토리 상태 확인 후 결제하는 부분 필요
     // 지금은 그냥 버튼을 삭제하는데 이걸 objectpool 해야함
 
-    private void SpendToBuyTower(Button button)
+    private void SpendToBuyTower(Button button, TowerData data)
     {
         currentGold = PlayerGold.Get(PhotonNetwork.LocalPlayer);
         Debug.Log($"현재 가진 골드 량 : {currentGold}");
@@ -37,11 +35,12 @@ public class BuyTower : MonoBehaviourPunCallbacks
             return;
         }
 
-        if(ButtonTowerPool.INVENTORYMAXCOUNT <= currentInventoryCount)
+        if(PlayerInventory.Instance.IsFullInventory)
         {
-            Debug.Log($"현재 인벤토리 여유 공간이 모자랍니다. 현재:{currentInventoryCount} / 맥스 : {ButtonTowerPool.INVENTORYMAXCOUNT}");
+            Debug.LogError("인벤토리가 가득 찼습니다.");
             return;
         }
+
         Debug.Log("결제 진행중");
 
         reflectedGold = currentGold - targetGold;
@@ -53,13 +52,23 @@ public class BuyTower : MonoBehaviourPunCallbacks
         }
         else
         {
+            isRequestComplete = false;
             Debug.Log("골드가 부족하여 요청이 거절되었습니다.");
             return;
         }
+        
+        GameObject inventoryTower = ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory, data);
+        // 인벤토리에 추가 못한다면
+        if (!PlayerInventory.Instance.TryAddTower(inventoryTower))
+        {
+            ButtonTowerPool.Instance.Return(inventoryTower);
+            PlayerGold.Add(targetGold);
+            isRequestComplete = false;
 
-        ButtonTowerPool.Instance.Return(button.gameObject, ButtonTowerPool.UIType.Shop);
-        ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory);
-        currentInventoryCount++;
+            return;
+        }
+
+        ButtonTowerPool.Instance.Return(button.gameObject);
     }
 
     // 타워 데이터 가져오기
@@ -96,7 +105,7 @@ public class BuyTower : MonoBehaviourPunCallbacks
         targetGold = so.data.Cost;
         Debug.Log($"타워의 가격 : {targetGold}");
 
-        SpendToBuyTower(button);
+        SpendToBuyTower(button, so.data);
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
@@ -106,7 +115,7 @@ public class BuyTower : MonoBehaviourPunCallbacks
         if (targetPlayer != PhotonNetwork.LocalPlayer)
             return;
 
-        if (!(changedProps[PlayerGold.Key] is float gold))
+        if (!changedProps.TryGetValue(PlayerGold.Key, out object value) || !(value is float gold))
             return;
 
         Debug.Log($" 반영된 재화 : {gold}");
