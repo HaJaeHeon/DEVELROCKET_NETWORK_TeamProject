@@ -5,6 +5,8 @@ public interface ITowerSO : ISOData
     public string Desc{get;}
     public string GetDetail();
     public TowerType Type{get;}
+    public int Level{get;}
+    public ITowerSO NextLevel{get;}
 
 }
 public enum TowerType
