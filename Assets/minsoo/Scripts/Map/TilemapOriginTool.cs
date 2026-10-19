@@ -1,10 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-
+#if UNITY_EDITOR
 public static class TilemapOriginTool
 {
-    [MenuItem("Tools/Tilemap/Move Bottom-Left To (0,0)")]
     static void MoveToOrigin()
     {
         var go = Selection.activeGameObject;
@@ -54,3 +53,4 @@ public static class TilemapOriginTool
         Debug.Log($"타일을 {offset}만큼 이동했어요");
     }
 }
+#endif

@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
 
 public class CurrentTile: ITileMap
 {
@@ -171,5 +170,10 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
     {
         photonView.RPC(nameof(RpcTowerSpawn), RpcTarget.MasterClient, pos.x, pos.y, (int)type, towerId, player.ActorNumber);
         Debug.Log($"{player.ActorNumber}가 건설 요청");
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.LogWarning($"Photon 연결 종료 사유: {cause}");
     }
 }

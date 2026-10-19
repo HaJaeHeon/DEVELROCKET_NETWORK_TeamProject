@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class PlayerProps 
 { 
@@ -69,7 +70,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public async Task<string> Connect()
     {
         if (PhotonNetwork.IsConnected)
-            return "Is already connected.";
+            return "Is already connected!";
 
         try
         {
@@ -201,7 +202,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.LoadLevel((int)SceneNumber.InGame); //TODO GameScene 정하기
+        PhotonNetwork.LoadLevel("GameScene");
     }
 
 
@@ -264,6 +265,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LocalPlayer.SetCustomProperties(
         new Hashtable { { ReadyKey, false } });
         RoomListChanged?.Invoke(RoomDicts);
+
+        Scene currentScene = SceneManager.GetActiveScene();
+
+        if(currentScene.name == "GameScene")
+            SceneManager.LoadScene("StartScene");
     }
     /*
     public override void OnPlayerEnteredRoom(Player newPlayer)

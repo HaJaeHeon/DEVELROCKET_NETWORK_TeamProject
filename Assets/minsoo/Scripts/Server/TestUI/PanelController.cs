@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -32,16 +33,6 @@ public class PanelController : MonoBehaviour
         NetworkManager.Instance.JoinedRoom -= OpenRoom;
     }
 
-    private void AuthFailed(string text)
-    {
-        isFail = true;
-    }
-
-    private void AuthSuccessed(string text)
-    {
-        isFail = false;
-    }
-
     public async void Open(PanelId main, PanelId sub = PanelId.None)
     {
         // 만약 로그인 실패 시 리턴
@@ -51,20 +42,25 @@ public class PanelController : MonoBehaviour
         }
 
         // 타이틀에서 로그인한 상태면 문제없으면 바로 로비로 이동
-        if (curPanel == PanelId.Title)
-        {
-            await AuthManager.Instance.TryAutoLoginAsync();
-            if (AuthManager.Instance.Auth.CurrentUser != null)
-            {
-                main = PanelId.Lobby;
-                sub = PanelId.None;
-            }
-        }
+        //if (curPanel == PanelId.Title)
+        //{
+        //    await AuthManager.Instance.TryAutoLoginAsync();
+        //    if (AuthManager.Instance.Auth.CurrentUser != null)
+        //    {
+        //        main = PanelId.Lobby;
+        //        sub = PanelId.None;
+        //    }
+        //}
             
             
         // 타이틀로 돌아가는 경우는 로그아웃
-        //if (main == PanelId.Title)
-        //    AuthManager.Instance.Auth.SignOut();
+        if (main == PanelId.Title)
+        {
+            AuthManager.Instance.SignOut();
+            if (PhotonNetwork.IsConnected)
+                PhotonNetwork.Disconnect();
+        }
+            
 
 
         foreach (var (id, go) in panels)

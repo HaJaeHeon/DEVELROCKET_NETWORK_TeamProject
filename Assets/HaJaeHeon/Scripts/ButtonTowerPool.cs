@@ -19,8 +19,8 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
     [SerializeField] private GameObject inventoryContent;
 
 
-    public const int INVENTORYMAXCOUNT = 7;
-    private const int SHOPMAXCOUNT = 10;
+    public const int INVENTORYMAXCOUNT = 5;
+    private const int SHOPMAXCOUNT = 3;
 
     private IObjectPool<GameObject> pool;
 
@@ -66,6 +66,7 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
             drag.enabled = false;
 
             towerImage.raycastTarget = false;
+            towerImage.sprite = so.data.GetIcon();
 
             towerButton.enabled = true;
             BuyTower bt = shopPanel.GetComponent<BuyTower>();

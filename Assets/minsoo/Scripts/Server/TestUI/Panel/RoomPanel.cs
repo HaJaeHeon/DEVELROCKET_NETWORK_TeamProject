@@ -1,10 +1,7 @@
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
-using UnityEngine.tvOS;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class RoomPanel : UIPanel
 {
@@ -30,8 +27,8 @@ public class RoomPanel : UIPanel
         leaderBoardButton.onClick.AddListener(() => ui.Open(PanelId.Room, PanelId.LeaderBoard));
         presetButton.onClick.AddListener(() => ui.Open(PanelId.Room, PanelId.Preset));
 
-        
-        
+
+
     }
 
     private void OnEnable()
@@ -57,13 +54,13 @@ public class RoomPanel : UIPanel
             Destroy(name.gameObject);
         }
 
-           // ActorNumber 순 = 들어온 순서
+        // ActorNumber 순 = 들어온 순서
         for (int i = 0; i < players.Length; i++)
         {
             var go = Instantiate(playerPrefabs, playerPanel);
             go.Set(i < players.Length ? players[i] : null);
         }
-            
+
 
         bool myReady = NetworkManager.IsReady(PhotonNetwork.LocalPlayer);
         readyButtonText.text = myReady ? "Cancel" : "Ready";

@@ -12,7 +12,7 @@ public class ShowPassword : MonoBehaviour
 
     private Image buttonImage;
 
-    private bool isShow;
+    private bool isShow = true;
 
     private void Awake()
     {
