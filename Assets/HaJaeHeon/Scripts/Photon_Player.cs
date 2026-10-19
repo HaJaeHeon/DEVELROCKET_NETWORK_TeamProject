@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum MyColor
 {
@@ -12,26 +13,43 @@ public class Photon_Player : MonoBehaviourPunCallbacks
 {
     private const string ColorKey = "PlayerColor";
 
+    
+    [SerializeField] private Image cursorImage;
+    [SerializeField] private RectTransform myRectTransform;
+    [SerializeField] private RectTransform canvasRect;
+    
+    
     // 카메라 캐싱
     private Camera mainCamera;
-    private SpriteRenderer targetSprite;
+    //private SpriteRenderer targetSprite;
+
 
     public MyColor currentMyColor;
 
     private void Awake()
     {
-        targetSprite = GetComponent<SpriteRenderer>();
+        cursorImage.raycastTarget = false;
+        cursorImage = GetComponentInChildren<Image>();
+        myRectTransform = GetComponent<RectTransform>();
     }
 
     private void Start()
     {
+        canvasRect = CursorRoot.Root;
+
+        if( canvasRect == null)
+        {
+            Debug.LogError("Rect canvas is null");
+            return;
+        }
+
+        transform.SetParent(canvasRect, false);
         // 플레이어 본인이 사용할 카메라 캐싱
         if (photonView.IsMine)
         {
             mainCamera = Camera.main;
             //SetMyColor(currentMyColor);
             ApplyColor(photonView.Owner.CustomProperties);
-            Cursor.visible = false;
         }
 
         if(photonView.Owner != null)
@@ -48,17 +66,23 @@ public class Photon_Player : MonoBehaviourPunCallbacks
         if (!photonView.IsMine || mainCamera == null)
             return;
 
-        Vector3 mousePosition = Input.mousePosition;
+        //Vector3 mousePosition = Input.mousePosition;
 
-        mousePosition.z =
-            mainCamera.WorldToScreenPoint(transform.position).z;
+        //mousePosition.z =
+        //    mainCamera.WorldToScreenPoint(transform.position).z;
 
-        Vector3 target =
-            mainCamera.ScreenToWorldPoint(mousePosition);
+        //Vector3 target =
+        //    mainCamera.ScreenToWorldPoint(mousePosition);
 
-        target.z = transform.position.z;
+        //target.z = transform.position.z;
 
-        transform.position = target;
+        //transform.position = target;
+
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect, Input.mousePosition, null, out Vector2 localMousePoint))
+        {
+            myRectTransform.localPosition = new Vector3(localMousePoint.x, localMousePoint.y, 0f);
+        }
     }
 
     //private void SetMyColor(MyColor mColor)
@@ -84,7 +108,7 @@ public class Photon_Player : MonoBehaviourPunCallbacks
         }
 
         currentMyColor = (MyColor)colorValue;
-        targetSprite.color = GetColor(currentMyColor);
+        cursorImage.color = GetColor(currentMyColor);
     }
 
     private Color GetColor(MyColor mColor)

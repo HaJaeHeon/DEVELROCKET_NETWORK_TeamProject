@@ -1,3 +1,4 @@
+using System;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -24,6 +25,11 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
 
     [SerializeField] private Vector2 towerSpawnTransformOffset = new Vector2(0.5f, 0.5f);
 
+    private GameObject pendingInventoryTower;
+    private bool isBuildRequestPending;
+
+    public event Action<bool> TowerRecallResultReceived;
+
     private void Awake()
     {
         map = MapManager.Instance;
@@ -48,6 +54,7 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
             Debug.Log("eventData null");
             return;
         }
+
         InventoryDraggable inventoryTower = eventData.pointerDrag.GetComponent<InventoryDraggable>();
 
         if (inventoryTower == null)
@@ -56,12 +63,19 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
             return;
         }
 
-        TryAttatchImage(inventoryTower);
+        GameObject inventoryButtonObject = inventoryTower.InventoryItemObject;
 
+        if (inventoryButtonObject == null)
+        {
+            Debug.LogError("인벤토리 버튼 null");
 
+            return;
+        }
+
+        TryAttatchImage(inventoryTower, inventoryButtonObject);
     }
 
-    public void TryAttatchImage(InventoryDraggable inventoryTower)
+    public void TryAttatchImage(InventoryDraggable inventoryTower, GameObject inventoryButtonObject)
     {
         if (map == null || targetCamera == null)
             return;
@@ -105,18 +119,16 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
             return;
         }
 
-
-
-        if(cellType == TileType.Build)
-        {
-            RequestTowerSpawn(cell, cellType, towerId, PhotonNetwork.LocalPlayer);
-        }
-        else
-        {
-            Debug.Log("Is not BuildTile");
+        if (cellType != TileType.Build)
             return;
-        }
 
+        if (isBuildRequestPending)
+            return;
+
+        pendingInventoryTower = inventoryButtonObject;
+        isBuildRequestPending = true;
+
+        RequestTowerSpawn(cell, cellType, towerId);
     }
 
     private void SpawnTower(DraggableImage image, Vector2Int cell)
@@ -133,47 +145,136 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
     }
 
     [PunRPC]
-    private void RpcTowerSpawn(int x, int y, int typeValue, string towerId, int actorNumber)
+    private void RpcTowerSpawn(int x, int y, int typeValue, string towerId, PhotonMessageInfo info)
     {
-        // 여기서
-        // 건설 가능 구역 확인은 되었는데
-        // 타워가 있는지 판단하고 
-        // 만약 타워가 있다면 현재 내가 소환하려는 타워랑 같은지, 내 소유 타워인지 확인하고
-        // 만약 타워가 같은 타워면 업그레이드
-        // 되도록 하는 로직 필요 
         if (!PhotonNetwork.IsMasterClient)
             return;
 
-        Player player = PhotonNetwork.CurrentRoom.GetPlayer(actorNumber);
+        Player requester = info.Sender;
 
-        if (player == null)
+        if (requester == null)
             return;
 
-        // 현재 타일에 타워 있는지 검사하고 타워 있으면 같은 타워인지, 내가 지은 타워인지 확인하고
-        // 여기까지도 true면 타워 업그레이드??
+        Vector2Int cell = new Vector2Int(x, y);
 
-        CurrentTile currentTile = new CurrentTile
+        if (map == null || tilemap == null ||
+            !tilemap.HasTile(new Vector3Int(x, y, 0)) ||
+            map.GetTileType(cell) != TileType.Build ||
+            (TileType)typeValue != TileType.Build)
         {
-            pos = new Vector2(x,y) + towerSpawnTransformOffset,
-            type = (TileType)typeValue
-        };
-        if(!GameManager.Instance.CreateTower(currentTile, towerId, player))
-        {
-            Debug.Log("건설 실패");
+            photonView.RPC(nameof(RpcTowerSpawnResult), requester, false);
             return;
         }
 
-        Debug.Log($"{actorNumber} 의 요청으로 건설함");
+        CurrentTile currentTile = new CurrentTile
+        {
+            pos = new Vector2(x, y) + towerSpawnTransformOffset,
+            type = (TileType)typeValue
+        };
+
+        Tower createdTower =
+            GameManager.Instance.CreateTower(currentTile, towerId, requester);
+
+        bool success = createdTower != null;
+
+        photonView.RPC(nameof(RpcTowerSpawnResult),
+            requester,
+            success);
     }
 
-    private void RequestTowerSpawn(Vector2Int pos, TileType type, string towerId, Player player)
+    private void RequestTowerSpawn(Vector2Int pos, TileType type, string towerId)
     {
-        photonView.RPC(nameof(RpcTowerSpawn), RpcTarget.MasterClient, pos.x, pos.y, (int)type, towerId, player.ActorNumber);
-        Debug.Log($"{player.ActorNumber}가 건설 요청");
+        photonView.RPC(nameof(RpcTowerSpawn), RpcTarget.MasterClient, pos.x, pos.y, (int)type, towerId);
+        Debug.Log($"{PhotonNetwork.LocalPlayer.ActorNumber}가 건설 요청");
+    }
+
+    public void RequestTowerRecall(int towerViewId)
+    {
+        if (!PhotonNetwork.InRoom || towerViewId <= 0)
+            return;
+
+        photonView.RPC(
+            nameof(RpcRequestTowerRecall),
+            RpcTarget.MasterClient,
+            towerViewId);
+    }
+
+    [PunRPC]
+    private void RpcRequestTowerRecall(int towerViewId, PhotonMessageInfo info)
+    {
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        Player requester = info.Sender;
+
+        if (requester == null)
+            return;
+
+        PhotonView towerView = PhotonView.Find(towerViewId);
+        Tower tower = towerView != null
+            ? towerView.GetComponent<Tower>()
+            : null;
+
+        bool success = tower != null &&
+            tower.OwnerPlayer != null &&
+            tower.OwnerPlayer.ActorNumber == requester.ActorNumber;
+
+        if (success)
+        {
+            PacketData destroyPacket = new PacketData();
+            destroyPacket.Write(Tower.TowerDestroy);
+            destroyPacket.Write(tower.IndexId);
+
+            IPacketer.SendPacket(
+                GameManager.Instance.MainGamePacketer.photonView,
+                destroyPacket);
+        }
+
+        photonView.RPC(
+            nameof(RpcTowerRecallResult),
+            requester,
+            success);
+    }
+
+    [PunRPC]
+    private void RpcTowerRecallResult(bool success)
+    {
+        TowerRecallResultReceived?.Invoke(success);
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
+        pendingInventoryTower = null;
+        isBuildRequestPending = false;
         Debug.LogWarning($"Photon 연결 종료 사유: {cause}");
+    }
+
+    [PunRPC]
+    private void RpcTowerSpawnResult(bool success)
+    {
+        if (!isBuildRequestPending)
+            return;
+
+        if (success)
+        {
+            bool removed =
+                PlayerInventory.Instance.TryRemoveTower(pendingInventoryTower);
+
+            if (removed)
+            {
+                ButtonTowerPool.Instance.Return(pendingInventoryTower);
+            }
+            else
+            {
+                Debug.LogError("건설은 성공했지만 인벤토리 제거에 실패했습니다.");
+            }
+        }
+        else
+        {
+            Debug.Log("타워 건설에 실패했습니다.");
+        }
+
+        pendingInventoryTower = null;
+        isBuildRequestPending = false;
     }
 }
