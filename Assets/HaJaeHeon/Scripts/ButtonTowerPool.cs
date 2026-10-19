@@ -58,6 +58,8 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         Button towerButton = buttonTower.GetComponent<Button>();
         drag.canvas = shopPanel.transform.root.GetComponent<Canvas>();
 
+        so.SetItemId(null);
+
         if (data != null)
             so.data = data;
 
@@ -100,7 +102,6 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
 
         pool.Release(obj);
     }
-
     private void OnDestroy()
     {
         pool?.Clear();

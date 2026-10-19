@@ -58,6 +58,11 @@ public class BuyTower : MonoBehaviourPunCallbacks
         }
         
         GameObject inventoryTower = ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory, data);
+
+        PresetSODataContainer container = inventoryTower.GetComponentInChildren<PresetSODataContainer>();
+
+        container.SetItemId(data.Id);
+
         // 인벤토리에 추가 못한다면
         if (!PlayerInventory.Instance.TryAddTower(inventoryTower))
         {

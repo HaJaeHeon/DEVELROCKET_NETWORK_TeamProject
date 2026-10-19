@@ -39,11 +39,11 @@ public class InventoryTowerItem
         }
     }
 
-    public InventoryTowerItem(string itemId, string towerId, float towerPrice)
+    public InventoryTowerItem(string itemId, string towerId, float towerPrice, int towerLevel = 1)
     {
         this.itemId = itemId;
         this.towerId = towerId;
         this.towerPrice = towerPrice;
-        towerLevel = 1;
+        this.towerLevel = towerLevel;
     }
 }
