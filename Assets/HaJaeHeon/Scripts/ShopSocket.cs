@@ -1,16 +1,19 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class ShopSocket : MonoBehaviour
+public class ShopSocket : MonoBehaviour, IDropHandler
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void OnDrop(PointerEventData eventData)
     {
-        
-    }
+        if (eventData.pointerDrag == null)
+            return;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (!eventData.pointerDrag.TryGetComponent(out InventoryDraggable draggable))
+            return;
+
+        if (TowerService.Instance == null)
+            return;
+
+        TowerService.Instance.RecallSell(draggable);
     }
 }
