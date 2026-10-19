@@ -1,6 +1,5 @@
 using Firebase.Auth;
 using Firebase.Database;
-using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -36,6 +35,7 @@ public class ProfileRepository
 {
     private FirebaseAuth auth;
     private DatabaseReference userRef;
+    public DatabaseReference UserRef { get { return userRef; } }
 
     private DatabaseReference listeningRef;
     public event Action<UserProfile> ProfileChanged;
@@ -47,6 +47,44 @@ public class ProfileRepository
     }
 
     private string CurrentUid => auth.CurrentUser?.UserId;
+
+    //익명 프로필 생성
+    public async Task<bool> CreateGuestProfileAsync(string name)
+    {
+        var user = auth.CurrentUser;
+        if (user == null)
+            return false;
+        string uid = user.UserId;
+
+        
+
+        // 첫 DB 목록 생성
+        Dictionary<string, object> keyValuePairs = new Dictionary<string, object>
+        {
+            {$"Nicknames/{name.ToLower()}", uid},
+            {$"Users/{uid}/name", name },
+            {$"Users/{uid}/rate", 0 },
+            {$"Users/{uid}/createdAt", ServerValue.Timestamp},
+            {$"Users/{uid}/stats",  new Dictionary<string, object>
+                {
+                    { "games", 0 },
+                    { "wins", 0 },
+                    { "losses", 0 }
+                } },
+        };
+
+        try
+        {
+            await userRef.UpdateChildrenAsync(keyValuePairs);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Create Failed : {e}");
+            return false;
+        }
+
+    }
 
     // 프로필 생성
     public async Task<bool> CreateProfileAsync(string name)
@@ -92,6 +130,7 @@ public class ProfileRepository
         return nickSnap.Exists;
     }
 
+    // 프로필 정보 가져오기
     public async Task<UserProfile> LoadProfileAsync(string uid = null)
     {
         uid ??= CurrentUid;
@@ -100,6 +139,7 @@ public class ProfileRepository
         var snap = await userRef.Child("Users").Child(uid).GetValueAsync();
         return UserProfile.FromSnapshot(snap);
     }
+
 
     public void StartListening()
     {

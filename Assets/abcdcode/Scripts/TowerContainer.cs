@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class TowerContainer : SingletonBehavior<TowerContainer>, IObjContainer<ITower>
+public class TowerContainer : IObjContainer<ITower>
 {
     public void AddObj(ITower obj)
     {
@@ -17,5 +17,5 @@ public class TowerContainer : SingletonBehavior<TowerContainer>, IObjContainer<I
     {
         return towers.ToList();
     }
-    private List<ITower> towers;
+    private List<ITower> towers = new List<ITower>();
 }

@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class CalcUtils
 {
+    
     public static bool SegmentCircleFast(Vector2 a, Vector2 b, Vector2 c, float r, out float tHit)
     {
         tHit = 0;
@@ -95,6 +97,11 @@ public static class CalcUtils
     {
         float angle = Mathf.Atan2(lookAt.y, lookAt.x) * Mathf.Rad2Deg;
         t.Obj.transform.eulerAngles =new Vector3(0,0,angle);
+    }
+    public static float GetAngle(this IMonoObj a, Vector2 objective)
+    {
+        var lookAt = objective-a.Position;
+        return Mathf.Atan2(lookAt.y, lookAt.x) * Mathf.Rad2Deg;
     }
     /// <summary>
     /// targetPos를 바라봄

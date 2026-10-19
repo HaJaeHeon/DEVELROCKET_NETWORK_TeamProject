@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 978ebd8569fa4ae4496a2b0dc761d772, type: 3}
+  m_Name: MissileTower3
+  m_EditorClassIdentifier: Assembly-CSharp::AttackTowerData
+  id: MissileTower3
+  cost: 50
+  towerName: "\uB300\uD615 \uBBF8\uC0AC\uC77C \uD0C0\uC6CC"
+  desc: "\uB113\uC740 \uBC94\uC704\uC5D0 \uD53C\uD574\uB97C \uC785\uD788\uB294 \uB300\uD615
+    \uBBF8\uC0AC\uC77C\uC744 \uC3DC\uB2E4. \uACF5\uACA9 \uC18D\uB3C4\uAC00 \uB290\uB9AC\uB2E4."
+  AIScript: LookAtAndAttackAI
+  icon: {fileID: 21300000, guid: 99f3a6b8b7331644bb6a8e9809755e60, type: 3}
+  range: 7
+  damage: 20
+  cool: 2
+  bulletPrefab: {fileID: 1107830369495406184, guid: ec60ca45e60c4ef46b556b3377fc2bee, type: 3}
