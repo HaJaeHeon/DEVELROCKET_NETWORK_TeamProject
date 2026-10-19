@@ -94,7 +94,7 @@ public class PlayerInventoryRegistry : MonoBehaviourPunCallbacks
         return result.AsReadOnly();
     }
 
-    // 설치·판매 전 예약한다. 같은 항목의 동시 사용을 막음
+    // 설치·판매 전 예약 같은 항목의 동시 사용을 막음
     public bool TryReserveItem(Player player, string itemId, ItemOperation operation,
         out string reservationId, out InventoryTowerItem item)
     {
@@ -111,7 +111,7 @@ public class PlayerInventoryRegistry : MonoBehaviourPunCallbacks
         return true;
     }
 
-    // 설치·판매 성공 시 보유 기록에서 제거한다. 예약 번호가 일치해야 함
+    // 설치·판매 성공 시 보유 기록에서 제거 / 예약 번호가 일치해야 함
     public bool TryConsumeItem(Player player, string itemId, string reservationId)
     {
         if (!TryGetReservation(player, itemId, reservationId, out _)) return false;

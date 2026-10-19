@@ -1,5 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
+using Unity.VisualScripting;
+using UnityEngine.EventSystems;
 
 
 /// <summary>
@@ -19,6 +21,16 @@ public class CameraMove : MonoBehaviourPunCallbacks
             return;
 
         myCamera = Camera.main;
+
+        // 2d raycast 추가
+        if(myCamera.TryGetComponent<Physics2DRaycaster>(out var rayCast))
+        {
+            rayCast.enabled = true;
+        }
+        else
+        {
+            myCamera.AddComponent<Physics2DRaycaster>();
+        }
     }
 
     private void Update()

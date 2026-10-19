@@ -1,79 +1,86 @@
-using UnityEngine;
 using Photon.Pun;
-using UnityEngine.UI;
 using Photon.Realtime;
-using ExitGames.Client.Photon;
-
+using System;
+using UnityEngine;
+using UnityEngine.UI;
 public class BuyTower : MonoBehaviourPunCallbacks
 {
-    [SerializeField] private GameObject inventoryObject;
+    public event Action<string, string> PurchaseRequested;
+
     [SerializeField] private float currentGold;
-    private float reflectedGold;
 
-    private bool isRequestComplete;
+    private bool isPurchasePending;
+    private string pendingRequestId;
+    private Button pendingShopButton;
+    private GameObject pendingInventoryTower;
 
-    private float targetGold;
-
-    // 인벤토리 상태 확인 후 결제하는 부분 필요
-    // 지금은 그냥 버튼을 삭제하는데 이걸 objectpool 해야함
 
     private void SpendToBuyTower(Button button, TowerData data)
     {
         currentGold = PlayerGold.Get(PhotonNetwork.LocalPlayer);
         Debug.Log($"현재 가진 골드 량 : {currentGold}");
         
-        if(!PhotonNetwork.InRoom || isRequestComplete)
+        if(!PhotonNetwork.InRoom || isPurchasePending)
         {
-            Debug.Log($"방이 아니거나 요청이 완료되지 않음 (요청상태 : {isRequestComplete})");
+            Debug.Log($"방이 아니거나 요청이 완료되지 않음 (요청상태 : {isPurchasePending})");
             return;
         }
 
-        if (currentGold < targetGold)
-        {
-            Debug.Log($"금액이 모자랍니다 currentGold{currentGold} / targetGold {targetGold}");
+        PlayerInventory inventory = PlayerInventory.Instance;
+        ButtonTowerPool pool = ButtonTowerPool.Instance;
 
-            return;
-        }
+        //if (inventory == null || pool == null)
+        //    return;
 
-        if(PlayerInventory.Instance.IsFullInventory)
+        if(inventory.IsFullInventory)
         {
             Debug.LogError("인벤토리가 가득 찼습니다.");
             return;
         }
 
+        if (currentGold < data.Cost)
+        {
+            Debug.Log($"금액이 모자랍니다 currentGold{currentGold} / Cost {data.Cost}");
+
+            return;
+        }
         Debug.Log("결제 진행중");
 
-        reflectedGold = currentGold - targetGold;
-        isRequestComplete = true;
-
-        if(PlayerGold.TrySpend(targetGold))
+        // 아직 통신 담당이 연결되지 않았다면 구매를 시작하지 않는다.
+        if (PurchaseRequested == null)
         {
-            Debug.Log($"골드 소모 요청이 완료되었습니다 원래 골드 : {currentGold} / 소모한 골드 : {targetGold} / 반영 골드 : {reflectedGold} ");
-        }
-        else
-        {
-            isRequestComplete = false;
-            Debug.Log("골드가 부족하여 요청이 거절되었습니다.");
-            return;
-        }
-        
-        GameObject inventoryTower = ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory, data);
-
-        PresetSODataContainer container = inventoryTower.GetComponentInChildren<PresetSODataContainer>();
-
-        container.SetItemId(data.Id);
-
-        // 인벤토리에 추가 못한다면
-        if (!PlayerInventory.Instance.TryAddTower(inventoryTower))
-        {
-            ButtonTowerPool.Instance.Return(inventoryTower);
-            PlayerGold.Add(targetGold);
-            isRequestComplete = false;
-
+            Debug.LogWarning("구매 요청을 전달할 통신 처리가 연결되지 않았습니다.");
             return;
         }
 
-        ButtonTowerPool.Instance.Return(button.gameObject);
+        GameObject inventoryTower =
+            pool.Spawn(ButtonTowerPool.UIType.Inventory, data);
+
+        if (inventoryTower == null)
+            return;
+
+        if (!inventory.TryAddTower(inventoryTower))
+        {
+            pool.Return(inventoryTower);
+            return;
+        }
+
+        // 구매가 승인되기 전에는 임시 항목을 끌지 못하게 한다.
+        InventoryDraggable draggable =
+            inventoryTower.GetComponentInChildren<InventoryDraggable>(true);
+
+        if (draggable != null)
+            draggable.enabled = false;
+
+        pendingInventoryTower = inventoryTower;
+        pendingShopButton = button;
+        pendingRequestId = System.Guid.NewGuid().ToString("N");
+        isPurchasePending = true;
+
+        button.interactable = false;
+
+        // 요청 번호와 종류만 전달. 여기서는 결제하지 않는다.
+        PurchaseRequested.Invoke(pendingRequestId, data.Id);
     }
 
     // 타워 데이터 가져오기
@@ -87,8 +94,6 @@ public class BuyTower : MonoBehaviourPunCallbacks
 
         if (!buttonObject.TryGetComponent<Button>(out var tryButton))
             return;
-
-        Button button = buttonObject.GetComponent<Button>();
 
         Debug.Log($"{buttonObject.name} : 을 구매하기위해 클릭함");
 
@@ -107,31 +112,89 @@ public class BuyTower : MonoBehaviourPunCallbacks
             return;
         }
 
-        targetGold = so.data.Cost;
-        Debug.Log($"타워의 가격 : {targetGold}");
-
-        SpendToBuyTower(button, so.data);
+        SpendToBuyTower(tryButton, so.data);
     }
 
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    // 통신 담당이 대표 참여자의 응답을 검증한 뒤 호출한다.
+    public void HandlePurchaseResult(
+        string requestId,
+        bool success,
+        string itemId)
     {
-        base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
-
-        if (targetPlayer != PhotonNetwork.LocalPlayer)
+        // 현재 기다리는 요청의 결과만 처리한다.
+        if (!isPurchasePending || requestId != pendingRequestId)
             return;
 
-        if (!changedProps.TryGetValue(PlayerGold.Key, out object value) || !(value is float gold))
-            return;
-
-        Debug.Log($" 반영된 재화 : {gold}");
-
-        if (!isRequestComplete)
-            return;
-
-        if(gold == reflectedGold)
+        if (!success)
         {
-            isRequestComplete = false;
-            Debug.Log($"reflectedGold : {reflectedGold} / propertiesGold : {gold} 골드가 반영되었습니다.");
+            CancelPendingPurchase();
+            Debug.Log("구매가 거절되었습니다.");
+            return;
         }
+
+        if (string.IsNullOrEmpty(itemId) || pendingInventoryTower == null)
+        {
+            Debug.LogError("구매 승인 정보가 올바르지 않습니다.");
+            return;
+        }
+
+        PresetSODataContainer container =
+            pendingInventoryTower
+                .GetComponentInChildren<PresetSODataContainer>(true);
+
+        if (container == null)
+        {
+            Debug.LogError("구매 항목의 정보 구성 요소(component)가 없습니다.");
+            return;
+        }
+
+        // Registry에서 발급한 항목 고유 식별자
+        container.SetItemId(itemId);
+
+        InventoryDraggable draggable =
+            pendingInventoryTower
+                .GetComponentInChildren<InventoryDraggable>(true);
+
+        if (draggable != null)
+            draggable.enabled = true;
+
+        // 승인된 보관함 항목은 남기고 상점 상품만 반환한다.
+        if (pendingShopButton != null)
+            ButtonTowerPool.Instance.Return(pendingShopButton.gameObject);
+
+        ClearPurchaseState();
+
+        Debug.Log("구매 승인과 보관함 등록이 완료되었습니다.");
+    }
+
+    private void CancelPendingPurchase()
+    {
+        if (pendingInventoryTower != null)
+        {
+            if (PlayerInventory.Instance != null)
+                PlayerInventory.Instance.TryRemoveTower(pendingInventoryTower);
+
+            if (ButtonTowerPool.Instance != null)
+                ButtonTowerPool.Instance.Return(pendingInventoryTower);
+        }
+
+        if (pendingShopButton != null)
+            pendingShopButton.interactable = true;
+
+        ClearPurchaseState();
+    }
+
+    private void ClearPurchaseState()
+    {
+        pendingInventoryTower = null;
+        pendingShopButton = null;
+        pendingRequestId = null;
+        isPurchasePending = false;
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        CancelPendingPurchase();
+        base.OnDisconnected(cause);
     }
 }

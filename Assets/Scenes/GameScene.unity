@@ -520,17 +520,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29fdd1f97b040334bb17de35490b4e49, type: 3}
---- !u!114 &464341951 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7490684609068218140, guid: 29fdd1f97b040334bb17de35490b4e49, type: 3}
-  m_PrefabInstance: {fileID: 464341950}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b6e1f15d680f794aa5631b2c06f5aee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MapManager
 --- !u!1001 &700710552
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -732,7 +721,9 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6541298674503827115, guid: fdc9ca83b358c66449a4a3e6c5bbc692, type: 3}
+    - {fileID: 4191069236244075873, guid: fdc9ca83b358c66449a4a3e6c5bbc692, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -3169,6 +3160,105 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1263924229
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1263924233}
+  - component: {fileID: 1263924232}
+  - component: {fileID: 1263924231}
+  - component: {fileID: 1263924230}
+  - component: {fileID: 1263924234}
+  m_Layer: 0
+  m_Name: SocketManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1263924230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263924229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f9a202d88af2384f95ba31e250abc02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SocketManager
+  map: {fileID: 0}
+  tilemap: {fileID: 0}
+  targetCamera: {fileID: 0}
+  towerSpawnTransformOffset: {x: 0.5, y: 0.5}
+  buyTower: {fileID: 1263924234}
+--- !u!114 &1263924231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263924229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d320d54cef49a4298590fb73a75c4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerService
+--- !u!114 &1263924232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263924229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 3
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!4 &1263924233
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263924229}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 996.96515, y: 65.66881, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1263924234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263924229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc8fde830a22d144a9116e8672b65dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuyTower
+  currentGold: 0
 --- !u!1001 &1532360286
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3181,6 +3271,10 @@ PrefabInstance:
       propertyPath: shopPanel
       value: 
       objectReference: {fileID: 805817513}
+    - target: {fileID: 91002513918371682, guid: 97ef3307f7c96124da392c5009727f81, type: 3}
+      propertyPath: shopTower
+      value: 
+      objectReference: {fileID: 1532360288}
     - target: {fileID: 91002513918371682, guid: 97ef3307f7c96124da392c5009727f81, type: 3}
       propertyPath: shopContent
       value: 
@@ -3240,8 +3334,28 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6256498561174523162, guid: 97ef3307f7c96124da392c5009727f81, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1532360288}
   m_SourcePrefab: {fileID: 100100000, guid: 97ef3307f7c96124da392c5009727f81, type: 3}
+--- !u!1 &1532360287 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6256498561174523162, guid: 97ef3307f7c96124da392c5009727f81, type: 3}
+  m_PrefabInstance: {fileID: 1532360286}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1532360288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532360287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 909869510cd41164fbfda73e452eae9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShopTower
 --- !u!1 &1658245675
 GameObject:
   m_ObjectHideFlags: 0
@@ -5773,10 +5887,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc75507afb6057b44a5a715b7090dd8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilemapSocket
-  map: {fileID: 464341951}
-  tilemap: {fileID: 2146565463}
-  targetCamera: {fileID: 0}
-  towerSpawnTransformOffset: {x: 0.5, y: 0.5}
 --- !u!114 &2146565466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5912,3 +6022,4 @@ SceneRoots:
   - {fileID: 1532360286}
   - {fileID: 290969971}
   - {fileID: 9075171288388919625}
+  - {fileID: 1263924233}
