@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 2016959414493232587}
   - component: {fileID: 8279656975265779639}
   - component: {fileID: 4896930808270545217}
-  - component: {fileID: 3887635952748802444}
   m_Layer: 0
   m_Name: Logic
   m_TagString: Untagged
@@ -6492,28 +6491,6 @@ MonoBehaviour:
   tilemap: {fileID: 4584077114197637723}
   targetCamera: {fileID: 0}
   towerSpawnTransformOffset: {x: 0.5, y: 0.5}
---- !u!114 &3887635952748802444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3713128767643199334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonView
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &4854112352818235761
 GameObject:
   m_ObjectHideFlags: 0

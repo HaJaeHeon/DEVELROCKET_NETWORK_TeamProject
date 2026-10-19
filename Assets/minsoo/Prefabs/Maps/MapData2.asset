@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: MapData2
   m_EditorClassIdentifier: Assembly-CSharp::MapSOData
   id: Map02
-  name: Windmill
+  mapName: Windmill
   mapPrefab: {fileID: 8339417105046302206, guid: 983ff7d9c323b4d40a129efd98ef8978, type: 3}
-  thumnail: {fileID: 21300000, guid: 3e62bd881afb64d42a2a097751a729b0, type: 3}
+  thumbnail: {fileID: 21300000, guid: 3e62bd881afb64d42a2a097751a729b0, type: 3}

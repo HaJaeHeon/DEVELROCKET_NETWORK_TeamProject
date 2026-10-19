@@ -12,7 +12,4 @@ public class GameTile : Tile
         Type == TileType.Road || Type == TileType.Start || Type == TileType.Goal;
     public bool IsBuildable => Type == TileType.Build;
 
-    
-
-    
 }

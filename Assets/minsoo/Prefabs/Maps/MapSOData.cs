@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "MapData", menuName = "SOData/MapData")]
 public class MapSOData : SOData
@@ -10,7 +9,7 @@ public class MapSOData : SOData
     [SerializeField] private GameObject mapPrefab;
     public GameObject MapPrefab => mapPrefab;
 
-    [SerializeField] private Sprite thumnail;
-    public Sprite Thumnail => thumnail;
+    [SerializeField] private Sprite thumbnail;
+    public Sprite Thumbnail => thumbnail;
 
 }

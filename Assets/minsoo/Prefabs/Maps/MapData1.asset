@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: MapData1
   m_EditorClassIdentifier: Assembly-CSharp::MapSOData
   id: Map01
-  name: BasicMap
+  mapName: Basic
   mapPrefab: {fileID: 8339417105046302206, guid: 8ed05a4f268446940a1a08e36790373e, type: 3}
-  thumnail: {fileID: 21300000, guid: 222add65c27c9f44da6f49dec466402a, type: 3}
+  thumbnail: {fileID: 21300000, guid: 222add65c27c9f44da6f49dec466402a, type: 3}
