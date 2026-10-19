@@ -10,6 +10,7 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     public void Awake()
     {
         RPCEvent = new Dictionary<string, Action<PacketData>>();
+        if(m_HeadSprite != null) m_HeadDefaultColor = m_HeadSprite.color;
         Data = mData;
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
@@ -17,9 +18,11 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     // PhotonNetwork.Instantiate 시 모든 클라이언트에서 호출 (풀에서 재사용될 때도 호출됨)
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
+        
         // 풀 재사용 시 Awake가 다시 호출되지 않으므로 ViewID 갱신 및 컨테이너 등록은 여기서 수행
         IndexId = photonView.ViewID;
         OwnerPlayer = null; // 풀 재사용 시 이전 소유자 초기화 (TowerSetOwner 패킷으로 지정됨)
+        ApplyOwnerColor();
         GameManager.Instance?.Container_Tower.AddObj(this);
         object[] instData = info.photonView.InstantiationData;
         if(instData != null && instData.Length > 0 && instData[0] is string towerId)
@@ -58,6 +61,20 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
         t.OwnerPlayer = actorNumber >= 0 && PhotonNetwork.CurrentRoom != null
             ? PhotonNetwork.CurrentRoom.GetPlayer(actorNumber)
             : null;
+        t.ApplyOwnerColor();
+    }
+    /// <summary>
+    /// 소유자의 커스텀 프로퍼티(PlayerColor)를 읽어 바닥 스프라이트 색상을 변경 (소유자가 없으면 흰색)
+    /// </summary>
+    public void ApplyOwnerColor()
+    {
+        if(m_BaseSprite == null) return;
+        Color color = Color.white;
+        if(OwnerPlayer != null && OwnerPlayer.CustomProperties.TryGetValue(PlayerColorKey, out object value) && value is int colorValue)
+        {
+            color = ExtensionUtil.GetColor((MyColor)colorValue);
+        }
+        m_BaseSprite.color = color;
     }
     public void Init(ITileMap tile, ITowerSO data)
     {
@@ -75,6 +92,20 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
         Data = data;
         AIData = (data as TowerData).CreateAI();
         AIData.Init(this);
+        ApplyLevelColor();
+    }
+    /// <summary>
+    /// 데이터 레벨에 따라 머리 스프라이트 색상을 변경 (1레벨은 프리팹 기본 색)
+    /// </summary>
+    public void ApplyLevelColor()
+    {
+        if(m_HeadSprite == null || Data == null) return;
+        m_HeadSprite.color = Data.Level switch
+        {
+            2 => HeadColorLv2,
+            3 => HeadColorLv3,
+            _ => m_HeadDefaultColor,
+        };
     }
     public virtual void OnClickDemo()
     {
@@ -140,6 +171,12 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     }
 
     [SerializeField]private TowerData mData;
+    [SerializeField]private SpriteRenderer m_BaseSprite;
+    [SerializeField]private SpriteRenderer m_HeadSprite;
+    private Color m_HeadDefaultColor = Color.white;
+    private static readonly Color HeadColorLv2 = new Color32(255, 255, 128, 255);
+    private static readonly Color HeadColorLv3 = new Color32(255, 255, 0, 255);
     public const string TowerDestroy = "TowerDestroy";
     public const string TowerSetOwner = "TowerSetOwner";
+    public const string PlayerColorKey = "PlayerColor";
 }

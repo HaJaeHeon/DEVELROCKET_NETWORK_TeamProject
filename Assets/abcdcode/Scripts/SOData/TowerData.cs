@@ -9,6 +9,8 @@ public abstract class TowerData : SOData, ITowerSO
     [SerializeField]protected string desc;
     [SerializeField]protected string AIScript;
     [SerializeField]protected Sprite icon;
+    [SerializeField]protected int level=1;
+    [SerializeField]protected TowerData next;
     public virtual float Cost => cost;
 
     public virtual string Name => towerName;
@@ -16,6 +18,11 @@ public abstract class TowerData : SOData, ITowerSO
     public virtual string Desc => desc;
 
     public virtual TowerType Type => TowerType.Special;
+
+    public int Level => level;
+
+    public ITowerSO NextLevel => next;
+
     public virtual TowerAI CreateAI()
     {
         var t = System.Type.GetType(AIScript);
