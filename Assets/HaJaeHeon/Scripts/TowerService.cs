@@ -6,8 +6,10 @@ public class TowerService : MonoBehaviourPunCallbacks
 {
     public static TowerService Instance { get; private set; }
 
-    private TilemapSocket networkGateway;
+    private TilemapSocket tileMapSocket;
+    // 회수 결과를 기다리는 임시 보관함
     private GameObject pendingInventoryTower;
+    // 회수 응답을 기다리고있는지
     private bool isRecallPending;
 
     private void Awake()
@@ -23,32 +25,33 @@ public class TowerService : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        networkGateway = FindAnyObjectByType<TilemapSocket>();
+        tileMapSocket = FindAnyObjectByType<TilemapSocket>();
 
-        if (networkGateway == null)
+        if (tileMapSocket == null)
         {
             Debug.LogError("타워 회수 요청에 사용할 TilemapSocket을 찾을 수 없습니다.");
             return;
         }
 
-        networkGateway.TowerRecallResultReceived += HandleRecallResult;
+        tileMapSocket.TowerRecallResultReceived += HandleRecallResult;
         Debug.Log("TowerService가 타워 회수 요청을 받을 준비가 되었습니다.");
     }
 
+    // 회수 요청
     public void RequestRecall(Tower tower)
     {
-        if (!PhotonNetwork.InRoom ||
-            tower == null ||
-            isRecallPending ||
-            networkGateway == null)
+        if (!PhotonNetwork.InRoom || tower == null ||
+            isRecallPending || tileMapSocket == null)
             return;
 
+        // 소유권 검사
         if (!IsOwnedBy(tower, PhotonNetwork.LocalPlayer))
         {
             Debug.Log("다른 플레이어의 타워는 회수할 수 없습니다.");
             return;
         }
 
+        // 인벤토리 가득 찼는지 확인
         if (PlayerInventory.Instance == null ||
             PlayerInventory.Instance.IsFullInventory)
         {
@@ -56,23 +59,24 @@ public class TowerService : MonoBehaviourPunCallbacks
             return;
         }
 
+        // ButtonPool 확인
         if (ButtonTowerPool.Instance == null)
         {
-            Debug.LogError("ButtonTowerPool을 찾을 수 없습니다.");
+            Debug.LogError("ButtonTowerPool이 없습니다.");
             return;
         }
 
+        // 데이터 형식 변환
         TowerData towerData = tower.Data as TowerData;
 
         if (towerData == null)
         {
-            Debug.LogError("회수할 타워의 데이터를 찾을 수 없습니다.");
+            Debug.LogError("회수할 타워의 데이터가 없습니다.");
             return;
         }
 
         pendingInventoryTower = ButtonTowerPool.Instance.Spawn(
-            ButtonTowerPool.UIType.Inventory,
-            towerData);
+            ButtonTowerPool.UIType.Inventory, towerData);
 
         if (!PlayerInventory.Instance.TryAddTower(pendingInventoryTower))
         {
@@ -81,12 +85,17 @@ public class TowerService : MonoBehaviourPunCallbacks
             return;
         }
 
+        // 조작 제한, 요청 전송 
+        // 드래그 제한
         SetPendingTowerInteractable(false);
+        // 회수 결과를 기다리는 상태로 변경
         isRecallPending = true;
 
-        networkGateway.RequestTowerRecall(tower.photonView.ViewID);
+        // 설치된 타워의 id 전달
+        tileMapSocket.RequestTowerRecall(tower.photonView.ViewID);
     }
 
+    // 연결 종료시 회수처리 cancel
     public override void OnDisconnected(DisconnectCause cause)
     {
         RollbackPendingInventoryTower();
@@ -96,8 +105,8 @@ public class TowerService : MonoBehaviourPunCallbacks
 
     private void OnDestroy()
     {
-        if (networkGateway != null)
-            networkGateway.TowerRecallResultReceived -= HandleRecallResult;
+        if (tileMapSocket != null)
+            tileMapSocket.TowerRecallResultReceived -= HandleRecallResult;
 
         if (Instance == this)
             Instance = null;
@@ -122,6 +131,7 @@ public class TowerService : MonoBehaviourPunCallbacks
         ClearPendingState();
     }
 
+    // 소유권 비교용
     private static bool IsOwnedBy(Tower tower, Player player)
     {
         return tower != null &&
@@ -130,6 +140,7 @@ public class TowerService : MonoBehaviourPunCallbacks
             tower.OwnerPlayer.ActorNumber == player.ActorNumber;
     }
 
+    // 임시 항목 드래그 조작 제어
     private void SetPendingTowerInteractable(bool interactable)
     {
         if (pendingInventoryTower == null)
@@ -142,6 +153,7 @@ public class TowerService : MonoBehaviourPunCallbacks
             draggable.enabled = interactable;
     }
 
+    // 임시 항목 원상 복구
     private void RollbackPendingInventoryTower()
     {
         if (pendingInventoryTower == null)
@@ -154,6 +166,7 @@ public class TowerService : MonoBehaviourPunCallbacks
             ButtonTowerPool.Instance.Return(pendingInventoryTower);
     }
 
+    // 상태 초기화
     private void ClearPendingState()
     {
         pendingInventoryTower = null;

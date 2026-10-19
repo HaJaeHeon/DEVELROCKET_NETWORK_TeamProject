@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 public class TowerRecallDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private Tower tower;
+    // 끌기가 가능한 조건인지(소유권 확인)
     private bool canRecall;
 
     public Tower Tower => tower;
@@ -18,9 +19,7 @@ public class TowerRecallDraggable : MonoBehaviour, IBeginDragHandler, IDragHandl
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        canRecall = tower != null &&
-            tower.OwnerPlayer != null &&
-            PhotonNetwork.LocalPlayer != null &&
+        canRecall = tower != null && tower.OwnerPlayer != null && PhotonNetwork.LocalPlayer != null &&
             tower.OwnerPlayer.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber;
 
         if(!canRecall)

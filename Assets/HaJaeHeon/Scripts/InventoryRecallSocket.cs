@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class InventoryRecallSocket : MonoBehaviour
 {
+    // 마우스 주변, 타워 선택할 최대 거리
     [SerializeField] private float towerSelectionRadius = 0.6f;
 
     private RectTransform inventoryRect;
@@ -34,9 +35,7 @@ public class InventoryRecallSocket : MonoBehaviour
 
     private void BeginTowerDrag()
     {
-        if (!PhotonNetwork.InRoom ||
-            targetCamera == null ||
-            towerService == null)
+        if (!PhotonNetwork.InRoom || targetCamera == null || towerService == null)
             return;
 
         Tower tower = FindTowerAtMousePosition();
@@ -44,8 +43,7 @@ public class InventoryRecallSocket : MonoBehaviour
         if (tower == null)
             return;
 
-        if (tower.OwnerPlayer == null ||
-            PhotonNetwork.LocalPlayer == null)
+        if (tower.OwnerPlayer == null || PhotonNetwork.LocalPlayer == null)
         {
             Debug.Log("타워 소유자 정보가 아직 준비되지 않았습니다.");
             return;
@@ -66,6 +64,7 @@ public class InventoryRecallSocket : MonoBehaviour
         Tower tower = selectedTower;
         selectedTower = null;
 
+        // 인벤토리 밖에 놓았을 경우
         if (!IsPointerInsideInventory(Input.mousePosition))
         {
             Debug.Log("인벤토리 밖에서 드래그가 종료되었습니다.");
@@ -76,18 +75,20 @@ public class InventoryRecallSocket : MonoBehaviour
         towerService.RequestRecall(tower);
     }
 
+    // 마우스 위치에서 가장 가까운 타워 검색
     private Tower FindTowerAtMousePosition()
     {
-        if (GameManager.Instance == null ||
-            GameManager.Instance.Container_Tower == null)
+        if (GameManager.Instance == null || GameManager.Instance.Container_Tower == null)
             return null;
 
+        // 마우스 화면 좌표를 게임 공간 좌표로 변경
         Vector3 mouseWorldPosition = targetCamera.ScreenToWorldPoint(Input.mousePosition);
         Vector2 pointerPosition = new Vector2(mouseWorldPosition.x, mouseWorldPosition.y);
 
         Tower nearestTower = null;
         float nearestDistance = towerSelectionRadius;
 
+        // 모든 타워 비교
         foreach (ITower towerItem in GameManager.Instance.Container_Tower.GetList())
         {
             Tower tower = towerItem as Tower;
@@ -107,19 +108,17 @@ public class InventoryRecallSocket : MonoBehaviour
         return nearestTower;
     }
 
+    // 인벤토리 영역 판정
     private bool IsPointerInsideInventory(Vector2 screenPosition)
     {
         if (inventoryRect == null)
             return false;
 
-        Camera eventCamera = canvas != null &&
-            canvas.renderMode != RenderMode.ScreenSpaceOverlay
+        Camera eventCamera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay
             ? (canvas.worldCamera != null ? canvas.worldCamera : targetCamera)
             : null;
 
         return RectTransformUtility.RectangleContainsScreenPoint(
-            inventoryRect,
-            screenPosition,
-            eventCamera);
+            inventoryRect, screenPosition, eventCamera);
     }
 }
