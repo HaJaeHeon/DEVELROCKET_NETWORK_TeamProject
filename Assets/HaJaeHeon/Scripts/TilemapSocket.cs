@@ -125,6 +125,12 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
         if (isBuildRequestPending)
             return;
 
+        if(TryFindTowerAtCell(cell, out _))
+        {
+            Debug.LogError("이미 타워가 설치된 칸입니다.");
+            return;
+        }
+
         pendingInventoryTower = inventoryButtonObject;
         isBuildRequestPending = true;
 
@@ -166,6 +172,13 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
             return;
         }
 
+        // 실제 생성 전 염유 여부 재검사
+        if(TryFindTowerAtCell(cell, out _))
+        {
+            photonView.RPC(nameof(RpcTowerSpawnResult), requester, false);
+            return;
+        }
+
         CurrentTile currentTile = new CurrentTile
         {
             pos = new Vector2(x, y) + towerSpawnTransformOffset,
@@ -197,6 +210,35 @@ public class TilemapSocket : MonoBehaviourPunCallbacks, IDropHandler
             nameof(RpcRequestTowerRecall),
             RpcTarget.MasterClient,
             towerViewId);
+    }
+
+    private bool TryFindTowerAtCell(Vector2Int cell, out ITower foundTower)
+    {
+        foundTower = null;
+
+        if (tilemap == null || GameManager.Instance == null || GameManager.Instance.Container_Tower == null)
+            return false;
+
+        foreach (ITower tower in GameManager.Instance.Container_Tower.GetList())
+        {
+            if (tower == null || (tower is UnityEngine.Object unityObject && unityObject == null))
+                continue;
+
+            if (tower.CurTile != null)
+                Debug.Log($"타일 : {tower.CurTile} / 타일 위치 : {tower.CurTile.Pos} / 타일 타입 : {tower.CurTile.Type}");
+
+            Vector3 worldPosition = new Vector3(tower.Position.x, tower.Position.y, 0f);
+
+            Vector3Int towerCell = tilemap.WorldToCell(worldPosition);
+
+            if (towerCell.x != cell.x || towerCell.y != cell.y)
+                continue;
+
+            foundTower = tower;
+            return true;
+        }
+
+        return false;
     }
 
     [PunRPC]

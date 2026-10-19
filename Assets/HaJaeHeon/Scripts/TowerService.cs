@@ -1,9 +1,12 @@
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 using UnityEngine;
 
 public class TowerService : MonoBehaviourPunCallbacks
 {
+    private const float SELLPRICERATE = 0.5f;
+
     public static TowerService Instance { get; private set; }
 
     private TilemapSocket tileMapSocket;
@@ -11,6 +14,8 @@ public class TowerService : MonoBehaviourPunCallbacks
     private GameObject pendingInventoryTower;
     // 회수 응답을 기다리고있는지
     private bool isRecallPending;
+
+    
 
     private void Awake()
     {
@@ -94,6 +99,70 @@ public class TowerService : MonoBehaviourPunCallbacks
         // 설치된 타워의 id 전달
         tileMapSocket.RequestTowerRecall(tower.photonView.ViewID);
     }
+
+    // 타워 판매
+    public bool RecallSell(InventoryDraggable draggable)
+    {
+        if (draggable == null)
+            return false;
+
+        GameObject inventoryTower = draggable.InventoryItemObject;
+
+        if (!PhotonNetwork.InRoom || PhotonNetwork.LocalPlayer == null || inventoryTower == null)
+            return false;
+
+        PlayerInventory inventory = PlayerInventory.Instance;
+        ButtonTowerPool pool = ButtonTowerPool.Instance;
+
+        if (inventory == null || pool == null)
+            return false;
+
+        // 회수 중에는 판매 x
+        if (isRecallPending)
+            return false;
+
+        // inventory에 등록되어있는지 
+        if(!inventory.HasTower(inventoryTower))
+        {
+            Debug.LogError("인벤토리에 해당 타워가 없습니다..");
+            return false;
+        }
+
+        PresetSODataContainer so = draggable.GetComponent<PresetSODataContainer>();
+
+        TowerData towerData = so != null ? so.data as TowerData
+            : null;
+
+        if (towerData == null)
+        {
+            Debug.LogError("타워 SO 데이터가 없습니다..");
+            return false;
+        }
+
+        if (!inventory.TryRemoveTower(inventoryTower))
+            return false;
+
+        float sellPrice = so.data.Cost * SELLPRICERATE;
+        PlayerGold.Add(sellPrice);
+
+        StartCoroutine(SellCoroutine(inventoryTower, pool));
+
+        Debug.Log($"타워 판매 완료 " +
+            $"/ 판매 금액 : {sellPrice} / 결과 금액 : {PlayerGold.Get(PhotonNetwork.LocalPlayer)}");
+
+        return true;
+    }
+
+    private IEnumerator SellCoroutine(GameObject inventoryTower, ButtonTowerPool pool)
+    {
+        yield return null;
+
+        if (inventoryTower != null && pool != null)
+            pool.Return(inventoryTower);
+    }
+
+
+
 
     // 연결 종료시 회수처리 cancel
     public override void OnDisconnected(DisconnectCause cause)
