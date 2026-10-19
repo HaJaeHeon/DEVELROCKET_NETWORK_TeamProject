@@ -31,7 +31,7 @@ public class GameManager : SingletonBehavior<GameManager>
             Pos = new Vector2(0, 0),
             Type = TileType.Build
         };
-        CreateTower(ft, "FireTower1", PhotonNetwork.LocalPlayer);
+        CreateTower(ft, "FireTower1_Lv3", PhotonNetwork.LocalPlayer);
             }
         
         /*

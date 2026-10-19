@@ -21,19 +21,9 @@ public class PlayerInventory : SingletonBehavior<PlayerInventory>
         }
     }
 
-    public bool HasTower(string towerId)
+    public bool HasTower(GameObject towerObject)
     {
-        return towerInventory.Exists(inventoryTower =>
-        {
-            if (inventoryTower == null)
-                return false;
-
-            PresetSODataContainer so = inventoryTower.GetComponentInChildren<PresetSODataContainer>();
-
-            return so != null && 
-                so.data != null && 
-                so.data.Id == towerId;
-        });
+        return towerObject != null && towerInventory.Contains(towerObject);
     }
 
     // 인벤토리에서 타워 추가 (같은 타워도 추가 허용)

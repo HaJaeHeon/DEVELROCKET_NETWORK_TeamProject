@@ -1,23 +1,23 @@
 using System;
 using System.Collections.Generic;
 using Photon.Pun;
-using Photon.Realtime;
 using UnityEngine;
 
 /// <summary>
-/// 타워 Id -> (외형 프리팹, 스탯 데이터) 쌍을 보관
+/// 적 Id -> (외형 프리팹, 스탯 데이터) 쌍을 보관
 /// </summary>
-public class TowerDB : MonoBehaviour
+public class EnemyDB : MonoBehaviour
 {
     [Serializable]
     public class Entry
     {
         public string id;
         public GameObject prefab;
-        public TowerData data;
+        public EnemyData data;
     }
     [SerializeField]private List<Entry> entries = new List<Entry>();
     private Dictionary<string, Entry> map;
+    public Dictionary<string,Entry> Map => map;
 
     public void Awake()
     {
@@ -31,7 +31,7 @@ public class TowerDB : MonoBehaviour
             if(e == null || string.IsNullOrEmpty(e.id)) continue;
             if(map.ContainsKey(e.id))
             {
-                Debug.LogWarning($"[TowerDB] 중복된 Id: {e.id}");
+                Debug.LogWarning($"[EnemyDB] 중복된 Id: {e.id}");
                 continue;
             }
             map[e.id] = e;
@@ -53,24 +53,25 @@ public class TowerDB : MonoBehaviour
         if(map == null) Build();
         if(!map.TryGetValue(id, out var entry))
         {
-            Debug.LogError($"[TowerDB] 등록되지 않은 타워 Id: {id}");
+            Debug.LogError($"[EnemyDB] 등록되지 않은 적 Id: {id}");
             return null;
         }
         return entry;
     }
     /// <summary>
-    /// tile 위치에 id에 해당하는 타워를 네트워크 생성하고 owner를 소유자로 지정
+    /// tile 위치에 id에 해당하는 적을 네트워크 생성 (마스터 전용)
     /// </summary>
-    public Tower Create(ITileMap tile, string id, Player owner)
+    public Enemy Create(ITileMap tile, string id)
     {
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            Debug.LogWarning($"[EnemyDB] 적 생성은 마스터 클라이언트만 가능: {id}");
+            return null;
+        }
         var entry = Get(id);
         if(entry == null || entry.prefab == null) return null;
-        // 타워 Id를 함께 보내 모든 클라이언트에서 같은 데이터로 Init (Tower.OnPhotonInstantiate)
+        // 적 Id를 함께 보내 모든 클라이언트에서 같은 데이터로 Init (Enemy.OnPhotonInstantiate)
         var go = PhotonNetwork.Instantiate(entry.prefab.name, tile.Pos, Quaternion.identity, 0, new object[] { id });
-        if(go == null) return null;
-        var t = go.GetComponent<Tower>();
-        t.SetTile(tile);
-        t.SetOwner(owner);
-        return t;
+        return go != null ? go.GetComponent<Enemy>() : null;
     }
 }
