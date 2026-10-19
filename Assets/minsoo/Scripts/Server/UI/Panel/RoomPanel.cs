@@ -9,6 +9,7 @@ public class RoomPanel : UIPanel
     [SerializeField] private Button settingButton;
     [SerializeField] private Button leaderBoardButton;
     [SerializeField] private Button presetButton;
+    [SerializeField] private Button QuitRoomButton;
 
     [Header("방")]
     [SerializeField] private Button readyButton;
@@ -42,6 +43,12 @@ public class RoomPanel : UIPanel
     private void OnDisable()
     {
         NM.RoomPlayersChanged -= Refresh;
+    }
+
+
+    public void OnQuitRoom()
+    {
+        PhotonNetwork.LeaveRoom();
     }
 
     [ContextMenu("Refresh")]
