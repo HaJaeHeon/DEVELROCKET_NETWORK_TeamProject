@@ -71,8 +71,10 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         so.SetItemId(null);
 
         if (data != null)
+        {
             so.data = data;
-
+            towerImage.sprite = so.data.GetIcon();
+        }
         if (type == UIType.Shop)
         {
             buttonTower.transform.SetParent(shopContent.transform, false);
@@ -80,7 +82,7 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
             drag.enabled = false;
 
             towerImage.raycastTarget = false;
-            towerImage.sprite = so.data.GetIcon();
+            
 
             towerButton.enabled = true;
 
