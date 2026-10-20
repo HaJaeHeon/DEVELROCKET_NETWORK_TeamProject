@@ -10,10 +10,12 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     public void Awake()
     {
         RPCEvent = new Dictionary<string, Action<PacketData>>();
+        /*
         if(m_HeadSprite != null) m_HeadDefaultColor = m_HeadSprite.color;
         Data = mData;
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
+        */
     }
     // PhotonNetwork.Instantiate 시 모든 클라이언트에서 호출 (풀에서 재사용될 때도 호출됨)
     public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -39,6 +41,7 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     private static void RegisterPackets()
     {
         MainGamePacketer.Register(TowerDestroy, TowerDestroyEvent);
+        MainGamePacketer.Register(TowerDestroys, TowerDestroysEvent);
         MainGamePacketer.Register(TowerSetOwner, TowerSetOwnerEvent);
     }
     /// <summary>
@@ -159,6 +162,17 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     public ITileMap CurTile {get;private set;}
     public int IndexId { get; set; }
 
+    /// <summary>
+    /// IndexId 목록에 해당하는 타워들을 한 패킷으로 모든 클라이언트에서 제거
+    /// </summary>
+    public static void SendDestroy(List<int> ids)
+    {
+        if(ids == null || ids.Count == 0) return;
+        PacketData d = new PacketData();
+        d.Write(TowerDestroys);
+        d.WriteList(ids, id => d.Write(id));
+        IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView, d);
+    }
     public static void TowerDestroyEvent(PacketData data)
     {
         var t = GameManager.Instance.Container_Tower.GetList().FindTower(data);
@@ -169,6 +183,21 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
         }
         GameManager.Instance.Container_Tower.DeleteObj(t);
     }
+    public static void TowerDestroysEvent(PacketData data)
+    {
+        List<int> ids = data.ReadList<int>(() => data);
+        var towers = GameManager.Instance.Container_Tower.GetList();
+        foreach(int id in ids)
+        {
+            var t = towers.FindTower(id);
+            if(t == null) continue;
+            if(PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.Destroy(t.gameObject);
+            }
+            GameManager.Instance.Container_Tower.DeleteObj(t);
+        }
+    }
 
     [SerializeField]private TowerData mData;
     [SerializeField]private SpriteRenderer m_BaseSprite;
@@ -177,6 +206,7 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     private static readonly Color HeadColorLv2 = new Color32(255, 255, 128, 255);
     private static readonly Color HeadColorLv3 = new Color32(255, 255, 0, 255);
     public const string TowerDestroy = "TowerDestroy";
+    public const string TowerDestroys = "TowerDestroys";
     public const string TowerSetOwner = "TowerSetOwner";
     public const string PlayerColorKey = "PlayerColor";
 }
