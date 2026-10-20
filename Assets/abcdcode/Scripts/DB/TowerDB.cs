@@ -67,7 +67,7 @@ public class TowerDB : MonoBehaviour
         var entry = Get(id);
         if(entry == null || entry.prefab == null) return null;
         // 타워 Id를 함께 보내 모든 클라이언트에서 같은 데이터로 Init (Tower.OnPhotonInstantiate)
-        var go = PhotonNetwork.Instantiate(entry.prefab.name, tile.Pos, Quaternion.identity, 0, new object[] { id});
+        var go = PhotonNetwork.InstantiateRoomObject(entry.prefab.name, tile.Pos, Quaternion.identity, 0, new object[] { id});
         if(go == null) return null;
         var t = go.GetComponent<Tower>();
         t.SetOwner(owner);

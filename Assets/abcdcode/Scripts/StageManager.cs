@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -128,6 +129,7 @@ public class StageManager
             // 적 전멸, 다음 웨이브 카운트다운 시작
             state = WaveState.Countdown;
             timer = 0;
+            OnWaveEnd?.Invoke(CurWaveIndex);
             SyncState();
             return;
         }
@@ -140,6 +142,7 @@ public class StageManager
     }
     private void StartWave(int index)
     {
+        OnWaveStart?.Invoke(index);
         CurWaveIndex = index;
         state = WaveState.Spawning;
         timer = 0;
@@ -166,7 +169,7 @@ public class StageManager
     private Vector2 GetStartTile(out int index)
     {
         var list = MapManager.Instance.GetPaths();
-        index = Random.Range(0,list.Count);
+        index = UnityEngine.Random.Range(0,list.Count);
         var result = list[index];
         
         return result.Points[0];
@@ -214,4 +217,12 @@ public class StageManager
         }
         return fallback;
     }
+    /// <summary>
+    /// 웨이브가 클리어될때
+    /// </summary>
+    public event Action<int> OnWaveEnd;
+    /// <summary>
+    /// 웨이브가 시작되어 몹이 나오기 시작할때
+    /// </summary>
+    public event Action<int> OnWaveStart;
 }
