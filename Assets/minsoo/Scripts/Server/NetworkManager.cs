@@ -34,6 +34,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private bool isStarting;
 
     public event Action<Dictionary<string, RoomInfo>> RoomListChanged;
+    public event Action<Player> PlayerLefted; //플레이어가 나갈 때 이벤트
+    public event Action<Player> MasterChanged; //방장이 나갈 때 이벤트
+
+    private int masterActor = -1;      // 현재 방장
+    private int prevMasterActor = -1;  // 바로 직전 방장
+
 
     RoomOptions roomOptions;
     byte maxPlayers = 4;
@@ -191,16 +197,25 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         Debug.Log($"선수 입장 : {newPlayer.NickName}");
         RoomPlayersChanged?.Invoke();
     }
-
+    
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         Debug.Log($"선수 퇴장 : {otherPlayer.NickName}");
         RoomPlayersChanged?.Invoke();
+        PlayerLefted?.Invoke(otherPlayer);
+        // OnMasterClientSwitched가 항상 먼저 호출되므로, 직전 방장과 비교
+        if (otherPlayer.ActorNumber == prevMasterActor)
+        {
+            prevMasterActor = -1;
+            MasterChanged?.Invoke(otherPlayer);
+        }
     }
 
     // 방장이 나가면 방장 표시와 시작 버튼이 바뀌어야 함
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
+        prevMasterActor = masterActor;
+        masterActor = newMasterClient.ActorNumber;
         RoomPlayersChanged?.Invoke();
     }
 
@@ -310,6 +325,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        masterActor = PhotonNetwork.MasterClient.ActorNumber;
+        prevMasterActor = -1;
+
         RoomDicts.Clear();
         JoinedRoom?.Invoke();
     }
@@ -361,5 +379,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (AuthManager.Instance != null)
             AuthManager.Instance.OnSignedIn -= OnFirebaseSignedIn;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F9)) PhotonNetwork.LeaveRoom();   // 게임 중 나가기
+        if (Input.GetKeyDown(KeyCode.F10)) PhotonNetwork.Disconnect(); // 연결 끊김
     }
 }
