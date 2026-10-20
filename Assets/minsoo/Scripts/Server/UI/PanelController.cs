@@ -10,6 +10,7 @@ public class PanelController : MonoBehaviour
     private PanelId curPanel = PanelId.None;
     private bool isFail;
 
+    private string roomName;
 
     private void Awake()
     {
@@ -67,6 +68,17 @@ public class PanelController : MonoBehaviour
             go.SetActive(id == main || id == sub);
 
         curPanel = main;
+    }
+
+
+    public void SaveRoom(string name)
+    {
+        roomName = name;
+    }
+
+    public string LoadRoom()
+    {
+        return roomName;
     }
 
     public async Task<bool> CheckLogIn()

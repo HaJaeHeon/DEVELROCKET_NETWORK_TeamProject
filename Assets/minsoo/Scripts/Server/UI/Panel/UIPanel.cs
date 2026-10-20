@@ -12,7 +12,8 @@ public enum PanelId
     Setting,
     Preset,
     CreateRoom,
-    SearchRoom
+    SearchRoom,
+    JoinRoom
 }
 
 public class UIPanel : MonoBehaviour

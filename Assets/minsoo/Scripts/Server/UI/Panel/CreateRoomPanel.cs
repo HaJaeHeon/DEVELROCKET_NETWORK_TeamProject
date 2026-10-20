@@ -10,8 +10,6 @@ public class CreateRoomPanel : UIPanel
     [SerializeField] private TMP_Dropdown playerCountDropdown;
     [SerializeField] private TMP_InputField roomPassword;
     [SerializeField] private Toggle OfflineToggle;
-    [SerializeField] private Toggle VisibleToggle;
-    [SerializeField] private Toggle OpenToggle;
     [SerializeField] private Toggle PrivateToggle;
 
     
@@ -31,7 +29,7 @@ public class CreateRoomPanel : UIPanel
         string pw = roomPassword.interactable && !string.IsNullOrEmpty(roomPassword.text) ? roomPassword.text : null;
         int playerCount = int.Parse(playerCountDropdown.options[playerCountDropdown.value].text);
 
-        NM.OnCreateRoom(OfflineToggle.isOn, name, playerCount, pw, VisibleToggle.isOn, OpenToggle.isOn);
+        NM.OnCreateRoom(OfflineToggle.isOn, name, playerCount, pw);
     }
 
     private void OnOfflineMode(bool isOffline)
@@ -39,8 +37,7 @@ public class CreateRoomPanel : UIPanel
 
         roomNameField.interactable = !isOffline;
         playerCountDropdown.interactable = !isOffline;
-        VisibleToggle.interactable = !isOffline;
-        OpenToggle.interactable = !isOffline;
+        playerCountDropdown.value = isOffline ? 3 : 0;
         PrivateToggle.interactable = !isOffline;
 
         if (!PrivateToggle.isOn)
