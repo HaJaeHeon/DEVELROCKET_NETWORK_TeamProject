@@ -36,6 +36,9 @@ public class InventoryDraggable : MonoBehaviour, IDragHandler, IEndDragHandler, 
     // 드래그가 시작될 떄 한 번 호출 (원래 위치 저장)
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (SocketManager.Instance == null || SocketManager.Instance.IsLocalOperationPending)
+            return;
+
         if (rect == null || canvas == null || rootPanel == null)
             return;
 

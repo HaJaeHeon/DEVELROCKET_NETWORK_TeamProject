@@ -68,13 +68,15 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         Button towerButton = buttonTower.GetComponent<Button>();
         drag.canvas = shopPanel.transform.root.GetComponent<Canvas>();
 
+        towerButton.interactable = true;
         so.SetItemId(null);
 
         if (data != null)
         {
             so.data = data;
-            towerImage.sprite = so.data.GetIcon();
+            towerImage.sprite = data.GetIcon();
         }
+
         if (type == UIType.Shop)
         {
             buttonTower.transform.SetParent(shopContent.transform, false);

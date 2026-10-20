@@ -5,17 +5,22 @@ using UnityEngine;
 
 public class TowerService : MonoBehaviourPunCallbacks
 {
-    private const float SELLPRICERATE = 0.5f;
-
     public static TowerService Instance { get; private set; }
+
+    public bool IsBusy => isRecallPending || isSellPending;
 
     private SocketManager socketManager;
     // 회수 결과를 기다리는 임시 보관함
     private GameObject pendingInventoryTower;
-    // 회수 응답을 기다리고있는지
-    private bool isRecallPending;
 
-    
+    private bool isRecallPending;
+    private string pendingRecallRequestId;
+
+    private GameObject pendingSaleInventoryTower;
+    private string pendingSaleRequestId;
+    private bool isSellPending;
+    private bool saleResultReceived;
+
 
     private void Awake()
     {
@@ -39,6 +44,7 @@ public class TowerService : MonoBehaviourPunCallbacks
         }
 
         socketManager.TowerRecallResultReceived += HandleRecallResult;
+        socketManager.TowerSellResultReceived += HandleSellResult;
         Debug.Log("TowerService가 타워 회수 요청을 받을 준비가 되었습니다.");
 
         // ButtonPool 확인
@@ -52,8 +58,9 @@ public class TowerService : MonoBehaviourPunCallbacks
     // 회수 요청
     public void RequestRecall(Tower tower)
     {
-        if (!PhotonNetwork.InRoom || tower == null ||
-            isRecallPending || socketManager == null)
+        if (!PhotonNetwork.InRoom || tower == null || socketManager == null 
+            || ButtonTowerPool.Instance == null || socketManager.IsLocalOperationPending 
+            || tower.photonView.ViewID <= 0)
             return;
 
         // 소유권 검사
@@ -82,8 +89,10 @@ public class TowerService : MonoBehaviourPunCallbacks
             return;
         }
 
-        pendingInventoryTower = ButtonTowerPool.Instance.Spawn(
-            ButtonTowerPool.UIType.Inventory, towerData);
+        pendingInventoryTower = ButtonTowerPool.Instance.Spawn(ButtonTowerPool.UIType.Inventory, towerData);
+
+        if (pendingInventoryTower == null)
+            return;
 
         if (!PlayerInventory.Instance.TryAddTower(pendingInventoryTower))
         {
@@ -99,89 +108,118 @@ public class TowerService : MonoBehaviourPunCallbacks
         isRecallPending = true;
 
         // 설치된 타워의 id 전달
-        socketManager.RequestTowerRecall(tower.photonView.ViewID);
+        pendingRecallRequestId = System.Guid.NewGuid().ToString("N");
+        socketManager.RequestTowerRecall(pendingRecallRequestId, tower.photonView.ViewID);
     }
 
     // 타워 판매
     public bool RecallSell(InventoryDraggable draggable)
     {
-        if (draggable == null)
+        if (!PhotonNetwork.InRoom || draggable == null || socketManager == null || socketManager.IsLocalOperationPending)
             return false;
 
         GameObject inventoryTower = draggable.InventoryItemObject;
+        var inventory = PlayerInventory.Instance;
 
-        if (!PhotonNetwork.InRoom || PhotonNetwork.LocalPlayer == null || inventoryTower == null)
+        if (inventoryTower == null || inventory == null || ButtonTowerPool.Instance == null || !inventory.HasTower(inventoryTower))
             return false;
 
-        PlayerInventory inventory = PlayerInventory.Instance;
-        ButtonTowerPool pool = ButtonTowerPool.Instance;
+        var container = draggable.GetComponent<PresetSODataContainer>();
 
-        if (inventory == null || pool == null)
+        if (container == null || container.data == null || string.IsNullOrEmpty(container.TowerItemId))
             return false;
 
-        // 회수 중에는 판매 x
-        if (isRecallPending || socketManager == null || socketManager.IsBuildRequestPending)
-            return false;
+        pendingSaleInventoryTower = inventoryTower;
+        pendingSaleRequestId = System.Guid.NewGuid().ToString("N");
 
-        // inventory에 등록되어있는지 
-        if (!inventory.HasTower(inventoryTower))
-        {
-            Debug.LogError("인벤토리에 해당 타워가 없습니다..");
-            return false;
-        }
+        isSellPending = true;
+        saleResultReceived = false;
 
-        PresetSODataContainer so = draggable.GetComponent<PresetSODataContainer>();
+        socketManager.RequestTowerSell(pendingSaleRequestId, container.TowerItemId);
 
-        TowerData towerData = so != null ? so.data : null;
-
-        if (towerData == null)
-        {
-            Debug.LogError("타워 SO 데이터가 없습니다..");
-            return false;
-        }
-
-        if (!inventory.TryRemoveTower(inventoryTower))
-            return false;
-
-        float sellPrice = so.data.Cost * SELLPRICERATE;
-        PlayerGold.Add(sellPrice);
-
-        StartCoroutine(SellCoroutine(inventoryTower, pool));
-
-        //Debug.Log($"타워 판매 완료 " +
-        //    $"/ 판매 금액 : {sellPrice} / 결과 금액 : {PlayerGold.Get(PhotonNetwork.LocalPlayer)}");
-
+        // 판매 완료가 아니라 요청을 시작했다는 뜻이다.
         return true;
     }
-
-    private IEnumerator SellCoroutine(GameObject inventoryTower, ButtonTowerPool pool)
+    private void HandleSellResult(string requestId, bool success)
     {
-        yield return null;
+        if (!isSellPending || saleResultReceived || requestId != pendingSaleRequestId)
+            return;
 
-        if (inventoryTower != null && pool != null)
-            pool.Return(inventoryTower);
+        saleResultReceived = true;
+        StartCoroutine(FinishSellUI(requestId, success));
     }
 
+    private IEnumerator FinishSellUI(string requestId, bool success)
+    {
+        // 현재 끌기 종료 처리가 원래 부모를 복원하도록 기다린다.
+        yield return null;
 
+        if (!isSellPending || requestId != pendingSaleRequestId)
+            yield break;
+
+        if (success)
+        {
+            var inventory = PlayerInventory.Instance;
+            var pool = ButtonTowerPool.Instance;
+
+            if (pendingSaleInventoryTower != null && inventory != null && pool != null && inventory.TryRemoveTower(pendingSaleInventoryTower))
+            {
+                pool.Return(pendingSaleInventoryTower);
+            }
+            else
+            {
+                Debug.LogError("판매는 승인됐지만 보관함 화면 제거에 실패했습니다.");
+            }
+        }
+        else
+        {
+            Debug.Log("판매가 거절되었습니다.");
+        }
+
+        ClearSaleState();
+    }
+
+    private void ClearSaleState()
+    {
+        pendingSaleInventoryTower = null;
+        pendingSaleRequestId = null;
+        isSellPending = false;
+        saleResultReceived = false;
+    }
 
 
     // 연결 종료시 회수처리 cancel
-    public override void OnDisconnected(DisconnectCause cause)
+    private void CancelLocalTransactions()
     {
         RollbackPendingInventoryTower();
         ClearPendingState();
+        ClearSaleState();
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        CancelLocalTransactions();
         base.OnDisconnected(cause);
     }
 
-    private void HandleRecallResult(bool success, string towerItemId)
+    public override void OnLeftRoom()
     {
-        if (!isRecallPending || pendingInventoryTower == null)
+        CancelLocalTransactions();
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        CancelLocalTransactions();
+    }
+
+    private void HandleRecallResult(string requestId, bool success, string towerItemId)
+    {
+        if (!isRecallPending || requestId != pendingRecallRequestId || pendingInventoryTower == null)
             return;
 
         if (success)
         {
             PresetSODataContainer container = pendingInventoryTower.GetComponentInChildren<PresetSODataContainer>(true);
-
             container.SetItemId(towerItemId);
 
             SetPendingTowerInteractable(true);
@@ -235,13 +273,17 @@ public class TowerService : MonoBehaviourPunCallbacks
     private void ClearPendingState()
     {
         pendingInventoryTower = null;
+        pendingRecallRequestId = null;
         isRecallPending = false;
     }
 
     private void OnDestroy()
     {
         if (socketManager != null)
+        {
             socketManager.TowerRecallResultReceived -= HandleRecallResult;
+            socketManager.TowerSellResultReceived -= HandleSellResult;
+        }
 
         if (Instance == this)
             Instance = null;

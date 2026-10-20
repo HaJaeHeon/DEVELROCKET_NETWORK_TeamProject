@@ -17,11 +17,11 @@ public class CurrentTile: ITileMap
     Vector2 ITileMap.Pos => pos;
 }
 
-public class SocketManager : MonoBehaviourPunCallbacks
+public partial class SocketManager : MonoBehaviourPunCallbacks
 {
     public static SocketManager Instance { get; private set;  }
 
-    public event Action<bool, string> TowerRecallResultReceived;
+    public event Action<string, bool, string> TowerRecallResultReceived;
 
     public bool IsBuildRequestPending => isBuildRequestPending;
 
@@ -138,8 +138,8 @@ public class SocketManager : MonoBehaviourPunCallbacks
 
         var registry = PlayerInventoryRegistry.Instance;
 
-        if (registry == null || !registry.CanManage || GameManager.Instance == null ||
-            GameManager.Instance.TowerDB == null || pendingPurchases.ContainsKey(requester.ActorNumber))
+        if (registry == null || !registry.CanManage || GameManager.Instance == null || 
+            GameManager.Instance.TowerDB == null || HasPendingGoldChange(requester.ActorNumber))
         {
             RejectPurchase(record);
             return;
@@ -196,7 +196,7 @@ public class SocketManager : MonoBehaviourPunCallbacks
     // 타워 이미지 붙이기
     public void TryAttatchImage(InventoryDraggable inventoryTower, GameObject inventoryButtonObject)
     {
-        if (!PhotonNetwork.InRoom || isBuildRequestPending)
+        if (!PhotonNetwork.InRoom || IsLocalOperationPending)
             return;
 
         if (inventoryTower == null || inventoryButtonObject == null ||
@@ -249,11 +249,26 @@ public class SocketManager : MonoBehaviourPunCallbacks
 
     private void DespawnTower(int towerIndexId)
     {
-        PacketData packet = new PacketData();
-        packet.Write(Tower.TowerDestroy);
-        packet.Write(towerIndexId);
+        var game = GameManager.Instance;
 
-        IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView, packet);
+        if (game == null || game.Container_Tower == null)
+            return;
+
+        Tower target = null;
+
+        foreach (ITower item in game.Container_Tower.GetList())
+        {
+            if (item is Tower tower && tower.IndexId == towerIndexId)
+            {
+                target = tower;
+                break;
+            }
+        }
+
+        if (target != null && !TryDestroyTowerOnMaster(target))
+        {
+            PlayerInventoryRegistry.Instance?.SuspendAuthority("합성 후 기존 타워 제거에 실패했습니다.");
+        }
     }
 
     [PunRPC]
@@ -374,17 +389,6 @@ public class SocketManager : MonoBehaviourPunCallbacks
         Debug.Log($"{PhotonNetwork.LocalPlayer.ActorNumber}가 건설 요청");
     }
 
-    public void RequestTowerRecall(int towerViewId)
-    {
-        if (!PhotonNetwork.InRoom || towerViewId <= 0)
-            return;
-
-        photonView.RPC(
-            nameof(RpcRequestTowerRecall),
-            RpcTarget.MasterClient,
-            towerViewId);
-    }
-
     private bool TryFindTowerAtCell(Vector2Int cell, out ITower foundTower)
     {
         foundTower = null;
@@ -413,68 +417,6 @@ public class SocketManager : MonoBehaviourPunCallbacks
 
         return false;
     }
-
-
-
-    // 타워 회수 요청 (Rpc)
-    [PunRPC]
-    private void RpcRequestTowerRecall(int towerViewId, PhotonMessageInfo info)
-    {
-        if (!PhotonNetwork.IsMasterClient || info.Sender == null)
-            return;
-
-        Player requester = info.Sender;
-        PlayerInventoryRegistry registry = PlayerInventoryRegistry.Instance;
-
-        PhotonView towerView = PhotonView.Find(towerViewId);
-        Tower tower = towerView != null ? towerView.GetComponent<Tower>() : null;
-
-        if (registry == null || tower == null ||
-            tower.OwnerPlayer == null ||
-            tower.OwnerPlayer.ActorNumber != requester.ActorNumber ||
-            !(tower.Data is TowerData towerData))
-        {
-            photonView.RPC(nameof(RpcTowerRecallResult), requester, false, "");
-            return;
-        }
-
-        // 회수할 타워를 보유 기록에 등록하고 새 식별자를 발급한다.
-        if (!registry.TryAddItem(requester, towerData, out var item))
-        {
-            photonView.RPC(nameof(RpcTowerRecallResult), requester, false, "");
-            return;
-        }
-
-        bool success = false;
-
-        try
-        {
-            PacketData destroyPacket = new PacketData();
-            destroyPacket.Write(Tower.TowerDestroy);
-            destroyPacket.Write(tower.IndexId);
-
-            IPacketer.SendPacket(GameManager.Instance.MainGamePacketer.photonView, destroyPacket);
-
-            success = true;
-        }
-        catch (Exception exception)
-        {
-            Debug.LogException(exception);
-            registry.TryRollbackAddedItem(requester, item.ItemId);
-        }
-
-        photonView.RPC(nameof(RpcTowerRecallResult), requester, success, success ? item.ItemId : "");
-    }
-
-    [PunRPC]
-    private void RpcTowerRecallResult(bool success, string itemId, PhotonMessageInfo info)
-    {
-        if (info.Sender != PhotonNetwork.MasterClient)
-            return;
-
-        TowerRecallResultReceived?.Invoke(success, itemId);
-    }
-
 
     [PunRPC]
     private void RpcTowerSpawnResult(string itemId, bool success, PhotonMessageInfo info)
@@ -562,46 +504,55 @@ public class SocketManager : MonoBehaviourPunCallbacks
     {
         base.OnPlayerPropertiesUpdate(targetPlayer, changedProps);
 
-        if (!PhotonNetwork.IsMasterClient)
+        if (!PhotonNetwork.IsMasterClient || targetPlayer == null)
             return;
 
-        if (!pendingPurchases.TryGetValue(targetPlayer.ActorNumber, out var record))
+        if (pendingPurchases.TryGetValue(targetPlayer.ActorNumber, out var purchase) &&
+            changedProps.TryGetValue(PurchaseReceiptKey, out object value) &&
+            value is string receipt &&
+            receipt == purchase.RequestId)
+        {
+            pendingPurchases.Remove(targetPlayer.ActorNumber);
+
+            purchase.Completed = true;
+            purchase.Success = true;
+
+            SendPurchaseResult(purchase);
             return;
+        }
 
-        if (!changedProps.TryGetValue(PurchaseReceiptKey, out object value))
-            return;
-
-        if (!(value is string receipt) || receipt != record.RequestId)
-            return;
-
-        pendingPurchases.Remove(targetPlayer.ActorNumber);
-
-        record.Completed = true;
-        record.Success = true;
-
-        SendPurchaseResult(record);
+        HandleSaleGoldReceipt(targetPlayer, changedProps);
     }
 
 
     // 방을 나간다면 구매 기록, 구매 대기 정리
     public override void OnLeftRoom()
     {
-        purchaseRecords.Clear();
-        pendingPurchases.Clear();
-
-        ClearBuildState();
+        transactionSessionStopped = true;
+        ResetAllRequestState();
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        purchaseRecords.Clear();
-        pendingPurchases.Clear();
-
-        ClearBuildState();
+        transactionSessionStopped = true;
+        ResetAllRequestState();
 
         Debug.LogWarning($"Photon 연결 종료 사유: {cause}");
     }
 
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        transactionSessionStopped = true;
+        ResetAllRequestState();
+
+        Debug.LogWarning("대표 참여자(Master Client)가 변경되어 거래를 중단합니다.");
+    }
+
+    public override void OnJoinedRoom()
+    {
+        ResetAllRequestState();
+        transactionSessionStopped = false;
+    }
     // 파괴시 이벤트 구독 해제
     private void OnDestroy()
     {

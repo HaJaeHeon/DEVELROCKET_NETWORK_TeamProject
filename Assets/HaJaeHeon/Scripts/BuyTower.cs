@@ -10,6 +10,8 @@ public class BuyTower : MonoBehaviourPunCallbacks
     [SerializeField] private float currentGold;
 
     private bool isPurchasePending;
+    public bool IsPurchasePending => isPurchasePending;
+
     private string pendingRequestId;
     private Button pendingShopButton;
     private GameObject pendingInventoryTower;
@@ -19,8 +21,9 @@ public class BuyTower : MonoBehaviourPunCallbacks
     {
         currentGold = PlayerGold.Get(PhotonNetwork.LocalPlayer);
         Debug.Log($"현재 가진 골드 량 : {currentGold}");
-        
-        if(!PhotonNetwork.InRoom || isPurchasePending)
+
+        if (!PhotonNetwork.InRoom || SocketManager.Instance == null 
+            || SocketManager.Instance.IsLocalOperationPending)
         {
             Debug.Log($"방이 아니거나 요청이 완료되지 않음 (요청상태 : {isPurchasePending})");
             return;
@@ -29,10 +32,10 @@ public class BuyTower : MonoBehaviourPunCallbacks
         PlayerInventory inventory = PlayerInventory.Instance;
         ButtonTowerPool pool = ButtonTowerPool.Instance;
 
-        //if (inventory == null || pool == null)
-        //    return;
+        if (inventory == null || pool == null)
+            return;
 
-        if(inventory.IsFullInventory)
+        if (inventory.IsFullInventory)
         {
             Debug.LogError("인벤토리가 가득 찼습니다.");
             return;
@@ -190,6 +193,16 @@ public class BuyTower : MonoBehaviourPunCallbacks
         pendingShopButton = null;
         pendingRequestId = null;
         isPurchasePending = false;
+    }
+
+    public override void OnLeftRoom()
+    {
+        CancelPendingPurchase();
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        CancelPendingPurchase();
     }
 
     public override void OnDisconnected(DisconnectCause cause)
