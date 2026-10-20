@@ -10,10 +10,12 @@ public class Tower : MultiMono,ITower,IPacketer,IdOwn,IPunInstantiateMagicCallba
     public void Awake()
     {
         RPCEvent = new Dictionary<string, Action<PacketData>>();
+        /*
         if(m_HeadSprite != null) m_HeadDefaultColor = m_HeadSprite.color;
         Data = mData;
         AIData = new LookAtAndAttackAI();
         AIData.Init(this);
+        */
     }
     // PhotonNetwork.Instantiate 시 모든 클라이언트에서 호출 (풀에서 재사용될 때도 호출됨)
     public void OnPhotonInstantiate(PhotonMessageInfo info)
