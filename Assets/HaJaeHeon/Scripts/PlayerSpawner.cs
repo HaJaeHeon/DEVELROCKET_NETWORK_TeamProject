@@ -12,13 +12,13 @@ public class PlayerSpawner : MonoBehaviour
 
     private void Awake()
     {
-        if (networkPlayerMousePrefab == null)
-            return;
+        //if (networkPlayerMousePrefab == null)
+        //    return;
 
-        if (PhotonNetwork.PrefabPool is DefaultPool pool)
-        {
-            pool.ResourceCache["NetworkPlayerMouse"] = networkPlayerMousePrefab.gameObject;
-        }
+        //if (PhotonNetwork.PrefabPool is DefaultPool pool)
+        //{
+        //    pool.ResourceCache["NetworkPlayerMouse"] = networkPlayerMousePrefab.gameObject;
+        //}
     }
 
     private void Start()
@@ -55,6 +55,26 @@ public class PlayerSpawner : MonoBehaviour
 
     private void SpawnNetworkCursor()
     {
-        GameObject mouse = PhotonNetwork.Instantiate("NetworkPlayerMouse", Vector3.zero, Quaternion.identity);
+        if (!PhotonNetwork.InRoom)
+        {
+            Debug.LogWarning("[마우스 생성 중단] 현재 방에 입장하지 않았습니다.");
+            return;
+        }
+
+        if (networkPlayerMousePrefab == null)
+        {
+            Debug.LogError("[마우스 생성 중단] 원본 객체가 연결되지 않았습니다.");
+            return;
+        }
+
+        Debug.Log($"[마우스 생성 요청] 이름={networkPlayerMousePrefab.name}, 보관소={PhotonNetwork.PrefabPool.GetType().Name}");
+
+        GameObject mouse = PhotonNetwork.Instantiate(networkPlayerMousePrefab.name, Vector3.zero, Quaternion.identity);
+
+        if (mouse == null)
+        {
+            Debug.LogError("[마우스 생성 실패] 원본 객체 등록과 Photon 오류를 확인하세요.");
+            return;
+        }
     }
 }
