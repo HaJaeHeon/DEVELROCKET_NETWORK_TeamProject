@@ -2,8 +2,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 #if UNITY_EDITOR
+
 public static class TilemapOriginTool
 {
+    [MenuItem("Tools/Tilemap/Move To Origin")]
     static void MoveToOrigin()
     {
         var go = Selection.activeGameObject;

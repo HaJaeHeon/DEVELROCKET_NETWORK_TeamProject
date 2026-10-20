@@ -17,6 +17,7 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
     [SerializeField] private GameObject shopContent;
     [SerializeField] private GameObject inventoryPanel;
     [SerializeField] private GameObject inventoryContent;
+    [SerializeField] private ShopTower shopTower;
 
 
     private const int SHOPMAXCOUNT = 3;
@@ -41,9 +42,18 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
 
     private void Start()
     {
+        shopTower.Initialize();
+
+        if (!shopTower.HasCandidates)
+        {
+            Debug.LogError("상점에 등장할 1레벨 타워가 없습니다.");
+            return;
+        }
+
         for (int i = 0; i < SHOPMAXCOUNT; i++)
         {
-            ButtonTowerPool.Instance.Spawn(UIType.Shop);
+            TowerData data = shopTower.GetRandomTower();
+            Spawn(UIType.Shop, data);
         }
     }
 
@@ -58,9 +68,13 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         Button towerButton = buttonTower.GetComponent<Button>();
         drag.canvas = shopPanel.transform.root.GetComponent<Canvas>();
 
-        if (data != null)
-            so.data = data;
+        so.SetItemId(null);
 
+        if (data != null)
+        {
+            so.data = data;
+            towerImage.sprite = so.data.GetIcon();
+        }
         if (type == UIType.Shop)
         {
             buttonTower.transform.SetParent(shopContent.transform, false);
@@ -68,10 +82,19 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
             drag.enabled = false;
 
             towerImage.raycastTarget = false;
-            towerImage.sprite = so.data.GetIcon();
+            
 
             towerButton.enabled = true;
-            BuyTower bt = shopPanel.GetComponent<BuyTower>();
+
+            if (SocketManager.Instance == null)
+                return buttonTower;
+
+            if (!SocketManager.Instance.TryGetComponent<BuyTower>(out var bt))
+            {
+                Debug.LogError("SocketManager 객체에 BuyTower가 없습니다.");
+                return buttonTower;
+            }
+
             towerButton.onClick.AddListener(() => bt.GetTowerData(buttonTower));
         }
         else if (type == UIType.Inventory)
@@ -100,7 +123,6 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
 
         pool.Release(obj);
     }
-
     private void OnDestroy()
     {
         pool?.Clear();

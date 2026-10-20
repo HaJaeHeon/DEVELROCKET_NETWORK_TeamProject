@@ -9,7 +9,7 @@ public class TowerService : MonoBehaviourPunCallbacks
 
     public static TowerService Instance { get; private set; }
 
-    private TilemapSocket tileMapSocket;
+    private SocketManager socketManager;
     // 회수 결과를 기다리는 임시 보관함
     private GameObject pendingInventoryTower;
     // 회수 응답을 기다리고있는지
@@ -30,23 +30,30 @@ public class TowerService : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        tileMapSocket = FindAnyObjectByType<TilemapSocket>();
+        socketManager = SocketManager.Instance;
 
-        if (tileMapSocket == null)
+        if (socketManager == null)
         {
-            Debug.LogError("타워 회수 요청에 사용할 TilemapSocket을 찾을 수 없습니다.");
+            Debug.LogError("타워 회수 요청에 사용할 socketManager 찾을 수 없습니다.");
             return;
         }
 
-        tileMapSocket.TowerRecallResultReceived += HandleRecallResult;
+        socketManager.TowerRecallResultReceived += HandleRecallResult;
         Debug.Log("TowerService가 타워 회수 요청을 받을 준비가 되었습니다.");
+
+        // ButtonPool 확인
+        if (ButtonTowerPool.Instance == null)
+        {
+            Debug.LogError("ButtonTowerPool이 없습니다.");
+            return;
+        }
     }
 
     // 회수 요청
     public void RequestRecall(Tower tower)
     {
         if (!PhotonNetwork.InRoom || tower == null ||
-            isRecallPending || tileMapSocket == null)
+            isRecallPending || socketManager == null)
             return;
 
         // 소유권 검사
@@ -64,12 +71,7 @@ public class TowerService : MonoBehaviourPunCallbacks
             return;
         }
 
-        // ButtonPool 확인
-        if (ButtonTowerPool.Instance == null)
-        {
-            Debug.LogError("ButtonTowerPool이 없습니다.");
-            return;
-        }
+        
 
         // 데이터 형식 변환
         TowerData towerData = tower.Data as TowerData;
@@ -97,7 +99,7 @@ public class TowerService : MonoBehaviourPunCallbacks
         isRecallPending = true;
 
         // 설치된 타워의 id 전달
-        tileMapSocket.RequestTowerRecall(tower.photonView.ViewID);
+        socketManager.RequestTowerRecall(tower.photonView.ViewID);
     }
 
     // 타워 판매
@@ -118,11 +120,11 @@ public class TowerService : MonoBehaviourPunCallbacks
             return false;
 
         // 회수 중에는 판매 x
-        if (isRecallPending)
+        if (isRecallPending || socketManager == null || socketManager.IsBuildRequestPending)
             return false;
 
         // inventory에 등록되어있는지 
-        if(!inventory.HasTower(inventoryTower))
+        if (!inventory.HasTower(inventoryTower))
         {
             Debug.LogError("인벤토리에 해당 타워가 없습니다..");
             return false;
@@ -130,8 +132,7 @@ public class TowerService : MonoBehaviourPunCallbacks
 
         PresetSODataContainer so = draggable.GetComponent<PresetSODataContainer>();
 
-        TowerData towerData = so != null ? so.data as TowerData
-            : null;
+        TowerData towerData = so != null ? so.data : null;
 
         if (towerData == null)
         {
@@ -147,8 +148,8 @@ public class TowerService : MonoBehaviourPunCallbacks
 
         StartCoroutine(SellCoroutine(inventoryTower, pool));
 
-        Debug.Log($"타워 판매 완료 " +
-            $"/ 판매 금액 : {sellPrice} / 결과 금액 : {PlayerGold.Get(PhotonNetwork.LocalPlayer)}");
+        //Debug.Log($"타워 판매 완료 " +
+        //    $"/ 판매 금액 : {sellPrice} / 결과 금액 : {PlayerGold.Get(PhotonNetwork.LocalPlayer)}");
 
         return true;
     }
@@ -172,24 +173,19 @@ public class TowerService : MonoBehaviourPunCallbacks
         base.OnDisconnected(cause);
     }
 
-    private void OnDestroy()
-    {
-        if (tileMapSocket != null)
-            tileMapSocket.TowerRecallResultReceived -= HandleRecallResult;
-
-        if (Instance == this)
-            Instance = null;
-    }
-
-    private void HandleRecallResult(bool success)
+    private void HandleRecallResult(bool success, string towerItemId)
     {
         if (!isRecallPending || pendingInventoryTower == null)
             return;
 
         if (success)
         {
+            PresetSODataContainer container = pendingInventoryTower.GetComponentInChildren<PresetSODataContainer>(true);
+
+            container.SetItemId(towerItemId);
+
             SetPendingTowerInteractable(true);
-            Debug.Log("타워 회수 완료");
+            Debug.Log($"타워 회수 완료: {towerItemId}");
         }
         else
         {
@@ -240,5 +236,14 @@ public class TowerService : MonoBehaviourPunCallbacks
     {
         pendingInventoryTower = null;
         isRecallPending = false;
+    }
+
+    private void OnDestroy()
+    {
+        if (socketManager != null)
+            socketManager.TowerRecallResultReceived -= HandleRecallResult;
+
+        if (Instance == this)
+            Instance = null;
     }
 }
