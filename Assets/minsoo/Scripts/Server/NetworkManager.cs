@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class PlayerProps 
-{ 
-    public const string Ready = "ready"; 
+public static class PlayerProps
+{
+    public const string Ready = "ready";
     public const string Rate = "rate";
 }
 
@@ -17,6 +17,8 @@ public static class RoomProps
 {
     public const string MapIdKey = "MapId";
     public const string RandomId = "Random";
+    public const string Locked = "locked";
+    public const string Password = "pw";
 }
 
 
@@ -62,6 +64,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             MaxPlayers = 4,
             IsVisible = true,
             IsOpen = true,
+            CustomRoomProperties = new Hashtable { { "locked", false } },
+            CustomRoomPropertiesForLobby = new[] { "locked" },
         };
         PhotonNetwork.AutomaticallySyncScene = true;
 
@@ -110,41 +114,53 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
 
     // 로비 - 방 생성
-    public void OnCreateRoom(bool isOffline, string roomName, int playerCount, string password, bool isVisible, bool isOpen)
+    public void OnCreateRoom(bool isOffline, string roomName, int playerCount, string password)
     {
         if (isOffline)
         {
             OnSiglePlay();
             return;
         }
-            
 
+        bool locked = !string.IsNullOrEmpty(password);
         RoomOptions roomOtions = new RoomOptions
         {
             MaxPlayers = playerCount,
-            CustomRoomProperties = new Hashtable { { "pw", password }, { "locked", true } },
-            CustomRoomPropertiesForLobby = new[] { "locked" },
-            IsVisible = isVisible,
-            IsOpen = isOpen,
+            CustomRoomProperties = new Hashtable
+            {
+                { RoomProps.Locked, locked },
+                { RoomProps.Password, locked ? password : "" }
+            },
+            CustomRoomPropertiesForLobby = new[] { RoomProps.Locked, RoomProps.Password },
+            IsVisible = true,
+            IsOpen = true,
         };
 
         PhotonNetwork.CreateRoom(roomName ?? null, roomOtions);
 
     }
 
+    public bool CheckRoomPassword(RoomInfo info, string input)
+    {
+        return info.CustomProperties.TryGetValue(RoomProps.Password, out object v)
+            && v is string pw
+            && pw == input;
+    }
+
     public void OnSiglePlay()
     {
         PhotonNetwork.Disconnect();
-        PhotonNetwork.OfflineMode = true;
+
     }
 
     // 로비 - 방 랜덤입장
     public void OnRandomJoinRoom()
     {
-        PhotonNetwork.JoinRandomOrCreateRoom(
-        expectedCustomRoomProperties: null,
-        expectedMaxPlayers: maxPlayers,
-        roomOptions: roomOptions
+        PhotonNetwork.JoinRandomOrCreateRoom
+        (
+            expectedCustomRoomProperties: new Hashtable { { RoomProps.Locked, false } },
+            expectedMaxPlayers: maxPlayers,
+            roomOptions: roomOptions
         );
     }
 
@@ -225,7 +241,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (mapDB.MapDatas.Count == 0) { Debug.LogError("MapDB에 맵이 없습니다."); return; }
         string pickedId = mapDB.MapDatas[UnityEngine.Random.Range(0, mapDB.MapDatas.Count)].Id;
 
-        isStarting = true;                         
+        isStarting = true;
         PhotonNetwork.CurrentRoom.IsOpen = false;
         if (!PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { RoomProps.MapIdKey, pickedId } }))
         {
@@ -233,7 +249,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             PhotonNetwork.CurrentRoom.IsOpen = true;
         }
 
-        PhotonNetwork.LoadLevel("GameScene");
+        //PhotonNetwork.LoadLevel("GameScene");
     }
 
 
@@ -267,7 +283,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        if(PhotonNetwork.OfflineMode)
+        if (PhotonNetwork.OfflineMode)
             PhotonNetwork.CreateRoom(null);
         else
             PhotonNetwork.JoinLobby();
@@ -276,6 +292,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         RoomDicts.Clear();
+        PhotonNetwork.OfflineMode = true;
         Debug.LogWarning($"Photon Connect Failed : {cause}");
     }
 
@@ -315,7 +332,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         Scene currentScene = SceneManager.GetActiveScene();
 
-        if(currentScene.name == "GameScene")
+        if (currentScene.name == "GameScene")
             SceneManager.LoadScene("StartScene");
 
         isStarting = false;
