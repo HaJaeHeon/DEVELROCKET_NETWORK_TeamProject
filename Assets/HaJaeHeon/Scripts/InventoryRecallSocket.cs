@@ -6,22 +6,24 @@ public class InventoryRecallSocket : MonoBehaviour
     // 마우스 주변, 타워 선택할 최대 거리
     [SerializeField] private float towerSelectionRadius = 0.6f;
 
+    private TowerService towerService;
+
     private RectTransform inventoryRect;
     private Canvas canvas;
     private Camera targetCamera;
-    private TowerService towerService;
     private Tower selectedTower;
 
     private void Awake()
     {
         inventoryRect = transform as RectTransform;
         canvas = GetComponentInParent<Canvas>();
-        towerService = GetComponent<TowerService>();
     }
 
     private void Start()
     {
         targetCamera = Camera.main;
+
+        towerService = TowerService.Instance;
     }
 
     private void Update()
