@@ -71,7 +71,7 @@ public class EnemyDB : MonoBehaviour
         var entry = Get(id);
         if(entry == null || entry.prefab == null) return null;
         // 적 Id를 함께 보내 모든 클라이언트에서 같은 데이터로 Init (Enemy.OnPhotonInstantiate)
-        var go = PhotonNetwork.Instantiate(entry.prefab.name, tile.Pos, Quaternion.identity, 0, new object[] { id });
+        var go = PhotonNetwork.InstantiateRoomObject(entry.prefab.name, tile.Pos, Quaternion.identity, 0, new object[] { id });
         return go != null ? go.GetComponent<Enemy>() : null;
     }
 }
