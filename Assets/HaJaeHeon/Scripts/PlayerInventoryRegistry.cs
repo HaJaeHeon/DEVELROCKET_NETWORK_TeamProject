@@ -114,6 +114,28 @@ public class PlayerInventoryRegistry : MonoBehaviourPunCallbacks
         return true;
     }
 
+    // 기존 항목 식별자를 그대로 복구
+    public bool TryRestoreConsumedItem(Player player, InventoryTowerItem item)
+    {
+        if (!IsCurrentPlayer(player) || item == null || string.IsNullOrEmpty(item.ItemId))
+            return false;
+
+        if (!inventories.TryGetValue(player.ActorNumber, out var inventory))
+            return false;
+
+        if (inventory.ContainsKey(item.ItemId) || inventory.Count >= PlayerInventory.MAXINVENTORYCOUNT)
+            return false;
+
+        inventory.Add(item.ItemId, new Record { Item = item });
+        return true;
+    }
+
+    public void SuspendAuthority(string reason)
+    {
+        authorityReady = false;
+        Debug.LogError(reason);
+    }
+
     // 설치·판매 성공 시 보유 기록에서 제거 / 예약 번호가 일치해야 함
     public bool TryConsumeItem(Player player, string itemId, string reservationId)
     {
