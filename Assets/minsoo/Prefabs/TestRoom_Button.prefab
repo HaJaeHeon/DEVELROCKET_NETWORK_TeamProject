@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 3542396063510411475}
   - component: {fileID: 982270554041400118}
   m_Layer: 5
-  m_Name: Map_Image
+  m_Name: LockImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -142,7 +142,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0fef71e0de8da47b782d9a17653f8388, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 28a3027aa09f54e7abc49c9bb8ad0818, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1068,3 +1068,7 @@ MonoBehaviour:
   nameText: {fileID: 903700118154696107}
   countText: {fileID: 8307171357043929303}
   joinButton: {fileID: 8738543857172378111}
+  lockImage: {fileID: 3542396063510411475}
+  lockSprite:
+  - {fileID: 21300000, guid: 28a3027aa09f54e7abc49c9bb8ad0818, type: 3}
+  - {fileID: 21300000, guid: 77213341e9402478f8011cfe1ff7356b, type: 3}
