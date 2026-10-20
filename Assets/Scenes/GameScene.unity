@@ -127,42 +127,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 503262561039469397, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_gotoScene
-      value: StartScene
-      objectReference: {fileID: 0}
-    - target: {fileID: 2909038860561827687, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 114715892}
-    - target: {fileID: 2909038860561827687, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnClickBack
-      objectReference: {fileID: 0}
-    - target: {fileID: 2909038860561827687, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GameEndPanelUI, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 2909038860561827687, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 3425723213473314899, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 114715892}
-    - target: {fileID: 3425723213473314899, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnClickBack
-      objectReference: {fileID: 0}
-    - target: {fileID: 3425723213473314899, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GameEndPanelUI, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 3425723213473314899, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 3485277551206906853, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -251,26 +215,13 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1658245677}
-    - target: {fileID: 8345544959082262855, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-      propertyPath: m_RenderMode
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7555187273857409015, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
+    - {fileID: 431631732075462582, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
---- !u!114 &114715892 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 503262561039469397, guid: 50527dbbcba8fb94e87e10b60d251b43, type: 3}
-  m_PrefabInstance: {fileID: 114715891}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64d67b317a7cdf2409aca4bd0132705f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameEndPanelUI
 --- !u!1001 &186917747
 PrefabInstance:
   m_ObjectHideFlags: 0
