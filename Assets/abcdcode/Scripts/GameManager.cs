@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
@@ -78,6 +79,20 @@ public class GameManager : SingletonBehavior<GameManager>
         IsGameOver = true;
         Debug.Log("Game Clear");
         GameEndPanelUI.Instance.OpenGameClear();
+    }
+    /// <summary>
+    /// 플레이어가 방에서 나가면 해당 플레이어가 설치한 모든 타워를 제거 (마스터 클라이언트에서만 처리)
+    /// </summary>
+    public void LeavePlayer(Player p)
+    {
+        if(p == null || !PhotonNetwork.IsMasterClient) return;
+        List<int> ids = new List<int>();
+        foreach(var t in Container_Tower.GetList())
+        {
+            if(t is not Tower tower || tower.OwnerPlayer == null || tower.OwnerPlayer.ActorNumber != p.ActorNumber) continue;
+            ids.Add(tower.IndexId);
+        }
+        Tower.SendDestroy(ids);
     }
     public bool IsGameOver { get; private set; }
     [SerializeField] private int m_startPlayerHP = 10;
