@@ -140,6 +140,8 @@ public class TowerService : MonoBehaviourPunCallbacks
         // 판매 완료가 아니라 요청을 시작했다는 뜻이다.
         return true;
     }
+
+    // 승인 결과를 확인한 뒤 인벤토리에 반영
     private void HandleSellResult(string requestId, bool success)
     {
         if (!isSellPending || saleResultReceived || requestId != pendingSaleRequestId)

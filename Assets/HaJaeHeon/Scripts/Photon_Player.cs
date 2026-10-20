@@ -21,7 +21,6 @@ public class Photon_Player : MonoBehaviourPunCallbacks
     
     // 카메라 캐싱
     private Camera mainCamera;
-    //private SpriteRenderer targetSprite;
 
 
     public MyColor currentMyColor;
@@ -48,7 +47,7 @@ public class Photon_Player : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             mainCamera = Camera.main;
-            //SetMyColor(currentMyColor);
+
             ApplyColor(photonView.Owner.CustomProperties);
         }
 
@@ -66,39 +65,12 @@ public class Photon_Player : MonoBehaviourPunCallbacks
         if (!photonView.IsMine || mainCamera == null)
             return;
 
-        //Vector3 mousePosition = Input.mousePosition;
-
-        //mousePosition.z =
-        //    mainCamera.WorldToScreenPoint(transform.position).z;
-
-        //Vector3 target =
-        //    mainCamera.ScreenToWorldPoint(mousePosition);
-
-        //target.z = transform.position.z;
-
-        //transform.position = target;
-
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvasRect, Input.mousePosition, null, out Vector2 localMousePoint))
         {
             myRectTransform.localPosition = new Vector3(localMousePoint.x, localMousePoint.y, 0f);
         }
     }
-
-    //private void SetMyColor(MyColor mColor)
-    //{
-    //    if (!photonView.IsMine)
-    //        return;
-
-    //    currentMyColor = mColor;
-
-    //    Hashtable properties = new Hashtable
-    //    {
-    //        { ColorKey, (int) mColor}
-    //    };
-
-    //    PhotonNetwork.LocalPlayer.SetCustomProperties(properties);
-    //}
 
     private void ApplyColor(Hashtable properties)
     {

@@ -7,6 +7,8 @@ using UnityEngine;
 
 public partial class SocketManager
 {
+    public const float REFUNDRATE = 0.5f;
+
     public event Action<string, bool> TowerSellResultReceived;
 
     public bool IsPurchasePending => IsPurchasePending;
@@ -30,12 +32,14 @@ public partial class SocketManager
 
     private bool transactionSessionStopped;
 
+    // 거래 중단 상태 / 설치 결과 대기 / 구매 결과 대기 / 판매,회수 결과 대기
     public bool IsLocalOperationPending =>
         transactionSessionStopped ||
         isBuildRequestPending ||
         (buyTower != null && buyTower.IsPurchasePending) ||
         (TowerService.Instance != null && TowerService.Instance.IsBusy);
 
+    // 사용자별 구매,판매, 대기 기록 확인(같은 사용자의 구매,판매,재화 변경이 겹치지 않게)
     private bool HasPendingGoldChange(int actorNumber)
     {
         return pendingPurchases.ContainsKey(actorNumber) || pendingSales.ContainsKey(actorNumber);
@@ -73,6 +77,7 @@ public partial class SocketManager
         photonView.RPC(nameof(RpcRequestItemOperation), RpcTarget.MasterClient, isRecall, requestId, targetId);
     }
 
+    // 사용자별 번호,요청 식별자,작업종류
     [PunRPC]
     private void RpcRequestItemOperation(bool isRecall, string requestId, string targetId, PhotonMessageInfo info)
     {
@@ -123,6 +128,13 @@ public partial class SocketManager
         }
     }
 
+    // 판매 : inventory 확인 > 재화 지급
+    // 해당 사용자의 다른 재화 변경 대기중?
+    // >> 인벤토리 내 정보 예약(중복사용x)
+    // >> 타워 등록 정보에서 가격을 읽어 판매 금액 책정
+    // >> 가격,현재 재화,계산 결과 정상값인지 검사
+    // >> inventory Registry에서 제거
+    // >> 재화와 판매 확인 식별자 전송
     private void BeginTowerSale(ItemRequestRecord record)
     {
         Player requester = record.Requester;
@@ -145,7 +157,7 @@ public partial class SocketManager
         TowerData data = entry != null ? entry.data : null;
 
         float currentGold = PlayerGold.Get(requester);
-        float refund = data != null ? data.Cost * 0.5f : -1f;
+        float refund = data != null ? data.Cost * REFUNDRATE : -1f;
         float resultGold = currentGold + refund;
 
         if (data == null || data.Id != item.TowerId || !IsValidAmount(data.Cost) || !IsValidAmount(currentGold) || !IsValidAmount(refund) || !IsValidAmount(resultGold))
@@ -180,9 +192,11 @@ public partial class SocketManager
 
             if (!registry.TryRestoreConsumedItem(requester, item))
             {
+                // 재화 변경 요청을 전송하지 못하면 제거한 항목을 같은 항목 식별자로 복구
+                // 복구까지 실패하면 아래 함수로 보유 기록 관리 권한을 중단 > 원인 출력
                 registry.SuspendAuthority("판매 전송 실패 후 항목 복구에 실패했습니다.");
             }
-
+            // 재화 변경이 확인되면 판매 확정시킴
             CompleteItemRequest(record, false, "");
         }
     }
@@ -233,6 +247,7 @@ public partial class SocketManager
         return true;
     }
 
+    // 타워 제ㅐ거와 각 참여자의 타워 목록 정리 연결(합성에 참여한 타워도 이를 통해 제거)
     private bool TryDestroyTowerOnMaster(Tower tower)
     {
         var game = GameManager.Instance;

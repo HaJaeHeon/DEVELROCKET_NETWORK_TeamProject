@@ -68,6 +68,7 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         Button towerButton = buttonTower.GetComponent<Button>();
         drag.canvas = shopPanel.transform.root.GetComponent<Canvas>();
 
+        // pool 에서 재사용하는 인벤토리, 상점 객체 상태 초기화
         towerButton.interactable = true;
         so.SetItemId(null);
 
