@@ -19,7 +19,6 @@ public class LoginPanel : UIPanel
     [SerializeField] private GameObject PopupPanel;
     [SerializeField] private TMP_Text messageText;
 
-    bool proceeding;
     AuthManager AM => AuthManager.Instance;
     Color errorColor = new Color(0.9f, 0.3f, 0.3f);
     WaitForSeconds wait = new WaitForSeconds(1.0f);
@@ -35,9 +34,6 @@ public class LoginPanel : UIPanel
 
     private void OnEnable()
     {
-        AM.OnInitialized += RefreshHandler;
-        AM.OnBusyChanged += RefreshHandler;
-
         // 팝업UI
         AM.OnAuthFailed += ShowError;
         AM.OnNotice += ShowNotice;
@@ -45,25 +41,16 @@ public class LoginPanel : UIPanel
 
     private void OnDisable()
     {
-        AM.OnInitialized -= RefreshHandler;
-        AM.OnBusyChanged -= RefreshHandler;
-
         AM.OnAuthFailed -= ShowError;
         AM.OnNotice -= ShowNotice;
     }
 
-
-    private void RefreshHandler() => RefreshInteractable();
-    private void RefreshHandler(bool busy) => RefreshInteractable();
-
-    private void RefreshInteractable()
+    private void Update()
     {
-        bool canInput = AM.IsReady && !AM.IsBusy && !proceeding;
-
-        //signInButton.interactable = canInput;
-        //signUpButton.interactable = canInput;
-        //signOutButton.interactable = canInput;
-        //loadingPanel.SetActive(!canInput);
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            signInButton.onClick.Invoke();
+        }
     }
 
     private void ShowError(string message)

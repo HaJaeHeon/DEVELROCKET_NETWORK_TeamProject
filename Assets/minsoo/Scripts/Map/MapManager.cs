@@ -1,11 +1,14 @@
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class MapManager : SingletonBehavior<MapManager>, IMap
 {
     [SerializeField] private Tilemap tilemap;
+    [SerializeField] private MapDB mapDB;
 
     private TileType[,] grid;
     private readonly List<Vector2Int> startCells = new();
@@ -15,9 +18,30 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
     public override void Awake()
     {
         base.Awake();
+        LoadMap();
         GetGridTileType();
         PrintGrid(); // 확인용
         BuildPath();
+    }
+
+    private void LoadMap()
+    {
+        string mapID = NetworkManager.Instance.GetMapId();
+
+        foreach (var map in mapDB.MapDatas)
+        {
+            if (map.Id == mapID)
+            {
+                GameObject instance = Instantiate(map.MapPrefab, Vector3.zero, Quaternion.identity);
+                tilemap = instance.GetComponentsInChildren<Tilemap>()[1];
+                break;
+            }
+        }
+
+        // 맵 중앙으로 카메라 이동
+        Camera cam = Camera.main;
+        cam.transform.position = new Vector3(tilemap.size.x / 2, tilemap.size.y / 2, -10);
+
     }
 
     private void GetGridTileType()
@@ -65,7 +89,7 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
         paths.Clear();
 
         BoundsInt b = tilemap.cellBounds;
-        for(int i = 0; i < startCells.Count; i++)
+        for (int i = 0; i < startCells.Count; i++)
         {
             var raw = Pathfinder.FindPath(grid, startCells[i], endPos);
             if (raw == null)
@@ -105,6 +129,17 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
         return t ? t.Type : TileType.Block;
     }
 
+    // 칸 좌표로 타일 가져오기 (타일 없는 칸이면 null)
+    public ITileMap GetTile(Vector3Int cell)
+    {
+        if (!tilemap.HasTile(cell)) return null;
+        return new MapTile(cell, tilemap.GetCellCenterWorld(cell), GetTileType(cell));
+    }
+
+    // 월드 좌표로 타일 가져오기
+    public ITileMap GetTileAtWorld(Vector2 world) => GetTile(tilemap.WorldToCell(world));
+
+
     public ITileMap GetGoalTile()
     {
 
@@ -121,6 +156,4 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
         throw new System.NotImplementedException();
     }
 
-
-    
 }

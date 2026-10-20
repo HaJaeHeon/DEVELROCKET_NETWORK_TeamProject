@@ -10,8 +10,16 @@ using UnityEngine.SceneManagement;
 public static class PlayerProps 
 { 
     public const string Ready = "ready"; 
-    public const string Rate = "rate"; 
+    public const string Rate = "rate";
 }
+
+public static class RoomProps
+{
+    public const string MapIdKey = "MapId";
+    public const string RandomId = "Random";
+}
+
+
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -20,9 +28,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public Dictionary<string, RoomInfo> RoomDicts = new();
 
-    public event Action<Dictionary<string, RoomInfo>> RoomListChanged;
+    [SerializeField] private MapDB mapDB;
+    private bool isStarting;
 
-    string ReadyKey = "ready";
+    public event Action<Dictionary<string, RoomInfo>> RoomListChanged;
 
     RoomOptions roomOptions;
     byte maxPlayers = 4;
@@ -189,7 +198,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // 게임 시작
     public void OnStartGame()
     {
-        if (!PhotonNetwork.IsMasterClient)
+        if (!PhotonNetwork.IsMasterClient || isStarting)
         {
             Debug.Log("방장이 아닙니다.");
             return;
@@ -201,10 +210,48 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             return;
         }
 
+        string mapId = GetMapId();
+
+        // 이미 실제 맵이 선택돼 있으면 바로 이동
+        if (mapId != RoomProps.RandomId)
+        {
+            isStarting = true;
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.LoadLevel("GameScene");
+            return;
+        }
+
+        // Random → 하나 골라서 저장하고, 반영될 때까지 기다림
+        if (mapDB.MapDatas.Count == 0) { Debug.LogError("MapDB에 맵이 없습니다."); return; }
+        string pickedId = mapDB.MapDatas[UnityEngine.Random.Range(0, mapDB.MapDatas.Count)].Id;
+
+        isStarting = true;                         
         PhotonNetwork.CurrentRoom.IsOpen = false;
+        if (!PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable { { RoomProps.MapIdKey, pickedId } }))
+        {
+            isStarting = false;
+            PhotonNetwork.CurrentRoom.IsOpen = true;
+        }
+
         PhotonNetwork.LoadLevel("GameScene");
     }
 
+
+    public string GetMapId()
+    {
+        var room = PhotonNetwork.CurrentRoom;
+        if (room != null && room.CustomProperties.TryGetValue(RoomProps.MapIdKey, out object v) && v is string id)
+            return id;
+        return "Random";
+    }
+
+    public override void OnRoomPropertiesUpdate(Hashtable changed)
+    {
+        if (!isStarting || !PhotonNetwork.IsMasterClient) return;
+
+        if (changed.TryGetValue(RoomProps.MapIdKey, out object v) && v is string id && id != RoomProps.RandomId)
+            PhotonNetwork.LoadLevel("GameScene");
+    }
 
     // 방목록 갱신
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -263,13 +310,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         PhotonNetwork.LocalPlayer.SetCustomProperties(
-        new Hashtable { { ReadyKey, false } });
+        new Hashtable { { PlayerProps.Ready, false } });
         RoomListChanged?.Invoke(RoomDicts);
 
         Scene currentScene = SceneManager.GetActiveScene();
 
         if(currentScene.name == "GameScene")
             SceneManager.LoadScene("StartScene");
+
+        isStarting = false;
     }
     /*
     public override void OnPlayerEnteredRoom(Player newPlayer)
