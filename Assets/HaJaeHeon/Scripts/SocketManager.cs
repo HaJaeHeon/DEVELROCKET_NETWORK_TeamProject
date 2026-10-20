@@ -281,6 +281,7 @@ public class SocketManager : MonoBehaviourPunCallbacks
             photonView.RPC(nameof(RpcTowerSpawnResult), requester, towerItemId, false);
             return;
         }
+        Debug.Log($"[설치 항목 조회] 사용자={requester.ActorNumber}, 요청항목={towerItemId}, 조회항목={item.ItemId}, 타워={item.TowerId}, 단계={item.TowerLevel}");
         Tower targetTower = null;
         TowerData nextData = null;
 
@@ -333,9 +334,13 @@ public class SocketManager : MonoBehaviourPunCallbacks
                     pos = spawnPosition /*+ towerSpawnTransformOffset*/,
                     type = TileType.Build
                 };
-
+                Debug.Log($"[타워 생성 전] 사용자={requester.ActorNumber}, 항목={item.ItemId}, 생성타워={spawnTowerId}, 등록정보={entry.data.Id}, 등록단계={entry.data.Level}");
                 createdTower = GameManager.Instance.CreateTower(currentTile, spawnTowerId, requester);
 
+                if (createdTower != null && createdTower.Data != null)
+                {
+                    Debug.Log($"[타워 생성 후] 사용자={requester.ActorNumber}, 항목={item.ItemId}, 객체={createdTower.photonView.ViewID}, 실제타워={createdTower.Data.Id}, 실제단계={createdTower.Data.Level}");
+                }
                 if (createdTower != null)
                     success = registry.TryConsumeItem(requester, towerItemId, reservationId);
             }
@@ -409,6 +414,9 @@ public class SocketManager : MonoBehaviourPunCallbacks
         return false;
     }
 
+
+
+    // 타워 회수 요청 (Rpc)
     [PunRPC]
     private void RpcRequestTowerRecall(int towerViewId, PhotonMessageInfo info)
     {

@@ -58,8 +58,11 @@ public class PlayerInventoryRegistry : MonoBehaviourPunCallbacks
             inventories.Add(player.ActorNumber, inventory);
         }
         if (inventory.Count >= PlayerInventory.MAXINVENTORYCOUNT) return false;
-
+        
+        Debug.Log($"[항목 생성 전] 사용자={player.ActorNumber}, 타워={data.Id}, 단계={data.Level}, 가격={data.Cost}");
         item = new InventoryTowerItem(Guid.NewGuid().ToString("N"), data.Id, data.Cost, data.Level);
+        Debug.Log($"[항목 생성 후] 사용자={player.ActorNumber}, 항목={item.ItemId}, 타워={item.TowerId}, 단계={item.TowerLevel}, 가격={item.TowerPrice}");
+        
         inventory.Add(item.ItemId, new Record { Item = item });
         return true;
     }
