@@ -312,7 +312,7 @@ public class SocketManager : MonoBehaviourPunCallbacks
 
         Vector2 spawnPosition = targetTower != null
             ? targetTower.Position
-            : new Vector2(x, y) /*+ towerSpawnTransformOffset*/;
+            : new Vector2(x, y) + towerSpawnTransformOffset;
 
         int oldTowerIndexId = targetTower != null ? targetTower.IndexId : -1;
 
