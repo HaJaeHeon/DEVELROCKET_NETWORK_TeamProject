@@ -28,7 +28,6 @@ public class Present_Imote : MonoBehaviourPunCallbacks
 
         if(Input.GetKeyDown(KeyCode.Alpha1))
         {
-            Debug.Log("1");
             PressAlpha1();
         }
 
