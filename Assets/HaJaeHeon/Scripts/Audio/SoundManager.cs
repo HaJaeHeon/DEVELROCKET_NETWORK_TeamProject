@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -104,11 +105,11 @@ public sealed class SoundManager : MonoBehaviour
     }
 
     // 2D (UI 등 위치 무관)
-    public SoundHandle PlaySfx(SOAudio _refAudio) => PlaySfx(_refAudio, Vector3.zero);
+    public SoundHandle PlaySound(SOAudio _refAudio) => PlaySound(_refAudio, Vector3.zero);
 
     // Transform이 아니라 위치값을 받는다 - 풀에 반납됐거나 파괴된 오브젝트의 Transform이 넘어오는 사고 방지.
     // SpatialBlend가 0인 SO면 위치는 무시됨
-    public SoundHandle PlaySfx(SOAudio _refAudio, Vector3 _vPos)
+    public SoundHandle PlaySound(SOAudio _refAudio, Vector3 _vPos)
     {
         if (_refAudio == null)
             return default;
@@ -149,7 +150,7 @@ public sealed class SoundManager : MonoBehaviour
     }
 
     // 옵션 UI 슬라이더(0~1)에서 호출. Slider 타입에 의존하지 않도록 값만 받음
-    public void SetVolume(eAudioChannelType _eType, float _fLinear)
+    public void SetVolume(eAudioChannelType _eType, float _fLinear) //0~1
     {
         float fDB = _fLinear <= 0.0001f ? MIN_DB : Mathf.Log10(_fLinear) * 20.0f;
         m_refMixer.SetFloat(GetVolumeParam(_eType), fDB);

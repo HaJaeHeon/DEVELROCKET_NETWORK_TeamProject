@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class PresetGroup : MonoBehaviour
 {
     // 속성 창(Inspector)에서 1번~5번 칸 순서대로 연결합니다.
-    [SerializeField] private List<ImageSocket> presetSlots = new List<ImageSocket>();
+    public List<ImageSocket> presetSlots = new List<ImageSocket>();
 
     private readonly Dictionary<string, DraggableImage> usedImages = new();
 
