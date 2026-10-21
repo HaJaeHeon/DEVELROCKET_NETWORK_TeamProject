@@ -40,6 +40,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private int masterActor = -1;      // 현재 방장
     private int prevMasterActor = -1;  // 바로 직전 방장
 
+    private bool goOffline;
 
     RoomOptions roomOptions;
     byte maxPlayers = 4;
@@ -88,8 +89,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // Photon 연결
     public async Task<string> Connect()
     {
-        if (PhotonNetwork.IsConnected)
-            return "Is already connected!";
+        if (PhotonNetwork.OfflineMode) PhotonNetwork.OfflineMode = false;  // 싱글플레이 후 다시 온라인 로그인
+        if (PhotonNetwork.IsConnected) return "Is already connected!";
 
         try
         {
@@ -155,8 +156,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void OnSiglePlay()
     {
-        PhotonNetwork.Disconnect();
-
+        goOffline = true;
+        if (PhotonNetwork.NetworkingClient.IsConnected) PhotonNetwork.Disconnect(); // 끊긴 뒤 OnDisconnected에서 오프라인 전환
+        else PhotonNetwork.OfflineMode = true;                                       // 원래 연결이 없으면 바로 전환
     }
 
     // 로비 - 방 랜덤입장
@@ -307,10 +309,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         RoomDicts.Clear();
-        PhotonNetwork.OfflineMode = true;
+        if (goOffline)
+        {
+            goOffline = false;
+            PhotonNetwork.OfflineMode = true;
+        }
         Debug.LogWarning($"Photon Connect Failed : {cause}");
     }
-
 
     public override void OnLeftLobby()
     {
