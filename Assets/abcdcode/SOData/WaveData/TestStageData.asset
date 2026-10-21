@@ -17,4 +17,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dc58bc7c410e8b846855884d662dde16, type: 2}
   - {fileID: 11400000, guid: c283fd661c195504eb6e36369075d2ec, type: 2}
   - {fileID: 11400000, guid: ae5c99e8b7549d44abc1e80a37bda0aa, type: 2}
+  - {fileID: 11400000, guid: f776167f53c24ca41a09232bc6ce08fe, type: 2}
   waveInterval: 10
