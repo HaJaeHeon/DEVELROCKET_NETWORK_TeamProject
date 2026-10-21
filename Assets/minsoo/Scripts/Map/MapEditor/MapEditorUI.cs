@@ -34,11 +34,17 @@ public class MapEditorUI : MonoBehaviour
     [SerializeField] private Button homeButton;
     [SerializeField] private string lobbySceneName = "StartScene";
 
+    [Header("SettingPanel")]
+    [SerializeField] private TMP_InputField sizeXInput;
+    [SerializeField] private TMP_InputField sizeYInput;
+    [SerializeField] private Button okButton;
+
     // 검사, 저장, 게시, 불러오기는 MapEditorController에서 구독해서 처리
     public event Action CheckRequested;
     public event Action SaveRequested;
     public event Action PublishRequested;
     public event Action LoadRequested;
+    public event Action<int, int> SizeChanged;
 
     public string MapName
     {
@@ -60,7 +66,7 @@ public class MapEditorUI : MonoBehaviour
         loadButton.onClick.AddListener(() => LoadRequested?.Invoke());
         clearButton.onClick.AddListener(() => painter.Clear());
         homeButton.onClick.AddListener(() => SceneManager.LoadScene(lobbySceneName));
-
+        okButton.onClick.AddListener(() => SizeChanged?.Invoke(int.Parse(sizeXInput.text), int.Parse(sizeYInput.text)));
         ApplySwatches();
     }
 
@@ -78,7 +84,7 @@ public class MapEditorUI : MonoBehaviour
     {
         SelectBrush((int)TileType.Road);
         RefreshInfo();
-        ShowMessage("Left click : Paint\nRight click : Erase");
+        ShowMessage("Left click : Paint\nRight click : Erase\nMap View : Tap");
     }
 
     public void SelectBrush(int type)
@@ -129,4 +135,5 @@ public class MapEditorUI : MonoBehaviour
         RuleTile r => r.m_DefaultSprite,
         _ => null
     };
+
 }

@@ -16,6 +16,7 @@ public class TilePainter : MonoBehaviour
     private TileType[,] grid;
     private TileType brush = TileType.Road;
     private Vector3Int? lastCell;
+    private TilemapRenderer tileRenderer;
 
     public TileType[,] Grid => grid;
     public Vector2Int Size => size;
@@ -27,17 +28,51 @@ public class TilePainter : MonoBehaviour
     {
         if (cam == null) cam = Camera.main;
         grid = new TileType[size.x, size.y];
-        FillAll(TileType.Block);
+        Clear();
+        CameraCenter();
+    }
+
+    private void Start()
+    {
+        tileRenderer = logicTilemap.GetComponent<TilemapRenderer>();
+    }
+
+    public void CameraCenter()
+    {
+        cam.transform.position = new Vector3(size.x / 2, size.y / 2, -10);
+    }
+
+    public void SizeChanged(int x, int y)
+    {
+        size.x = x;
+        size.y = y;
+        grid = new TileType[size.x, size.y];
+        Clear();
+        CameraCenter();
     }
 
     // 팔레트 버튼 OnClick에 연결 (0=Block, 1=Road, 2=Build, 3=Start, 4=Goal)
     public void SetBrush(int type) => brush = (TileType)type;
 
     // 전체를 Block으로 초기화
-    public void Clear() => FillAll(TileType.Block);
+    public void Clear()
+    {
+        logicTilemap.ClearAllTiles();
+        visualTilemap.ClearAllTiles();
+        lastCell = null;
+        FillAll(TileType.Block);
+        logicTilemap.CompressBounds();
+        visualTilemap.CompressBounds();
+    }
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            tileRenderer.enabled = !tileRenderer.enabled;
+        }
+
+
         var mouse = Mouse.current;
         if (mouse == null) return;
 
@@ -89,6 +124,10 @@ public class TilePainter : MonoBehaviour
         grid[cell.x, cell.y] = type;
         logicTilemap.SetTile(cell, tileSet.Logic(type));
         visualTilemap.SetTile(cell, tileSet.Visual(type));
+        // 칠한 칸과 주변 8칸을 다시 그림 (풀 RuleTile이 바뀐 길 모양을 반영하도록)
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dy = -1; dy <= 1; dy++)
+                visualTilemap.RefreshTile(cell + new Vector3Int(dx, dy, 0));
         Changed?.Invoke();
     }
 
