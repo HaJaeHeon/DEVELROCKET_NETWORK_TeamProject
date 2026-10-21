@@ -97,7 +97,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
         }
     }
 
-    public float MaxHP => Data.HP;
+    public float MaxHP => Data.HP * DifficultyManager.EnemyHPMult();
     private void UpdateHPBar()
     {
         if(hpBar == null || Data == null || MaxHP <= 0) return;
