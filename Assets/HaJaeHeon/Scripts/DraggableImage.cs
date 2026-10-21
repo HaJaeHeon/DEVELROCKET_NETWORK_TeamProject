@@ -19,7 +19,12 @@ public class DraggableImage : MonoBehaviour, IDragHandler, IEndDragHandler, IBeg
     private Transform originParentTransform;
 
     private Transform beforeParentTransform;
-    private Vector3 beforePosition;
+    private Vector3 beforeAnchoredPosition;
+    private Vector3 beforeLocalScale;
+    private Quaternion beforeLocalRotation;
+
+    private RectTransform dragPlane;
+    private Vector3 dragOffset;
 
     private bool isDragging;
     private bool dropSuccessed;
@@ -59,15 +64,31 @@ public class DraggableImage : MonoBehaviour, IDragHandler, IEndDragHandler, IBeg
     // 드래그가 시작될 떄 한 번 호출 (원래 위치 저장)
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (rect == null || canvas == null || rootPanel == null)
+        if (rect == null || rootPanel == null || canvasGroup == null)
             return;
 
+        dragPlane = rootPanel.transform as RectTransform;
+
+        if (dragPlane == null)
+            return;
+
+        // 원래 부모를 기준으로 위치와 크기 배율을 저장합니다.
         beforeParentTransform = rect.parent;
-        beforePosition = rect.position;
+        beforeAnchoredPosition = rect.anchoredPosition3D;
+        beforeLocalScale = rect.localScale;
+        beforeLocalRotation = rect.localRotation;
 
-        gameObject.transform.SetParent(rootPanel.transform);
+        // 부모를 바꿀 때 현재 화면 위치를 유지합니다.
+        rect.SetParent(dragPlane, true);
+        rect.SetAsLastSibling();
+
+        // 처음 집은 지점을 유지합니다.
+        dragOffset = Vector3.zero;
+
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(dragPlane, eventData.position, eventData.pressEventCamera, out Vector3 pointerPosition))
+            dragOffset = rect.position - pointerPosition;
+
         canvasGroup.blocksRaycasts = false;
-
         isDragging = true;
         dropSuccessed = false;
     }
@@ -75,33 +96,30 @@ public class DraggableImage : MonoBehaviour, IDragHandler, IEndDragHandler, IBeg
     // 드래그 중일때 호출(이미지 위치 이동)
     public void OnDrag(PointerEventData eventData)
     {
-        if (rect == null)
+        if (!isDragging || rect == null || dragPlane == null)
             return;
 
-        if (!isDragging)
-            return;
-
-        rect.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        if (RectTransformUtility.ScreenPointToWorldPointInRectangle(dragPlane, eventData.position, eventData.pressEventCamera, out Vector3 pointerPosition))
+            rect.position = pointerPosition + dragOffset;
     }
 
     // 드래그가 종료되면 한 번 호출 (소켓에 끼워넣거나 원래 위치로 복귀)
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (rect == null)
+        if (!isDragging || rect == null)
             return;
 
-        if (!isDragging)
-            return;
-
-        if(!dropSuccessed)
+        if (!dropSuccessed && beforeParentTransform != null)
         {
-            rect.SetParent(beforeParentTransform);
-            rect.position = beforePosition;
+            rect.SetParent(beforeParentTransform, false);
+            rect.anchoredPosition3D = beforeAnchoredPosition;
+            rect.localScale = beforeLocalScale;
+            rect.localRotation = beforeLocalRotation;
         }
 
         canvasGroup.blocksRaycasts = true;
-
         isDragging = false;
+        dragPlane = null;
     }
 
     // 이미지 장착
