@@ -40,6 +40,11 @@ public class GameManager : SingletonBehavior<GameManager>
         e.Position = new Vector2(-3, -3);
         */
         }
+        NetworkManager.Instance.PlayerLefted += LeavePlayer;
+    }
+    public void OnDestroy()
+    {
+        NetworkManager.Instance.PlayerLefted -= LeavePlayer;
     }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     private static void RegisterPackets()
