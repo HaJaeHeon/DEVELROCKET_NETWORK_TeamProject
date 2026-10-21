@@ -41,36 +41,29 @@ public class PresetGroup : MonoBehaviour
     {
         spriteIds = new List<int>(5);
 
-        if (spriteCatalog == null || presetSlots == null || presetSlots.Count != 5)
+        if (spriteCatalog == null || presetSlots == null || spriteCatalog[0] == null)
         {
-            Debug.LogWarning("전체 그림 목록과 프리셋 5개 칸을 연결해야 합니다.");
+            Debug.LogWarning("전체 그림 목록의 0번에 기본 그림을 등록해야 합니다.");
             return false;
         }
 
-        for (int i = 0; i < presetSlots.Count; i++)
+        for (int i = 0; i < 5; i++)
         {
-            ImageSocket slot = presetSlots[i];
+            int spriteId = 0;
 
-            if (slot == null || slot.CurrentImage == null)
+            ImageSocket slot = presetSlots != null && i < presetSlots.Count ? presetSlots[i] : null;
+
+            if (slot != null && slot.CurrentImage != null)
             {
-                Debug.LogWarning($"{i + 1}번 프리셋이 비어 있습니다.");
-                return false;
-            }
+                Image image = slot.CurrentImage.GetComponent<Image>();
 
-            Image image = slot.CurrentImage.GetComponent<Image>();
+                if (image != null && image.sprite != null)
+                {
+                    int foundId = spriteCatalog.IndexOf(image.sprite);
 
-            if (image == null || image.sprite == null)
-            {
-                Debug.LogWarning($"{i + 1}번 프리셋에 그림이 없습니다.");
-                return false;
-            }
-
-            int spriteId = spriteCatalog.IndexOf(image.sprite);
-
-            if (spriteId < 0)
-            {
-                Debug.LogWarning($"{i + 1}번 그림이 전체 그림 목록에 없습니다.");
-                return false;
+                    if (foundId >= 0)
+                        spriteId = foundId;
+                }
             }
 
             spriteIds.Add(spriteId);
