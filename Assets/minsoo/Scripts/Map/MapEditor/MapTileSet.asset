@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a926280c01d4c458b2db68dcbcdf01, type: 3}
+  m_Name: MapTileSet
+  m_EditorClassIdentifier: Assembly-CSharp::MapTileSet
+  logicTiles:
+  - {fileID: 11400000, guid: 0a022216c00ba3b49a8723fd6e5ec2e3, type: 2}
+  - {fileID: 11400000, guid: dce7e5c9e6d2f824594c9c5ce52468c1, type: 2}
+  - {fileID: 11400000, guid: b9271ece8dbfb0f4caa80ac491675138, type: 2}
+  - {fileID: 11400000, guid: cada45a2b0d52d04494e9ac94fe8a9ad, type: 2}
+  - {fileID: 11400000, guid: ad103c9d7ab4b1a4992923aa61a11c7d, type: 2}
+  visualTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
