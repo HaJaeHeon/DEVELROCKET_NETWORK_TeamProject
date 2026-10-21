@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
-
+#if UNITY_EDITOR
 // 열려 있는 씬의 Canvas에 맵 에디터 UI를 만들고 MapEditorUI 참조를 연결
 // 디자인은 StartScene MainCanvas(LobbyPanel, RoomPanel)와 같은 스프라이트·폰트·크기 규칙을 따름
 public static class MapEditorUIBuilder
@@ -335,3 +335,4 @@ public static class MapEditorUIBuilder
             prop.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
     }
 }
+#endif

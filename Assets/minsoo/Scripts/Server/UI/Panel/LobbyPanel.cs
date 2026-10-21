@@ -2,6 +2,7 @@ using Photon.Realtime;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LobbyPanel : UIPanel
@@ -12,7 +13,7 @@ public class LobbyPanel : UIPanel
     [SerializeField] private Button presetButton;
     [SerializeField] private Button searchRoomButton;
     [SerializeField] private Button createRoomButton;
-
+    [SerializeField] private string lobbySceneName = "EditorScene";
 
     [SerializeField] Transform content;          // ScrollView의 Content
     [SerializeField] TestRoomItemUI roomItemPrefab;
@@ -31,7 +32,7 @@ public class LobbyPanel : UIPanel
         var ui = GetComponentInParent<PanelController>(true);
         homeButton.onClick.AddListener(() => ui.Open(PanelId.Title)); // 타이틀로 가면 로그아웃
         settingButton.onClick.AddListener(() => ui.Open(PanelId.Lobby, PanelId.Setting));
-        leaderBoardButton.onClick.AddListener(() => ui.Open(PanelId.Lobby, PanelId.LeaderBoard));
+        leaderBoardButton.onClick.AddListener(() => SceneManager.LoadScene(lobbySceneName));
         presetButton.onClick.AddListener(() => ui.Open(PanelId.Lobby, PanelId.Preset));
         searchRoomButton.onClick.AddListener(() => ui.Open(PanelId.Lobby, PanelId.SearchRoom));
         createRoomButton.onClick.AddListener(() => ui.Open(PanelId.Lobby, PanelId.CreateRoom));

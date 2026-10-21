@@ -150,4 +150,31 @@ public class TilePainter : MonoBehaviour
     }
 
     private bool InBounds(Vector3Int c) => c.x >= 0 && c.y >= 0 && c.x < size.x && c.y < size.y;
+
+    // 저장된 격자를 에디터에 통째로 올림 (불러오기용)
+    public void LoadGrid(TileType[,] source)
+    {
+        size = new Vector2Int(source.GetLength(0), source.GetLength(1));
+        grid = (TileType[,])source.Clone();
+
+        logicTilemap.ClearAllTiles();
+        visualTilemap.ClearAllTiles();
+
+        var bounds = new BoundsInt(0, 0, 0, size.x, size.y, 1);
+        var logic = new TileBase[size.x * size.y];
+        var visual = new TileBase[size.x * size.y];
+        for (int y = 0; y < size.y; y++)
+            for (int x = 0; x < size.x; x++)
+            {
+                int i = x + y * size.x;   // SetTilesBlock은 x가 먼저 도는 순서
+                logic[i] = tileSet.Logic(grid[x, y]);
+                visual[i] = tileSet.Visual(grid[x, y]);
+            }
+        logicTilemap.SetTilesBlock(bounds, logic);
+        visualTilemap.SetTilesBlock(bounds, visual);
+
+        lastCell = null;
+        CameraCenter();
+        Changed?.Invoke();
+    }
 }
