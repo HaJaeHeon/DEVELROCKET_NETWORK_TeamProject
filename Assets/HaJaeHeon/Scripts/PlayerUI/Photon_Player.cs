@@ -83,7 +83,7 @@ public class Photon_Player : MonoBehaviourPunCallbacks
         cursorImage.color = GetColor(currentMyColor);
     }
 
-    private Color GetColor(MyColor mColor)
+    public static Color GetColor(MyColor mColor)
     {
         switch (mColor)
         {
