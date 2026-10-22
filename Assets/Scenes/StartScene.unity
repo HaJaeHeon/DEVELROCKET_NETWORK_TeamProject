@@ -188,6 +188,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3844578162433186906, guid: 5f94ba37f02d69f4d98d6b76cee1a0fe, type: 3}
+      propertyPath: m_ScrollSensitivity
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 4596122177819870730, guid: 5f94ba37f02d69f4d98d6b76cee1a0fe, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -271,6 +275,18 @@ PrefabInstance:
     - target: {fileID: 8658894907518151558, guid: 5f94ba37f02d69f4d98d6b76cee1a0fe, type: 3}
       propertyPath: m_Name
       value: MainCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 9068406249618594947, guid: 5f94ba37f02d69f4d98d6b76cee1a0fe, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 877530566}
+    - target: {fileID: 9068406249618594947, guid: 5f94ba37f02d69f4d98d6b76cee1a0fe, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: OnClickSavePreset
+      objectReference: {fileID: 0}
+    - target: {fileID: 9068406249618594947, guid: 5f94ba37f02d69f4d98d6b76cee1a0fe, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: UI_ImoteManager, Assembly-CSharp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
