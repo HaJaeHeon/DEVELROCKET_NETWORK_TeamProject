@@ -1,7 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.Tilemaps;
-
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 카메라 이동 범위 제한 존재해야함
@@ -15,12 +15,22 @@ public class CameraMove : MonoBehaviourPunCallbacks
     private Camera myCamera;
     private Tilemap mapTilemap;
 
+    private string currentSceneName;
+
     private void Start()
     {
+        currentSceneName = SceneManager.GetActiveScene().name;
+
+        if(currentSceneName == "EditorScene")
+        {
+            mapTilemap = GameObject.FindAnyObjectByType<Tilemap>();
+        }
+
+        myCamera = Camera.main;
+
         if (!PhotonNetwork.InRoom)
             return;
 
-        myCamera = Camera.main;
 
         MapManager mapManager = MapManager.Instance;
 
@@ -39,6 +49,11 @@ public class CameraMove : MonoBehaviourPunCallbacks
 
     private void Update()
     {
+        if(currentSceneName == "EditorScene")
+        {
+            MoveCamera();
+        }
+
         if (!PhotonNetwork.InRoom)
             return;
 
@@ -53,8 +68,15 @@ public class CameraMove : MonoBehaviourPunCallbacks
         Vector3 moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0f);
 
         Vector3 nextPosition = myCamera.transform.position + moveDirection.normalized * cameraSpeed * Time.deltaTime;
-
-        myCamera.transform.position = ClampCameraPosition(nextPosition);
+        if (currentSceneName == "EditorScene")
+        {
+            myCamera.transform.position = nextPosition;
+            return;
+        }
+        else
+        {
+            myCamera.transform.position = ClampCameraPosition(nextPosition);
+        }
     }
 
     private Vector3 ClampCameraPosition(Vector3 position)

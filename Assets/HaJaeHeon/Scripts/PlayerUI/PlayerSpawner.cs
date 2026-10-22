@@ -41,6 +41,11 @@ public class PlayerSpawner : MonoBehaviour
             SpawnNetworkCursor();
             return;
         }
+
+        if(currentSceneName == "EditorScene")
+        {
+            SpawnLocalCursor();
+        }
     }
 
     private void SpawnLocalCursor()

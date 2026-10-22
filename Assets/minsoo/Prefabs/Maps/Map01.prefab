@@ -2319,10 +2319,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc75507afb6057b44a5a715b7090dd8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilemapSocket
-  map: {fileID: 0}
-  tilemap: {fileID: 4584077114197637723}
-  targetCamera: {fileID: 0}
-  towerSpawnTransformOffset: {x: 0.5, y: 0.5}
 --- !u!1 &4854112352818235761
 GameObject:
   m_ObjectHideFlags: 0
