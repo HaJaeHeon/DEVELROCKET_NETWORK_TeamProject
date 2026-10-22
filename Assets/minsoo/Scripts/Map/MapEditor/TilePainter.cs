@@ -157,21 +157,7 @@ public class TilePainter : MonoBehaviour
         size = new Vector2Int(source.GetLength(0), source.GetLength(1));
         grid = (TileType[,])source.Clone();
 
-        logicTilemap.ClearAllTiles();
-        visualTilemap.ClearAllTiles();
-
-        var bounds = new BoundsInt(0, 0, 0, size.x, size.y, 1);
-        var logic = new TileBase[size.x * size.y];
-        var visual = new TileBase[size.x * size.y];
-        for (int y = 0; y < size.y; y++)
-            for (int x = 0; x < size.x; x++)
-            {
-                int i = x + y * size.x;   // SetTilesBlock은 x가 먼저 도는 순서
-                logic[i] = tileSet.Logic(grid[x, y]);
-                visual[i] = tileSet.Visual(grid[x, y]);
-            }
-        logicTilemap.SetTilesBlock(bounds, logic);
-        visualTilemap.SetTilesBlock(bounds, visual);
+        MapGridBuilder.Fill(logicTilemap, visualTilemap, tileSet, grid);
 
         lastCell = null;
         CameraCenter();
