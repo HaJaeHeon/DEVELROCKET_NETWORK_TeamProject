@@ -55,10 +55,10 @@ public class UI_ImoteManager : SingletonBehavior<UI_ImoteManager>
                 imote.sprite = imoteSprites[i];
             }
 
-            if (savedSprites != null)
-            {
-                presetGroup.presetSlots[i].GetComponent<ImageSocket>().TryAttach(draggable);
-            }
+            //if (savedSprites != null)
+            //{
+            //    presetGroup.presetSlots[i].GetComponent<ImageSocket>().TryAttach(draggable);
+            //}
 
             draggable.imageId = i.ToString();
             draggable.canvas = targetCanvas;
