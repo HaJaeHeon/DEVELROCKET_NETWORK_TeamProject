@@ -11,21 +11,20 @@ public class ShopTower : MonoBehaviourPunCallbacks
     private GameManager gameManager;
     private ButtonTowerPool pool;
 
-    private void Awake()
+    private void Start()
     {
         gameManager = GameManager.Instance;
         stageManager = GameManager.Instance.StageManager;
         pool = ButtonTowerPool.Instance;
-    }
 
-    public override void OnEnable()
-    {
-        stageManager.OnWaveEnd += SendReroll;
+        if (stageManager != null)
+            stageManager.OnWaveEnd += SendReroll;
     }
 
     private void OnDestroy()
     {
-        stageManager.OnWaveEnd -= SendReroll;
+        if(stageManager != null)
+            stageManager.OnWaveEnd -= SendReroll;
     }
 
 
