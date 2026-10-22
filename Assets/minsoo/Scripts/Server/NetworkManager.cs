@@ -224,6 +224,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (otherPlayer.ActorNumber == prevMasterActor)
         {
             prevMasterActor = -1;
+            PhotonNetwork.LeaveRoom();
             MasterChanged?.Invoke(otherPlayer);
         }
     }
