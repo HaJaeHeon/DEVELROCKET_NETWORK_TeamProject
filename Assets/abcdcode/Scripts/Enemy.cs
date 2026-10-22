@@ -128,7 +128,7 @@ public class Enemy : MultiMono, IEnemy, IdOwn, IPacketer, IPunInstantiateMagicCa
 
     public void Update()
     {
-        if(!PhotonNetwork.IsMasterClient) return;
+        //if(!PhotonNetwork.IsMasterClient) return;
         if(Data == null || path == null || pathIndex >= path.Count) return;
 
         float moveDist = Data.Speed * Time.deltaTime;
