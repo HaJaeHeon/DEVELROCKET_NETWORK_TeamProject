@@ -38,6 +38,8 @@ public class MapEditorUI : MonoBehaviour
     [SerializeField] private TMP_InputField sizeXInput;
     [SerializeField] private TMP_InputField sizeYInput;
     [SerializeField] private Button okButton;
+    [SerializeField] private int minSize = 5;
+    [SerializeField] private int maxSize = 40;   // 맵 내용이 방 프로퍼티로 전송되므로 크기 제한
 
     // 검사, 저장, 게시, 불러오기는 MapEditorController에서 구독해서 처리
     public event Action CheckRequested;
@@ -66,7 +68,7 @@ public class MapEditorUI : MonoBehaviour
         loadButton.onClick.AddListener(() => LoadRequested?.Invoke());
         clearButton.onClick.AddListener(() => painter.Clear());
         homeButton.onClick.AddListener(() => SceneManager.LoadScene(lobbySceneName));
-        okButton.onClick.AddListener(() => SizeChanged?.Invoke(int.Parse(sizeXInput.text), int.Parse(sizeYInput.text)));
+        okButton.onClick.AddListener(OnSizeOk);
         ApplySwatches();
     }
 
@@ -85,6 +87,17 @@ public class MapEditorUI : MonoBehaviour
         SelectBrush((int)TileType.Road);
         RefreshInfo();
         ShowMessage("Left click : Paint\nRight click : Erase\nMap View : Tap");
+    }
+
+    private void OnSizeOk()
+    {
+        if (!int.TryParse(sizeXInput.text, out int x) || !int.TryParse(sizeYInput.text, out int y)
+            || x < minSize || y < minSize || x > maxSize || y > maxSize)
+        {
+            ShowMessage($"Size must be {minSize} ~ {maxSize}.", true);
+            return;
+        }
+        SizeChanged?.Invoke(x, y);
     }
 
     public void SelectBrush(int type)

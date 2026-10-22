@@ -25,6 +25,10 @@ public class PanelController : MonoBehaviour
     {
         NetworkManager.Instance.JoinedLobby += OpenLobby;
         NetworkManager.Instance.JoinedRoom += OpenRoom;
+
+        // 다른 씬(맵 에디터 등)에서 돌아온 경우: 이미 로비/방에 있으면 바로 그 화면으로
+        if (PhotonNetwork.InRoom) Open(PanelId.Room);
+        else if (PhotonNetwork.InLobby) Open(PanelId.Lobby);
     }
 
     private void OnDestroy()

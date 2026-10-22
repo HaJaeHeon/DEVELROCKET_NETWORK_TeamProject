@@ -45,3 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapManager
   tilemap: {fileID: 0}
+  userMapPrefab: {fileID: 8339417105046302206, guid: e8164eddcf2a40a8a29649d9171e497b, type: 3}
+  tileSet: {fileID: 11400000, guid: f1b4cca9cfbd23b4abea30c4eef3ddfe, type: 2}

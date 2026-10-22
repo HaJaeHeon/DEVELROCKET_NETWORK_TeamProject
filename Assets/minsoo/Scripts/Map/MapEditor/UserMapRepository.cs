@@ -49,6 +49,20 @@ public class UserMapRepository
         return maps;
     }
 
+    // 공개된 맵 목록 (요약만, cells 없음 → 고른 뒤 LoadAsync로 가져옴), 최근 순
+    public async Task<List<UserMapData>> ListPublishedAsync()
+    {
+        var snap = await root.Child("MapList").GetValueAsync();
+        var maps = new List<UserMapData>();
+        foreach (var child in snap.Children)
+        {
+            var map = UserMapData.FromSnapshot(child);
+            if (map != null) maps.Add(map);
+        }
+        maps.Sort((a, b) => b.UpdatedAt.CompareTo(a.UpdatedAt));
+        return maps;
+    }
+
     // 맵을 공개 목록에 올림 (저장된 맵이어야 함)
     public async Task PublishAsync(UserMapData data)
     {
