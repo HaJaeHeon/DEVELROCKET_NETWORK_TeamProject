@@ -7,9 +7,6 @@ public class PanelController : MonoBehaviour
 {
     private readonly Dictionary<PanelId, GameObject> panels = new();
 
-    private PanelId curPanel = PanelId.None;
-    private bool isFail;
-
     private string roomName;
 
     private void Awake()
@@ -39,25 +36,7 @@ public class PanelController : MonoBehaviour
     }
 
     public async void Open(PanelId main, PanelId sub = PanelId.None)
-    {
-        // 만약 로그인 실패 시 리턴
-        if(curPanel == PanelId.Login && isFail)
-        {
-            return;
-        }
-
-        // 타이틀에서 로그인한 상태면 문제없으면 바로 로비로 이동
-        //if (curPanel == PanelId.Title)
-        //{
-        //    await AuthManager.Instance.TryAutoLoginAsync();
-        //    if (AuthManager.Instance.Auth.CurrentUser != null)
-        //    {
-        //        main = PanelId.Lobby;
-        //        sub = PanelId.None;
-        //    }
-        //}
-            
-            
+    {             
         // 타이틀로 돌아가는 경우는 로그아웃
         if (main == PanelId.Title)
         {
@@ -66,12 +45,8 @@ public class PanelController : MonoBehaviour
                 PhotonNetwork.Disconnect();
         }
             
-
-
         foreach (var (id, go) in panels)
             go.SetActive(id == main || id == sub);
-
-        curPanel = main;
     }
 
 

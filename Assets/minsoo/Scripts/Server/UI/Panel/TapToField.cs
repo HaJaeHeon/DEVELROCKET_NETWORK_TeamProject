@@ -35,6 +35,6 @@ public class TabToField : MonoBehaviour
 
         int next = (index + 1) % fields.Count;
         fields[next].Select();
-        fields[next].ActivateInputField();
+        //fields[next].ActivateInputField();
     }
 }
