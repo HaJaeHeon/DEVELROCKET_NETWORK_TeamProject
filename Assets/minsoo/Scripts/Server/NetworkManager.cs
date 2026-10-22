@@ -19,6 +19,15 @@ public static class RoomProps
     public const string RandomId = "Random";
     public const string Locked = "locked";
     public const string Password = "pw";
+
+    // 유저 맵: MapId = "user:{firebaseId}", 맵 내용은 아래 키로 함께 보냄
+    public const string UserMapPrefix = "user:";
+    public const string MapName = "MapName";
+    public const string MapWidth = "MapW";
+    public const string MapHeight = "MapH";
+    public const string MapCells = "MapCells";
+
+    public static bool IsUserMap(string id) => id != null && id.StartsWith(UserMapPrefix);
 }
 
 
@@ -40,6 +49,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     private int masterActor = -1;      // 현재 방장
     private int prevMasterActor = -1;  // 바로 직전 방장
 
+    private bool goOffline;
 
     RoomOptions roomOptions;
     byte maxPlayers = 4;
@@ -88,8 +98,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     // Photon 연결
     public async Task<string> Connect()
     {
+        if (PhotonNetwork.OfflineMode) PhotonNetwork.OfflineMode = false;  // 싱글플레이 후 다시 온라인 로그인
         if (PhotonNetwork.IsConnected)
-            return "Is already connected!";
+        {
+            if (PhotonNetwork.InLobby) JoinedLobby?.Invoke();          // 이미 로비 → 로비 화면 열기
+            else if (PhotonNetwork.IsConnectedAndReady && !PhotonNetwork.InRoom)
+                PhotonNetwork.JoinLobby();                              // 마스터 서버에만 붙어 있으면 로비 접속
+            return null;
+        }
 
         try
         {
@@ -155,8 +171,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     public void OnSiglePlay()
     {
-        PhotonNetwork.Disconnect();
-
+        goOffline = true;
+        if (PhotonNetwork.NetworkingClient.IsConnected) PhotonNetwork.Disconnect(); // 끊긴 뒤 OnDisconnected에서 오프라인 전환
+        else PhotonNetwork.OfflineMode = true;                                       // 원래 연결이 없으면 바로 전환
     }
 
     // 로비 - 방 랜덤입장
@@ -207,6 +224,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         if (otherPlayer.ActorNumber == prevMasterActor)
         {
             prevMasterActor = -1;
+            PhotonNetwork.LeaveRoom();
             MasterChanged?.Invoke(otherPlayer);
         }
     }
@@ -243,6 +261,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         string mapId = GetMapId();
 
+        // 유저 맵은 내용까지 방에 들어와 있어야 시작 가능
+        if (RoomProps.IsUserMap(mapId) && !TryGetUserMap(out _, out _))
+        {
+            Debug.LogError("유저 맵 데이터가 아직 방에 없습니다.");
+            return;
+        }
+
         // 이미 실제 맵이 선택돼 있으면 바로 이동
         if (mapId != RoomProps.RandomId)
         {
@@ -276,6 +301,33 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         return "Random";
     }
 
+    // 방에 저장된 유저 맵 복원 (유저 맵이 아니거나 값이 깨졌으면 false)
+    public bool TryGetUserMap(out string name, out TileType[,] grid)
+    {
+        name = null;
+        grid = null;
+
+        var room = PhotonNetwork.CurrentRoom;
+        if (room == null || !RoomProps.IsUserMap(GetMapId())) return false;
+
+        var props = room.CustomProperties;
+        if (!props.TryGetValue(RoomProps.MapCells, out object c) || c is not string cells) return false;
+        if (!props.TryGetValue(RoomProps.MapWidth, out object w) || w is not int width) return false;
+        if (!props.TryGetValue(RoomProps.MapHeight, out object h) || h is not int height) return false;
+
+        try
+        {
+            grid = MapCodec.Decode(cells, width, height);
+        }
+        catch (ArgumentException e)
+        {
+            Debug.LogError(e.Message);
+            return false;
+        }
+        name = props.TryGetValue(RoomProps.MapName, out object n) ? n as string : null;
+        return true;
+    }
+
     public override void OnRoomPropertiesUpdate(Hashtable changed)
     {
         if (!isStarting || !PhotonNetwork.IsMasterClient) return;
@@ -307,10 +359,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnDisconnected(DisconnectCause cause)
     {
         RoomDicts.Clear();
-        PhotonNetwork.OfflineMode = true;
+        if (goOffline)
+        {
+            goOffline = false;
+            PhotonNetwork.OfflineMode = true;
+        }
         Debug.LogWarning($"Photon Connect Failed : {cause}");
     }
-
 
     public override void OnLeftLobby()
     {

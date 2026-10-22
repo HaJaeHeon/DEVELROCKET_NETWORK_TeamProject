@@ -1,6 +1,7 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,9 +15,6 @@ public class UI_ImoteManager : SingletonBehavior<UI_ImoteManager>
     [SerializeField] private List<Sprite> imoteSprites = new List<Sprite>();
     [SerializeField] private Transform contentTransform;
     [SerializeField] private GameObject imotePrefab;
-    
-
-
 
     private void Start()
     {
@@ -31,21 +29,42 @@ public class UI_ImoteManager : SingletonBehavior<UI_ImoteManager>
 
         Canvas targetCanvas = contentTransform.GetComponentInParent<Canvas>(true);
 
+        var properties = PhotonNetwork.LocalPlayer.CustomProperties;
+
+        int[] savedSprites = null;
+
+        if (properties.TryGetValue(PRESETIMOTE, out object value) && value is int[] spriteIds)
+        {
+            savedSprites = spriteIds;
+            Debug.Log($"저장된 이모티콘 번호 : {string.Join(", ", spriteIds)}");
+        }
+        else
+        {
+            Debug.LogWarning("저장된 이모티콘이 없습니다.");
+        }
+
         for (int i = 0; i < imoteSprites.Count; i++)
         {
             GameObject go = Instantiate(imotePrefab, contentTransform);
             Image[] images = go.GetComponentsInChildren<Image>(true);
+
+            DraggableImage draggable = go.GetComponentInChildren<DraggableImage>(true);
 
             foreach (Image imote in images)
             {
                 imote.sprite = imoteSprites[i];
             }
 
-            DraggableImage draggable = go.GetComponentInChildren<DraggableImage>(true);
+            //if (savedSprites != null)
+            //{
+            //    presetGroup.presetSlots[i].GetComponent<ImageSocket>().TryAttach(draggable);
+            //}
 
             draggable.imageId = i.ToString();
             draggable.canvas = targetCanvas;
             draggable.rootPanel = targetCanvas.gameObject;
+
+            
         }
     }
 

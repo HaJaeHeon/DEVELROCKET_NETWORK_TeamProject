@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.UI;
@@ -19,8 +20,10 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
     [SerializeField] private GameObject inventoryContent;
     [SerializeField] private ShopTower shopTower;
 
+    private List<GameObject> shopObjectList = new List<GameObject>();
 
-    private const int SHOPMAXCOUNT = 3;
+
+    public const int SHOPMAXCOUNT = 3;
 
     private IObjectPool<GameObject> pool;
 
@@ -99,6 +102,8 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
             }
 
             towerButton.onClick.AddListener(() => bt.GetTowerData(buttonTower));
+
+            shopObjectList.Add(buttonTower);
         }
         else if (type == UIType.Inventory)
         {
@@ -122,10 +127,25 @@ public class ButtonTowerPool : SingletonBehavior<ButtonTowerPool>
         //{
         //    obj.GetComponent<Button>().onClick.RemoveAllListeners();
         //}
+
+        shopObjectList.Remove(obj);
+
         obj.GetComponent<Button>().onClick.RemoveAllListeners();
 
         pool.Release(obj);
     }
+
+    public void ClearShopObjects()
+    {
+        for (int i = shopObjectList.Count - 1; i >= 0; i--)
+        {
+            Return(shopObjectList[i]);
+        }
+    }
+
+
+
+
     private void OnDestroy()
     {
         pool?.Clear();

@@ -10,6 +10,10 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
     [SerializeField] private Tilemap tilemap;
     [SerializeField] private MapDB mapDB;
 
+    [Header("User Map")]
+    [SerializeField] private GameObject userMapPrefab;   // 빈 Grid (Logic, Image 타일맵)
+    [SerializeField] private MapTileSet tileSet;         // 맵 에디터와 같은 타일 세트
+
     private TileType[,] grid;
     private readonly List<Vector2Int> startCells = new();
     private Vector2Int endPos;
@@ -28,6 +32,15 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
     {
         string mapID = NetworkManager.Instance.GetMapId();
 
+        if (RoomProps.IsUserMap(mapID))
+        {
+            if (!LoadUserMap())
+            {
+                Debug.LogError("유저 맵을 불러오지 못해 기본 맵으로 대체합니다.");
+                mapID = mapDB.MapDatas[0].Id;
+            }
+        }
+
         foreach (var map in mapDB.MapDatas)
         {
             if (map.Id == mapID)
@@ -42,6 +55,21 @@ public class MapManager : SingletonBehavior<MapManager>, IMap
         Camera cam = Camera.main;
         cam.transform.position = new Vector3(tilemap.size.x / 2, tilemap.size.y / 2, -10);
 
+    }
+
+    // 방에 들어있는 유저 맵 격자로 타일맵 생성
+    private bool LoadUserMap()
+    {
+        if (!NetworkManager.Instance.TryGetUserMap(out string mapName, out TileType[,] userGrid)) return false;
+
+        GameObject instance = Instantiate(userMapPrefab, Vector3.zero, Quaternion.identity);
+        instance.name = $"UserMap_{mapName}";
+        var logic = instance.transform.Find("Logic").GetComponent<Tilemap>();
+        var visual = instance.transform.Find("Image").GetComponent<Tilemap>();
+
+        MapGridBuilder.Fill(logic, visual, tileSet, userGrid);
+        tilemap = logic;
+        return true;
     }
 
     private void GetGridTileType()
